@@ -51,7 +51,7 @@ public class GreenifierPortfolio : Portfolio {
                 workload,
                 operationalPhenomena,
                 allocationPolicy,
-                mapOf("topology" to topology.name, "workload" to workload.name)
+                mapOf("topology" to topology.name, "workload" to workload.name, "allocationPolicy" to allocationPolicy)
             )
         }
     }

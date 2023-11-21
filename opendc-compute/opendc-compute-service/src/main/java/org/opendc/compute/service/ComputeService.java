@@ -37,6 +37,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.SplittableRandom;
 import java.util.UUID;
+
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opendc.common.Dispatcher;
@@ -52,6 +55,7 @@ import org.opendc.compute.service.driver.HostModel;
 import org.opendc.compute.service.driver.HostState;
 import org.opendc.compute.service.scheduler.ComputeScheduler;
 import org.opendc.compute.service.telemetry.SchedulerStats;
+import org.opendc.simulator.compute.workload.SimWorkload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,7 +165,7 @@ public final class ComputeService implements AutoCloseable {
 
             serviceServer.setState(newState);
 
-            if (newState == ServerState.TERMINATED || newState == ServerState.DELETED) {
+            if (newState == ServerState.TERMINATED || newState == ServerState.ERROR || newState == ServerState.DELETED) {
                 LOGGER.info("Server {} {} {} finished", server.getUid(), server.getName(), server.getFlavor());
 
                 if (activeServers.remove(server) != null) {
@@ -578,9 +582,29 @@ public final class ComputeService implements AutoCloseable {
             isClosed = true;
         }
 
+
         @Override
         public String toString() {
             return "ComputeService.Client";
+        }
+
+        @Nullable
+        @Override
+        public void rescheduleServer(
+            @NotNull Server server,
+            @NotNull SimWorkload workload)
+        {
+            ServiceServer internalServer = (ServiceServer) findServer(server.getUid());
+            Host from = service.lookupHost(internalServer);
+
+            from.delete(internalServer);
+
+            internalServer.host = null;
+
+//            Map<String, Object> meta = internalServer.getMeta();
+//            meta.get("workload") = workload;
+
+            internalServer.start();
         }
     }
 

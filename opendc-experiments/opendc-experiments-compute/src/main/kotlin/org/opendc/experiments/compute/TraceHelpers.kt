@@ -33,6 +33,7 @@ import org.opendc.compute.api.Server
 import org.opendc.compute.api.ServerState
 import org.opendc.compute.api.ServerWatcher
 import org.opendc.compute.service.ComputeService
+import org.opendc.simulator.compute.workload.SimRuntimeWorkload
 import java.time.InstantSource
 import java.util.Random
 import kotlin.coroutines.coroutineContext
@@ -56,9 +57,9 @@ public class RunningServerWatcher: ServerWatcher {
             ServerState.TERMINATED -> {
                 _mutex.unlock()
             }
-            ServerState.ERROR -> {
-                _mutex.unlock()
-            }
+//            ServerState.ERROR -> {
+//                _mutex.unlock()
+//            }
             ServerState.DELETED -> {
                 _mutex.unlock()
             }
@@ -116,7 +117,10 @@ public suspend fun ComputeService.replay(
                     delay(max(0, (start - now - simulationOffset)));
                 }
 
-                val workload = entry.trace.createWorkload(start)
+                val workload = SimRuntimeWorkload(
+                    (entry.stopTime.toEpochMilli() - entry.startTime.toEpochMilli()),
+                    1.0,
+                )
                 val meta = mutableMapOf<String, Any>("workload" to workload)
 
                 val interferenceProfile = entry.interferenceProfile

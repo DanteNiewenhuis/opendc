@@ -40,6 +40,7 @@ dependencies {
     implementation(projects.opendcSimulator.opendcSimulatorCompute)
 
     implementation(libs.kotlin.logging)
+    implementation(project(mapOf("path" to ":opendc-trace:opendc-trace-failure")))
 
     testImplementation(libs.slf4j.simple)
 }

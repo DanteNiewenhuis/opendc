@@ -185,8 +185,11 @@ public class SimHost(
     }
 
     override fun delete(server: Server) {
-        val guest = guests[server] ?: return
+        val guest: Guest = guests[server] ?: return
         guest.delete()
+
+        guests.remove(server);
+        _guests.remove(guest);
     }
 
     override fun addListener(listener: HostListener) {
@@ -306,7 +309,7 @@ public class SimHost(
                     _state = HostState.UP
                     hypervisor.onStart(ctx)
 
-                    // Recover the guests that were running on the hypervisor.
+//                  Recover the guests that were running on the hypervisor.
                     for (guest in _guests) {
                         guest.recover()
                     }
