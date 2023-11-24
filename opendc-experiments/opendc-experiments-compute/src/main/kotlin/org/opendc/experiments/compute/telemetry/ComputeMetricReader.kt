@@ -39,6 +39,7 @@ import org.opendc.experiments.compute.telemetry.table.ServerTableReader
 import org.opendc.experiments.compute.telemetry.table.ServiceTableReader
 import java.time.Duration
 import java.time.Instant
+import kotlin.math.max
 
 /**
  * A helper class to collect metrics from a [ComputeService] instance and automatically export the metrics every
@@ -278,22 +279,30 @@ public class ComputeMetricReader(
         private var _cpuUtilization = 0.0
 
         override val cpuActiveTime: Long
-            get() = _cpuActiveTime - previousCpuActiveTime
+            // Due to the implementation of failure in OpenDC this can get below 0.
+            // Prevent this by clamping the value to 0.
+            get() = max(_cpuActiveTime - previousCpuActiveTime, 0)
         private var _cpuActiveTime = 0L
         private var previousCpuActiveTime = 0L
 
         override val cpuIdleTime: Long
-            get() = _cpuIdleTime - previousCpuIdleTime
+            // Due to the implementation of failure in OpenDC this can get below 0.
+            // Prevent this by clamping the value to 0.
+            get() = max(_cpuIdleTime - previousCpuIdleTime, 0)
         private var _cpuIdleTime = 0L
         private var previousCpuIdleTime = 0L
 
         override val cpuStealTime: Long
-            get() = _cpuStealTime - previousCpuStealTime
+            // Due to the implementation of failure in OpenDC this can get below 0.
+            // Prevent this by clamping the value to 0.
+            get() = max(_cpuStealTime - previousCpuStealTime, 0)
         private var _cpuStealTime = 0L
         private var previousCpuStealTime = 0L
 
         override val cpuLostTime: Long
-            get() = _cpuLostTime - previousCpuLostTime
+            // Due to the implementation of failure in OpenDC this can get below 0.
+            // Prevent this by clamping the value to 0.
+            get() = max(_cpuLostTime - previousCpuLostTime, 0)
         private var _cpuLostTime = 0L
         private var previousCpuLostTime = 0L
 
@@ -302,17 +311,19 @@ public class ComputeMetricReader(
         private var _powerUsage = 0.0
 
         override val powerTotal: Double
-            get() = _powerTotal - previousPowerTotal
+            // Due to the implementation of failure in OpenDC this can get below 0.
+            // Prevent this by clamping the value to 0.
+            get() = max(_powerTotal - previousPowerTotal, 0.0)
         private var _powerTotal = 0.0
         private var previousPowerTotal = 0.0
 
         override val uptime: Long
-            get() = _uptime - previousUptime
+            get() = max(_uptime - previousUptime, 0)
         private var _uptime = 0L
         private var previousUptime = 0L
 
         override val downtime: Long
-            get() = _downtime - previousDowntime
+            get() = max(_downtime - previousDowntime, 0)
         private var _downtime = 0L
         private var previousDowntime = 0L
 
@@ -427,12 +438,12 @@ public class ComputeMetricReader(
             get() = _timestamp
 
         override val uptime: Long
-            get() = _uptime - previousUptime
+            get() = max(_uptime - previousUptime, 0)
         private var _uptime: Long = 0
         private var previousUptime = 0L
 
         override val downtime: Long
-            get() = _downtime - previousDowntime
+            get() = max(_downtime - previousDowntime, 0)
         private var _downtime: Long = 0
         private var previousDowntime = 0L
 
@@ -449,22 +460,22 @@ public class ComputeMetricReader(
         private var _cpuLimit = 0.0
 
         override val cpuActiveTime: Long
-            get() = _cpuActiveTime - previousCpuActiveTime
+            get() = max(_cpuActiveTime - previousCpuActiveTime, 0)
         private var _cpuActiveTime = 0L
         private var previousCpuActiveTime = 0L
 
         override val cpuIdleTime: Long
-            get() = _cpuIdleTime - previousCpuIdleTime
+            get() = max(_cpuIdleTime - previousCpuIdleTime, 0)
         private var _cpuIdleTime = 0L
         private var previousCpuIdleTime = 0L
 
         override val cpuStealTime: Long
-            get() = _cpuStealTime - previousCpuStealTime
+            get() = max(_cpuStealTime - previousCpuStealTime, 0)
         private var _cpuStealTime = 0L
         private var previousCpuStealTime = 0L
 
         override val cpuLostTime: Long
-            get() = _cpuLostTime - previousCpuLostTime
+            get() = max(_cpuLostTime - previousCpuLostTime, 0)
         private var _cpuLostTime = 0L
         private var previousCpuLostTime = 0L
 

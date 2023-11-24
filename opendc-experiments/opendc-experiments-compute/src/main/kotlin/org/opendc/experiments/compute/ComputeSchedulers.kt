@@ -43,6 +43,8 @@ import java.util.random.RandomGenerator
 public fun createComputeScheduler(name: String, seeder: RandomGenerator, placements: Map<String, String> = emptyMap()): ComputeScheduler {
     val cpuAllocationRatio = 16.0
     val ramAllocationRatio = 1.5
+//    val cpuAllocationRatio = 1.0
+//    val ramAllocationRatio = 1.0
     return when (name) {
         "mem" -> FilterScheduler(
             filters = listOf(ComputeFilter(), VCpuFilter(cpuAllocationRatio), RamFilter(ramAllocationRatio)),

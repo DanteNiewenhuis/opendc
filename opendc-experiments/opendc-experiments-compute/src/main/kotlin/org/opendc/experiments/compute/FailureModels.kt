@@ -121,7 +121,6 @@ public class TraceBasedFaultInjector(
      */
     private var job: Job? = null
 
-    // TODO: replace with traceName
     private var failureList = FailureTraceReader.get(Paths.get("resources/failure_traces/$traceName")).iterator()
 
     /**

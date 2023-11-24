@@ -71,7 +71,9 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
     }
 
     @Override
-    public void setOffset(long now) {}
+    public void setOffset(long now) {
+        this.lastUpdate = now;
+    }
 
     @Override
     public void onStart(SimMachineContext ctx) {

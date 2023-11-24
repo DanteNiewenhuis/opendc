@@ -188,8 +188,8 @@ public class SimHost(
         val guest: Guest = guests[server] ?: return
         guest.delete()
 
-        guests.remove(server);
-        _guests.remove(guest);
+//        guests.remove(server);
+//        _guests.remove(guest);
     }
 
     override fun addListener(listener: HostListener) {

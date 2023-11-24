@@ -604,6 +604,9 @@ public final class ComputeService implements AutoCloseable {
 //            Map<String, Object> meta = internalServer.getMeta();
 //            meta.get("workload") = workload;
 
+//            service.
+
+            internalServer.setWorkload(workload);
             internalServer.start();
         }
     }
