@@ -200,7 +200,7 @@ public class InstantMigrationHostFault(
         val client = service.newClient()
 
         for (host in victims) {
-            val servers = host.instances // TODO: why is did shuffled?
+            val servers = host.instances
             val snapshots = servers.map { (it.meta["workload"] as SimRuntimeWorkload).snapshot() }
             host.fail()
 

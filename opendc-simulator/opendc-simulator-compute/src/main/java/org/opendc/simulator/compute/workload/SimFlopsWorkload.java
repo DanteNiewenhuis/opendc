@@ -64,6 +64,9 @@ public class SimFlopsWorkload implements SimWorkload, FlowStageLogic {
     }
 
     @Override
+    public void createCheckpoint() {}
+
+    @Override
     public void setOffset(long now) {}
 
     @Override

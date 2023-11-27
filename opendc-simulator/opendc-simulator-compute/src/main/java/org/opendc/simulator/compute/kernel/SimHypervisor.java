@@ -73,6 +73,9 @@ public final class SimHypervisor implements SimWorkload {
     private final HvCounters counters = new HvCounters();
 
     @Override
+    public void createCheckpoint() {}
+
+    @Override
     public void setOffset(long now) {}
 
     /**

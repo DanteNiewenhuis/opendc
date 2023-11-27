@@ -617,7 +617,6 @@ public final class ComputeService implements AutoCloseable {
     static class SchedulingRequest {
         final ServiceServer server;
         final long submitTime;
-
         boolean isCancelled;
 
         SchedulingRequest(ServiceServer server, long submitTime) {

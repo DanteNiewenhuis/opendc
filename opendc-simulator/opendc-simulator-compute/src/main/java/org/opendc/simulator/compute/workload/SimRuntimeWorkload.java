@@ -43,6 +43,12 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
     private long remainingDuration;
     private long lastUpdate;
 
+    private long checkpoint;
+
+    private long check_time =  300000; // How long does it take to make a checkpoint?
+    private long check_wait = 3600000; // How long to wait until a new checkpoint is made?
+    private long total_checks;
+
     private final long duration;
     private final double utilization;
 
@@ -62,9 +68,13 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
             throw new IllegalArgumentException("Utilization must be in (0, 1]");
         }
 
+        this.total_checks = (duration / this.check_wait) - 2;
+        duration = duration + (this.check_time * total_checks);
+
         this.duration = duration;
         this.utilization = utilization;
         this.remainingDuration = duration;
+        this.checkpoint = duration;
 
         this.cpuCount = 0;
         this.cpuCapacity = 0;
@@ -74,6 +84,12 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
     public void setOffset(long now) {
         this.lastUpdate = now;
     }
+
+    @Override
+    public void createCheckpoint() {
+        this.checkpoint = this.remainingDuration;
+    }
+
 
     @Override
     public void onStart(SimMachineContext ctx) {
@@ -118,7 +134,15 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
             stage.sync();
         }
 
-        return new SimRuntimeWorkload(remainingDuration, utilization);
+        // Calculate last checkpoint
+        var total_check_time = this.check_wait + this.check_time;
+        var processed_time = this.duration - this.remainingDuration;
+        var processed_checks = processed_time / total_check_time;
+        var closest_check = (processed_checks * total_check_time);
+        var remaining_checks = this.total_checks - processed_checks;
+        var remaining_time =  this.duration - closest_check - (remaining_checks * this.check_time);
+
+        return new SimRuntimeWorkload(remaining_time, utilization);
     }
 
     @Override
@@ -135,6 +159,7 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
             return Long.MAX_VALUE;
         }
 
+        // workload is completed
         if (duration <= 0) {
             final SimMachineContext machineContext = this.ctx;
             if (machineContext != null) {

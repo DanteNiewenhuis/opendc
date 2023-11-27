@@ -79,7 +79,7 @@ public class ComputeMetricReader(
      * The background job that is responsible for collecting the metrics every cycle.
      */
     private val job = scope.launch {
-//        loggState()
+        loggState()
 
         val intervalMs = exportInterval.toMillis()
         try {

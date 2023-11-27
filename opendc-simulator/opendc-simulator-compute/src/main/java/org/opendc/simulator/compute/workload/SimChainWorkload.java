@@ -61,6 +61,13 @@ final class SimChainWorkload implements SimWorkload {
     }
 
     @Override
+    public void createCheckpoint() {
+        for (SimWorkload workload : this.workloads) {
+            workload.createCheckpoint();
+        }
+    }
+
+    @Override
     public void setOffset(long now) {
         for (SimWorkload workload : this.workloads) {
             workload.setOffset(now);

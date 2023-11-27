@@ -52,4 +52,5 @@ public interface SimWorkload {
     SimWorkload snapshot();
 
     void setOffset(long now);
+    void createCheckpoint();
 }

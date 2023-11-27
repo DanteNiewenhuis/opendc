@@ -225,6 +225,9 @@ public final class SimTrace {
         }
 
         @Override
+        public void createCheckpoint() {}
+
+        @Override
         public void setOffset(long now) {
             this.offset = now - this.start;
         }
