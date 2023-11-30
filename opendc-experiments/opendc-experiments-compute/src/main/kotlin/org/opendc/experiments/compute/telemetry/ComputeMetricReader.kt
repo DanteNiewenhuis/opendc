@@ -295,6 +295,7 @@ public class ComputeMetricReader(
         private var _cpuLostTime = 0L
         private var previousCpuLostTime = 0L
 
+        // TODO: add powerUsage to the parquet output!!!
         override val powerUsage: Double
             get() = _powerUsage
         private var _powerUsage = 0.0

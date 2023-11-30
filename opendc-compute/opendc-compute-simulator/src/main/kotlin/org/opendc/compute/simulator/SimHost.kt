@@ -96,8 +96,8 @@ public class SimHost(
         }
 
     private val model: HostModel = HostModel(
-        machine.model.cpus.sumOf { it.frequency },
-        machine.model.cpus.size,
+        machine.model.cpus.sumOf { it.frequency }, // TODO: look at this
+        machine.model.cpus.sumOf { it.node.coreCount }, // TODO: look at this
         machine.model.memory.sumOf { it.size }
     )
 

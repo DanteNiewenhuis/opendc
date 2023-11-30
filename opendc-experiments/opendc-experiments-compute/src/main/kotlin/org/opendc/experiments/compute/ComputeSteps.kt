@@ -43,7 +43,7 @@ import java.time.Duration
 public fun setupComputeService(
     serviceDomain: String,
     scheduler: (ProvisioningContext) -> ComputeScheduler,
-    schedulingQuantum: Duration = Duration.ofMinutes(5)
+    schedulingQuantum: Duration = Duration.ofMillis(1)
 ): ProvisioningStep {
     return ComputeServiceProvisioningStep(serviceDomain, scheduler, schedulingQuantum)
 }
@@ -59,7 +59,7 @@ public fun setupComputeService(
 public fun registerComputeMonitor(
     serviceDomain: String,
     monitor: ComputeMonitor,
-    exportInterval: Duration = Duration.ofMinutes(5)
+    exportInterval: Duration = Duration.ofSeconds(30)
 ): ProvisioningStep {
     return ComputeMonitorProvisioningStep(serviceDomain, monitor, exportInterval)
 }

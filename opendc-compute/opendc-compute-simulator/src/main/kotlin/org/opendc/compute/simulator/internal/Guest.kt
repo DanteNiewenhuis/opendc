@@ -220,7 +220,7 @@ internal class Guest(
     private var _downtime = 0L
     private var _lastReport = clock.millis()
     private var _bootTime: Instant? = null
-    private val _cpuLimit = machine.model.cpus.sumOf { it.frequency }
+    private val _cpuLimit = machine.model.cpus.sumOf { it.frequency * it.node.coreCount } // Fixme: make based on corecount
 
     /**
      * Helper function to track the uptime and downtime of the guest.

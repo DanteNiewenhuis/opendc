@@ -129,6 +129,7 @@ public class SimPsuFactories {
         private final InHandler handler = new InHandler() {
             @Override
             public void onPush(InPort port, float demand) {
+                var port_demand = port.getDemand();
                 totalUsage += -port.getDemand() + demand;
             }
 

@@ -420,7 +420,7 @@ public final class ComputeService implements AutoCloseable {
     public static class Builder {
         private final Dispatcher dispatcher;
         private final ComputeScheduler computeScheduler;
-        private Duration quantum = Duration.ofMinutes(5);
+        private Duration quantum = Duration.ofSeconds(15);
 
         Builder(Dispatcher dispatcher, ComputeScheduler computeScheduler) {
             this.dispatcher = dispatcher;
