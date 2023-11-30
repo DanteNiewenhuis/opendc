@@ -72,14 +72,14 @@ public class SurfsaraRunner(
 
             if (outputPath != null) {
                 val partitions = scenario.partitions + ("seed" to seed.toString())
-                val partition = partitions.map { (k, v) -> "$k=$v" }.joinToString("_")
+                val partition = partitions.map { (k, v) -> "$k=$v" }.joinToString("/")
 
                 provisioner.runStep(
                     registerComputeMonitor(
                         serviceDomain,
                         ParquetComputeMonitor(
                             outputPath,
-                            "${partitions.get("workload")}/${partitions.get("topology")}_${partitions.get("seed")}",
+                            partition,
                             bufferSize = 4096
                         )
                     )
