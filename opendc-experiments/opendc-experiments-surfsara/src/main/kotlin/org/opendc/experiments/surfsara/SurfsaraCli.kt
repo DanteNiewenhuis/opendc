@@ -52,7 +52,7 @@ fun main(args: Array<String>): Unit = SurfsaraCommand().main(args)
 /**
  * Represents the command for the Surfsara experiments.
  */
-internal class SurfsaraCommand : CliktCommand(name = "surfsara") {
+internal class SurfsaraCommand : CliktCommand(name = "traces/surfsara") {
     /**
      * The path to the environment directory.
      */
@@ -105,7 +105,7 @@ internal class SurfsaraCommand : CliktCommand(name = "surfsara") {
      */
     private val portfolio by argument(help = "portfolio to replay")
         .choice(
-            "surfsara" to { SurfsaraPortfolio() },
+            "traces/surfsara" to { SurfsaraPortfolio() },
         )
         .default({SurfsaraPortfolio()})
 

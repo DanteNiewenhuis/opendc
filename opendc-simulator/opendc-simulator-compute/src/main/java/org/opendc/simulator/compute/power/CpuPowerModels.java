@@ -59,6 +59,10 @@ public class CpuPowerModels {
         return new LinearPowerModel(maxPower, idlePower);
     }
 
+    public static CpuPowerModel ifelse(double maxPower, double idlePower) {
+        return new IfElsePowerModel(maxPower, idlePower);
+    }
+
     /**
      * Construct a square {@link CpuPowerModel} that is adapted from CloudSim.
      *
@@ -163,6 +167,28 @@ public class CpuPowerModels {
             return getClass().getSimpleName() + "[max=" + maxPower + ",idle=" + idlePower + "]";
         }
     }
+
+    private static final class IfElsePowerModel extends MaxIdlePowerModel {
+        private final double factor;
+
+        IfElsePowerModel(double maxPower, double idlePower) {
+                super(maxPower, idlePower);
+                this.factor = (maxPower - idlePower) / 100;
+        }
+
+        @Override
+        public double computePower(double utilization) {
+            if (utilization < 0.2) {
+                utilization = Math.random();
+            }
+            else {
+                utilization = 1;
+            }
+
+            return idlePower + factor * utilization * 100;
+        }
+    }
+
 
     private static final class SqrtPowerModel extends MaxIdlePowerModel {
         private final double factor;

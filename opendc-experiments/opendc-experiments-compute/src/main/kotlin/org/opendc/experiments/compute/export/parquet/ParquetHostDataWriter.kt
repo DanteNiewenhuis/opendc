@@ -166,7 +166,7 @@ public class ParquetHostDataWriter(path: File, bufferSize: Int) :
             .addFields(
                 Types
                     .required(PrimitiveType.PrimitiveTypeName.INT64)
-                    .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
+                    .`as`(LogicalTypeAnnotation.timestampType(false, LogicalTypeAnnotation.TimeUnit.MILLIS))
                     .named("timestamp"),
                 Types
                     .required(PrimitiveType.PrimitiveTypeName.BINARY)
