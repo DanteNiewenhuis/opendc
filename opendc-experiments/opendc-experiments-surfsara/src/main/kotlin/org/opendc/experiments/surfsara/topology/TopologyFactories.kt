@@ -88,7 +88,7 @@ private fun ClusterSpec.toHostSpecs(random: RandomGenerator, powerModel: CpuPowe
     val unknownProcessingNode = ProcessingNode("unknown", "unknown", "unknown", coreCount)
     val unknownMemoryUnit = MemoryUnit("unknown", "unknown", -1.0, memoryPerHost)
     val machineModel = MachineModel(
-        List(cpuCount) { coreId -> ProcessingUnit(unknownProcessingNode, coreId, actualCpuSpeed) },
+        List(cpuCount) { cpuId -> ProcessingUnit(unknownProcessingNode, cpuId, actualCpuSpeed) },
         listOf(unknownMemoryUnit)
     )
 
