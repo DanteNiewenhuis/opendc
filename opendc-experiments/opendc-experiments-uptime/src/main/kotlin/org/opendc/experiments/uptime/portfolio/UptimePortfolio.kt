@@ -33,24 +33,37 @@ import org.opendc.experiments.compute.trace
  * A [Portfolio] that explores the difference between horizontal and vertical scaling.
  */
 public class UptimePortfolio : Portfolio {
-    private val topologies = listOf(
-        Topology("single"),
-        Topology("multi"),
+    private val topology = Topology("single")
+
+    private val workload = Workload("bitbrains-small", trace("trace").sampleByLoad(1.0));
+
+    private val check_times = listOf(
+        5 * 60000L, // 5 minutes
     )
 
-    private val workloads = listOf(
-        Workload("bitbrains-small", trace("trace").sampleByLoad(1.0)),
+    private val check_waits = listOf(
+        30 * 60000L, // 30 minutes
+        60 * 60000L,
+        90 * 60000L,
+        2 * 60 * 60000L,
+        5 * 60 * 60000L,
+        10 * 60 * 60000L,
+        50 * 60 * 60000L,
+        100 * 60 * 60000L,
     )
+
     private val operationalPhenomena = OperationalPhenomena(0.0, false)
     private val allocationPolicy = "active-servers"
 
-    override val scenarios: Iterable<Scenario> = topologies.flatMap { topology ->
-        workloads.map { workload ->
+    override val scenarios: Iterable<Scenario> = check_times.flatMap { check_time ->
+        check_waits.map { check_wait ->
             Scenario(
                 topology,
                 workload,
                 operationalPhenomena,
                 allocationPolicy,
+                check_time,
+                check_wait,
                 mapOf("topology" to topology.name, "workload" to workload.name)
             )
         }

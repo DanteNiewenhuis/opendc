@@ -82,6 +82,8 @@ public class RunningServerWatcher: ServerWatcher {
 public suspend fun ComputeService.replay(
     clock: InstantSource,
     trace: List<VirtualMachine>,
+    check_time: Long,
+    check_wait: Long,
     seed: Long,
     submitImmediately: Boolean = false,
     failureModel: FailureModel? = null,
@@ -120,6 +122,8 @@ public suspend fun ComputeService.replay(
                 val workload = SimRuntimeWorkload(
                     (entry.stopTime.toEpochMilli() - entry.startTime.toEpochMilli()),
                     1.0,
+                    check_time,
+                    check_wait
                 )
                 val meta = mutableMapOf<String, Any>("workload" to workload)
 

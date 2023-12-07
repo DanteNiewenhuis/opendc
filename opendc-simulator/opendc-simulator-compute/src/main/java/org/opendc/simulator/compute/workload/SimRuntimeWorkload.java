@@ -45,8 +45,8 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
 
     private long checkpoint;
 
-    private long check_time =  300000; // How long does it take to make a checkpoint?
-    private long check_wait = 3600000; // How long to wait until a new checkpoint is made?
+    private long check_time; // How long does it take to make a checkpoint?
+    private long check_wait; // How long to wait until a new checkpoint is made?
     private long total_checks;
 
     private final long duration;
@@ -60,13 +60,18 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
      *
      * @param duration The duration of the workload in milliseconds.
      * @param utilization The CPU utilization of the workload.
+     * @param check_time The time it takes to make a checkpoint
+     * @param check_wait The time a server waits until it makes a checkpoint
      */
-    public SimRuntimeWorkload(long duration, double utilization) {
+    public SimRuntimeWorkload(long duration, double utilization, long check_time, long check_wait) {
         if (duration < 0) {
             throw new IllegalArgumentException("Duration must be positive");
         } else if (utilization <= 0.0 || utilization > 1.0) {
             throw new IllegalArgumentException("Utilization must be in (0, 1]");
         }
+
+        this.check_time = check_time;
+        this.check_wait = check_wait;
 
         this.total_checks = (duration / this.check_wait) - 2;
         duration = duration + (this.check_time * total_checks);
@@ -142,7 +147,7 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
         var remaining_checks = this.total_checks - processed_checks;
         var remaining_time =  this.duration - closest_check - (remaining_checks * this.check_time);
 
-        return new SimRuntimeWorkload(remaining_time, utilization);
+        return new SimRuntimeWorkload(remaining_time, utilization, this.check_time, this.check_wait);
     }
 
     @Override

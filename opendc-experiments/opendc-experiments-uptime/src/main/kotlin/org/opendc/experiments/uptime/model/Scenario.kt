@@ -36,5 +36,7 @@ public data class Scenario(
     val workload: Workload,
     val operationalPhenomena: OperationalPhenomena,
     val allocationPolicy: String,
-    val partitions: Map<String, String> = emptyMap()
+    val check_time: Long,
+    val check_wait: Long,
+    val partitions: Map<String, String> = emptyMap(),
 )

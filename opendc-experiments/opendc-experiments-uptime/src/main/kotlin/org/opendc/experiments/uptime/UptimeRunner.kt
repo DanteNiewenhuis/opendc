@@ -71,6 +71,7 @@ public class UptimeRunner(
                 setupHosts(serviceDomain, topology, optimize = true)
             )
 
+
             if (outputPath != null) {
                 val partitions = scenario.partitions + ("seed" to seed.toString())
                 val partition = partitions.map { (k, v) -> "$k=$v" }.joinToString("/")
@@ -80,7 +81,7 @@ public class UptimeRunner(
                         serviceDomain,
                         ParquetComputeMonitor(
                             outputPath,
-                            partition,
+                            "${scenario.check_time}_${scenario.check_wait}",
                             bufferSize = 4096
                         )
                     )
@@ -98,7 +99,9 @@ public class UptimeRunner(
 //                }
             val failureModel = cloudUptimeArchive("single_failure.csv")
 
-            service.replay(timeSource, vms, seed, failureModel = failureModel, interference = operationalPhenomena.hasInterference)
+            service.replay(timeSource, vms, scenario.check_time, scenario.check_wait,
+                           seed, failureModel = failureModel,
+                           interference = operationalPhenomena.hasInterference)
         }
     }
 }
