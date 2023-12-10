@@ -37,35 +37,58 @@ public class UptimePortfolio : Portfolio {
 
     private val workload = Workload("bitbrains-small", trace("trace").sampleByLoad(1.0));
 
-    private val check_times = listOf(
+    private val checkTimes = listOf(
         5 * 60000L, // 5 minutes
     )
 
-    private val check_waits = listOf(
+    private val checkWaits = listOf(
         30 * 60000L, // 30 minutes
-        60 * 60000L,
-        90 * 60000L,
-        2 * 60 * 60000L,
-        5 * 60 * 60000L,
-        10 * 60 * 60000L,
-        50 * 60 * 60000L,
-        100 * 60 * 60000L,
+//        60 * 60000L,
+//        2 * 60 * 60000L,
+//        4 * 60 * 60000L,
+//        6 * 60 * 60000L,
+//        12 * 60 * 60000L,
+//        24 * 60 * 60000L, // 1 day
+//        24 * 80 * 60000L, // 1 day
+//        24 * 100 * 60000L, // 1 day
+//        2 * 24 * 60 * 60000L, // 1 day
+//        3 * 24 * 60 * 60000L, // 1 day
+//        4 * 24 * 60 * 60000L, // 1 day
+//        5 * 24 * 60 * 60000L,
+//        7 * 24 * 60 * 60000L,
+//        8 * 24 * 60 * 60000L,
+//        9 * 24 * 60 * 60000L,
+//        10 * 24 * 60 * 60000L,
+//        11 * 24 * 60 * 60000L,
+//        12 * 24 * 60 * 60000L,
+//        15 * 24 * 60 * 60000L,
+//        20 * 24 * 60 * 60000L,
+//        30 * 24 * 60 * 60000L,
     )
 
     private val operationalPhenomena = OperationalPhenomena(0.0, false)
     private val allocationPolicy = "active-servers"
 
-    override val scenarios: Iterable<Scenario> = check_times.flatMap { check_time ->
-        check_waits.map { check_wait ->
-            Scenario(
-                topology,
-                workload,
-                operationalPhenomena,
-                allocationPolicy,
-                check_time,
-                check_wait,
-                mapOf("topology" to topology.name, "workload" to workload.name)
-            )
+    private val failureTraces = listOf(
+        "no_failure",
+        "single_failure",
+        "two_failures",
+    )
+
+    override val scenarios: Iterable<Scenario> = failureTraces.flatMap { failureTrace ->
+        checkTimes.flatMap{ checkTime ->
+            checkWaits.map { checkWait ->
+                Scenario(
+                    topology,
+                    workload,
+                    operationalPhenomena,
+                    allocationPolicy,
+                    failureTrace,
+                    checkTime,
+                    checkWait,
+                    mapOf("topology" to topology.name, "workload" to workload.name)
+                )
+            }
         }
     }
 }

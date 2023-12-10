@@ -29,7 +29,6 @@ import org.opendc.experiments.compute.ComputeWorkloadLoader
 import org.opendc.experiments.compute.cloudUptimeArchive
 import org.opendc.experiments.compute.createComputeScheduler
 import org.opendc.experiments.compute.export.parquet.ParquetComputeMonitor
-import org.opendc.experiments.compute.grid5000
 import org.opendc.experiments.compute.registerComputeMonitor
 import org.opendc.experiments.compute.replay
 import org.opendc.experiments.compute.setupComputeService
@@ -37,9 +36,7 @@ import org.opendc.experiments.compute.setupHosts
 import org.opendc.experiments.provisioner.Provisioner
 import org.opendc.simulator.kotlin.runSimulation
 import java.io.File
-import java.time.Duration
 import java.util.Random
-import kotlin.math.roundToLong
 
 /**
  * Helper class for running the Uptime experiments.
@@ -81,7 +78,7 @@ public class UptimeRunner(
                         serviceDomain,
                         ParquetComputeMonitor(
                             outputPath,
-                            "${scenario.check_time}_${scenario.check_wait}",
+                            "${scenario.failureTrace}/${scenario.checkTime}/${scenario.checkWait}",
                             bufferSize = 4096
                         )
                     )
@@ -97,9 +94,9 @@ public class UptimeRunner(
 //                } else {
 //                    null
 //                }
-            val failureModel = cloudUptimeArchive("single_failure.csv")
+            val failureModel = cloudUptimeArchive(scenario.failureTrace + ".csv")
 
-            service.replay(timeSource, vms, scenario.check_time, scenario.check_wait,
+            service.replay(timeSource, vms, scenario.checkTime, scenario.checkWait,
                            seed, failureModel = failureModel,
                            interference = operationalPhenomena.hasInterference)
         }
