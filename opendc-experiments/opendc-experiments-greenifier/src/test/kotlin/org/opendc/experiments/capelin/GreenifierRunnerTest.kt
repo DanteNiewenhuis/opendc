@@ -56,7 +56,7 @@ class GreenifierRunnerTest {
         try {
             val runner = GreenifierRunner(envPath, tracePath, outputPath)
             val scenario = Scenario(
-                Topology("topology"),
+                Topology("single"),
                 Workload("bitbrains-small", trace("bitbrains-small")),
                 OperationalPhenomena(failureFrequency = 24.0 * 7, hasInterference = true),
                 "active-servers"
@@ -75,7 +75,7 @@ class GreenifierRunnerTest {
     fun testSmokeNoOutput() {
         val runner = GreenifierRunner(envPath, tracePath, null)
         val scenario = Scenario(
-            Topology("topology"),
+            Topology("multi"),
             Workload("bitbrains-small", trace("bitbrains-small")),
             OperationalPhenomena(failureFrequency = 24.0 * 7, hasInterference = true),
             "active-servers"

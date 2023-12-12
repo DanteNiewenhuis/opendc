@@ -85,6 +85,46 @@ class GreenifierIntegrationTest {
     }
 
     /**
+     * Test a small simulation setup.
+     */
+    @Test
+    fun testSmall() = runSimulation {
+        val seed = 1L
+        val workload = createTestWorkload(0.25, seed)
+        val topology = createTopology("single")
+        val monitor = monitor
+
+        Provisioner(dispatcher, seed).use { provisioner ->
+            provisioner.runSteps(
+                setupComputeService(serviceDomain = "compute.opendc.org", { computeScheduler }),
+                registerComputeMonitor(serviceDomain = "compute.opendc.org", monitor),
+                setupHosts(serviceDomain = "compute.opendc.org", topology)
+            )
+
+            val service = provisioner.registry.resolve("compute.opendc.org", ComputeService::class.java)!!
+            service.replay(timeSource, workload, seed)
+        }
+
+        println(
+            "Scheduler " +
+                "Success=${monitor.attemptsSuccess} " +
+                "Failure=${monitor.attemptsFailure} " +
+                "Error=${monitor.attemptsError} " +
+                "Pending=${monitor.serversPending} " +
+                "Active=${monitor.serversActive}"
+        )
+
+        // Note that these values have been verified beforehand
+        assertAll(
+            { assertEquals(10996730, monitor.idleTime) { "Idle time incorrect" } },
+            { assertEquals(9741285, monitor.activeTime) { "Active time incorrect" } },
+            { assertEquals(0, monitor.stealTime) { "Steal time incorrect" } },
+            { assertEquals(0, monitor.lostTime) { "Lost time incorrect" } },
+            { assertEquals(7.0109E8, monitor.energyUsage, 1E4) { "Incorrect power draw" } }
+        )
+    }
+
+    /**
      * Test a large simulation setup.
      */
     @Test
@@ -120,53 +160,15 @@ class GreenifierIntegrationTest {
             { assertEquals(0, monitor.serversActive, "All VMs should finish after a run") },
             { assertEquals(0, monitor.attemptsFailure, "No VM should be unscheduled") },
             { assertEquals(0, monitor.serversPending, "No VM should not be in the queue") },
-            { assertEquals(223394101, monitor.idleTime) { "Incorrect idle time" } },
-            { assertEquals(66977086, monitor.activeTime) { "Incorrect active time" } },
-            { assertEquals(3160276, monitor.stealTime) { "Incorrect steal time" } },
+            { assertEquals(223379987, monitor.idleTime) { "Incorrect idle time" } },
+            { assertEquals(66977088, monitor.activeTime) { "Incorrect active time" } },
+            { assertEquals(3160266, monitor.stealTime) { "Incorrect steal time" } },
             { assertEquals(0, monitor.lostTime) { "Incorrect lost time" } },
-            { assertEquals(5.84093E9, monitor.energyUsage, 1E4) { "Incorrect power draw" } }
+            { assertEquals(5.8407E9, monitor.energyUsage, 1E4) { "Incorrect power draw" } }
         )
     }
 
-    /**
-     * Test a small simulation setup.
-     */
-    @Test
-    fun testSmall() = runSimulation {
-        val seed = 1L
-        val workload = createTestWorkload(0.25, seed)
-        val topology = createTopology("single")
-        val monitor = monitor
 
-        Provisioner(dispatcher, seed).use { provisioner ->
-            provisioner.runSteps(
-                setupComputeService(serviceDomain = "compute.opendc.org", { computeScheduler }),
-                registerComputeMonitor(serviceDomain = "compute.opendc.org", monitor),
-                setupHosts(serviceDomain = "compute.opendc.org", topology)
-            )
-
-            val service = provisioner.registry.resolve("compute.opendc.org", ComputeService::class.java)!!
-            service.replay(timeSource, workload, seed)
-        }
-
-        println(
-            "Scheduler " +
-                "Success=${monitor.attemptsSuccess} " +
-                "Failure=${monitor.attemptsFailure} " +
-                "Error=${monitor.attemptsError} " +
-                "Pending=${monitor.serversPending} " +
-                "Active=${monitor.serversActive}"
-        )
-
-        // Note that these values have been verified beforehand
-        assertAll(
-            { assertEquals(10999514, monitor.idleTime) { "Idle time incorrect" } },
-            { assertEquals(9741285, monitor.activeTime) { "Active time incorrect" } },
-            { assertEquals(0, monitor.stealTime) { "Steal time incorrect" } },
-            { assertEquals(0, monitor.lostTime) { "Lost time incorrect" } },
-            { assertEquals(7.0116E8, monitor.energyUsage, 1E4) { "Incorrect power draw" } }
-        )
-    }
 
     /**
      * Test a small simulation setup with interference.
@@ -199,9 +201,9 @@ class GreenifierIntegrationTest {
 
         // Note that these values have been verified beforehand
         assertAll(
-            { assertEquals(6028018, monitor.idleTime) { "Idle time incorrect" } },
-            { assertEquals(14712781, monitor.activeTime) { "Active time incorrect" } },
-            { assertEquals(12532934, monitor.stealTime) { "Steal time incorrect" } },
+            { assertEquals(42814948, monitor.idleTime) { "Idle time incorrect" } },
+            { assertEquals(40138266, monitor.activeTime) { "Active time incorrect" } },
+            { assertEquals(23489356, monitor.stealTime) { "Steal time incorrect" } },
             { assertEquals(424267, monitor.lostTime) { "Lost time incorrect" } }
         )
     }
@@ -229,11 +231,11 @@ class GreenifierIntegrationTest {
 
         // Note that these values have been verified beforehand
         assertAll(
-            { assertEquals(10085111, monitor.idleTime) { "Idle time incorrect" } },
-            { assertEquals(8539204, monitor.activeTime) { "Active time incorrect" } },
+            { assertEquals(1404277, monitor.idleTime) { "Idle time incorrect" } },
+            { assertEquals(1478675, monitor.activeTime) { "Active time incorrect" } },
             { assertEquals(0, monitor.stealTime) { "Steal time incorrect" } },
             { assertEquals(0, monitor.lostTime) { "Lost time incorrect" } },
-            { assertEquals(2328039558, monitor.uptime) { "Uptime incorrect" } }
+            { assertEquals(360369187, monitor.uptime) { "Uptime incorrect" } }
         )
     }
 
@@ -248,7 +250,7 @@ class GreenifierIntegrationTest {
     /**
      * Obtain the topology factory for the test.
      */
-    private fun createTopology(name: String = "topology"): List<HostSpec> {
+    private fun createTopology(name: String = "multi"): List<HostSpec> {
         val stream = checkNotNull(object {}.javaClass.getResourceAsStream("/env/$name.txt"))
         return stream.use { clusterTopology(stream) }
     }

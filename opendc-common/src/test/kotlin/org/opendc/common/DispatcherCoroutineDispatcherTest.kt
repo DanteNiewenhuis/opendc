@@ -36,6 +36,7 @@ import org.opendc.simulator.kotlin.runSimulation
  * Test suite for [DispatcherCoroutineDispatcher].
  */
 class DispatcherCoroutineDispatcherTest {
+    
     @Test
     fun testYield() = runSimulation {
         withContext(dispatcher.asCoroutineDispatcher()) {
