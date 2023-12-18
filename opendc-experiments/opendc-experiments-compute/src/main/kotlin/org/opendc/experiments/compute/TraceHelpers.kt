@@ -56,9 +56,9 @@ public class RunningServerWatcher : ServerWatcher {
             ServerState.TERMINATED -> {
                 _mutex.unlock()
             }
-            ServerState.ERROR -> {
-                _mutex.unlock()
-            }
+//            ServerState.ERROR -> {
+//                _mutex.unlock()
+//            }
             ServerState.DELETED -> {
                 _mutex.unlock()
             }

@@ -68,6 +68,7 @@ public abstract class SimAbstractMachine implements SimMachine {
 
         final Context ctx = createContext(workload, new HashMap<>(meta), completion);
         ctx.start();
+
         return ctx;
     }
 

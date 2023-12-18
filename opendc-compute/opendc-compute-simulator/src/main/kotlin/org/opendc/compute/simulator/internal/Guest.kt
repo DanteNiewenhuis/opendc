@@ -172,6 +172,7 @@ internal class Guest(
 
         val workload: SimWorkload = mapper.createWorkload(server)
         workload.setOffset(clock.millis())
+//        ctx.setClosed(False);
         val meta = mapOf("driver" to host, "server" to server) + server.meta
         ctx = machine.startWorkload(workload, meta) { cause ->
             onStop(if (cause != null) ServerState.ERROR else ServerState.TERMINATED)
@@ -203,6 +204,7 @@ internal class Guest(
     private fun onStart() {
         _bootTime = clock.instant()
         state = ServerState.RUNNING
+
         listener.onStart(this)
     }
 

@@ -161,7 +161,7 @@ public final class ComputeService implements AutoCloseable {
 
             serviceServer.setState(newState);
 
-            if (newState == ServerState.TERMINATED || newState == ServerState.DELETED) {
+            if (newState == ServerState.TERMINATED || newState == ServerState.DELETED || newState == ServerState.ERROR) {
                 LOGGER.info("Server {} {} {} finished", server.getUid(), server.getName(), server.getFlavor());
 
                 if (activeServers.remove(server) != null) {

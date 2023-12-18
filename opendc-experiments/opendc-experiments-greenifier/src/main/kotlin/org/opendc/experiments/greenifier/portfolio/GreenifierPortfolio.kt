@@ -41,7 +41,7 @@ public class GreenifierPortfolio : Portfolio {
     private val workloads = listOf(
         Workload("bitbrains-small", trace("trace").sampleByLoad(1.0))
     )
-    private val operationalPhenomena = OperationalPhenomena(0.0, false)
+    private val operationalPhenomena = OperationalPhenomena(24.0 * 7, false)
     private val allocationPolicy = "active-servers"
 
     override val scenarios: Iterable<Scenario> = topologies.flatMap { topology ->
