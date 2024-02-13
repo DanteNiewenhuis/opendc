@@ -34,14 +34,17 @@ import org.opendc.experiments.compute.trace
  */
 public class SurfsaraPortfolio : Portfolio {
     private val topologies = listOf(
-        Topology("surfsara_189"),
+        Topology("277"),
+        Topology("277_2"),
+        Topology("277_3"),
 //        Topology("surfsara_large"),
     )
 
     private val workloads = listOf(
 //        Workload("surfsara/2022-10-10_2022-10-11", trace("surfsara/2022-10-10_2022-10-11").sampleByLoad(1.0)),
 //        Workload("surfsara/2022-10-10_2022-10-25", trace("surfsara/2022-10-10_2022-10-25").sampleByLoad(1.0)),
-        Workload("surfsara/2022-10-13_2022-10-14", trace("surfsara/2022-10-13_2022-10-14").sampleByLoad(1.0)),
+//        Workload("surfsara/2022-10-13_2022-10-14", trace("surfsara/2022-10-13_2022-10-14").sampleByLoad(1.0)),
+        Workload("surfsara/2022-10-07_2022-10-14", trace("surfsara/2022-10-07_2022-10-14").sampleByLoad(1.0)),
     )
     private val operationalPhenomena = OperationalPhenomena(0.0, false)
     private val allocationPolicy = "active-servers"
