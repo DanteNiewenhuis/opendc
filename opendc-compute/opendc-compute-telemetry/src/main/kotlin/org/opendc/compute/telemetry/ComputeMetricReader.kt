@@ -86,7 +86,7 @@ public class ComputeMetricReader(
                 loggState()
             }
         } finally {
-            loggState()
+//            loggState()
 
             if (monitor is AutoCloseable) {
                 monitor.close()
