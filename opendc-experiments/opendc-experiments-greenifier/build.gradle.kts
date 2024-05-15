@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-description = "Experiments for the Scenario work"
+description = "Experiments for the greenifier demo"
 
 // Build configuration
 plugins {
@@ -54,11 +54,11 @@ dependencies {
     runtimeOnly(libs.log4j.slf4j)
 }
 
-val createScenarioApp by tasks.creating(CreateStartScripts::class) {
+val createGreenifierApp by tasks.creating(CreateStartScripts::class) {
     dependsOn(tasks.jar)
 
-    applicationName = "scenario"
-    mainClass.set("org.opendc.experiments.scenario.ScenarioCLI")
+    applicationName = "greenifier"
+    mainClass.set("org.opendc.experiments.greenifier.GreenifierCLI")
     classpath = tasks.jar.get().outputs.files + configurations["runtimeClasspath"]
     outputDir = project.buildDir.resolve("scripts")
 }
@@ -66,7 +66,7 @@ val createScenarioApp by tasks.creating(CreateStartScripts::class) {
 // Create custom Greenifier distribution
 distributions {
     main {
-        distributionBaseName.set("scenario")
+        distributionBaseName.set("greenifier")
 
         contents {
             from("README.md")
@@ -76,7 +76,7 @@ distributions {
             }
 
             into("bin") {
-                from(createScenarioApp)
+                from(createGreenifierApp)
             }
 
             into("lib") {
