@@ -1,0 +1,15 @@
+{
+    "name": "greenifier-demo",
+    "topologies": [{
+            "pathToFile": "resources/topologies/single.json"
+        },
+        {
+            "pathToFile": "resources/topologies/large.json"
+        }],
+    "workloads": [
+        {
+            "pathToFile": "resources/workloads/bitbrains-small",
+            "type": "ComputeWorkload"
+        }
+    ]
+}

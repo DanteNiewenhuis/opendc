@@ -28,6 +28,7 @@ import ExportModelSpec
 import ScenarioTopologySpec
 import WorkloadSpec
 import kotlinx.serialization.Serializable
+import org.opendc.compute.service.scheduler.ComputeSchedulerEnum
 import java.util.UUID
 
 /**
@@ -48,7 +49,7 @@ public data class ScenarioSpec(
     var name: String = "",
     val topologies: List<ScenarioTopologySpec>,
     val workloads: List<WorkloadSpec>,
-    val allocationPolicies: List<AllocationPolicySpec>,
+    val allocationPolicies: List<AllocationPolicySpec> = listOf(AllocationPolicySpec(ComputeSchedulerEnum.Mem)),
     val failureModels: List<FailureModelSpec?> = listOf(null),
     val checkpointModels: List<CheckpointModelSpec?> = listOf(null),
     val carbonTracePaths: List<String?> = listOf(null),

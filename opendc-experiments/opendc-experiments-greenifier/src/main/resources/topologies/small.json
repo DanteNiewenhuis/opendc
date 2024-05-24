@@ -9,16 +9,14 @@
                     "name": "H01",
                     "cpu":
                     {
-                        "coreCount": 8,
+                        "coreCount": 32,
                         "coreSpeed": 3200
                     },
                     "memory": {
-                        "memorySize": 128000
+                        "memorySize": 256000
                     }
                 }
             ]
         }
     ]
 }
-
-
