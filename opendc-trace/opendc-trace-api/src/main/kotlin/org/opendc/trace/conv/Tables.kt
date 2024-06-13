@@ -49,6 +49,12 @@ public const val TABLE_RESOURCE_STATES: String = "resource_states"
  */
 public const val TABLE_INTERFERENCE_GROUPS: String = "interference_groups"
 
+/**
+ * A table containing the carbon intensity at different times during the workload
+ */
 public const val TABLE_CARBON_INTENSITIES: String = "carbon_intensities"
 
+/**
+ * A table containing the failures during the workload
+ */
 public const val TABLE_FAILURES: String = "failures"

@@ -27,7 +27,7 @@ import org.opendc.trace.TableColumn
 import org.opendc.trace.TableColumnType
 import org.opendc.trace.TableReader
 import org.opendc.trace.TableWriter
-import org.opendc.trace.conv.TABLE_TASKS
+import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TASK_CHILDREN
 import org.opendc.trace.conv.TASK_ID
 import org.opendc.trace.conv.TASK_PARENTS
@@ -53,14 +53,14 @@ public class WfFormatTraceFormat : TraceFormat {
         throw UnsupportedOperationException("Writing not supported for this format")
     }
 
-    override fun getTables(path: Path): List<String> = listOf(TABLE_TASKS)
+    override fun getTables(path: Path): List<String> = listOf(TABLE_RESOURCES)
 
     override fun getDetails(
         path: Path,
         table: String,
     ): TableDetails {
         return when (table) {
-            TABLE_TASKS ->
+            TABLE_RESOURCES ->
                 TableDetails(
                     listOf(
                         TableColumn(TASK_ID, TableColumnType.String),
@@ -81,7 +81,7 @@ public class WfFormatTraceFormat : TraceFormat {
         projection: List<String>?,
     ): TableReader {
         return when (table) {
-            TABLE_TASKS -> WfFormatTaskTableReader(factory.createParser(path.toFile()))
+            TABLE_RESOURCES -> WfFormatTaskTableReader(factory.createParser(path.toFile()))
             else -> throw IllegalArgumentException("Table $table not supported")
         }
     }

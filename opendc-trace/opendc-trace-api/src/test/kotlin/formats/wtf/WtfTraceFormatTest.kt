@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.opendc.trace.TableColumn
 import org.opendc.trace.TableReader
-import org.opendc.trace.conv.TABLE_TASKS
+import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TASK_ID
 import org.opendc.trace.conv.TASK_PARENTS
 import org.opendc.trace.conv.TASK_RUNTIME
@@ -54,13 +54,13 @@ class WtfTraceFormatTest {
     @Test
     fun testTables() {
         val path = Paths.get("src/test/resources/wtf/schema-1.0")
-        assertEquals(listOf(TABLE_TASKS), format.getTables(path))
+        assertEquals(listOf(TABLE_RESOURCES), format.getTables(path))
     }
 
     @Test
     fun testTableExists() {
         val path = Paths.get("src/test/resources/wtf/wtf-trace")
-        assertDoesNotThrow { format.getDetails(path, TABLE_TASKS) }
+        assertDoesNotThrow { format.getDetails(path, TABLE_RESOURCES) }
     }
 
     @Test
@@ -76,7 +76,7 @@ class WtfTraceFormatTest {
     @Test
     fun testTableReader() {
         val path = Paths.get("src/test/resources/wtf/wtf-trace")
-        val reader = format.newReader(path, TABLE_TASKS, listOf(TASK_ID, TASK_WORKFLOW_ID, TASK_SUBMIT_TIME, TASK_RUNTIME, TASK_PARENTS))
+        val reader = format.newReader(path, TABLE_RESOURCES, listOf(TASK_ID, TASK_WORKFLOW_ID, TASK_SUBMIT_TIME, TASK_RUNTIME, TASK_PARENTS))
 
         assertAll(
             { assertTrue(reader.nextRow()) },
@@ -119,8 +119,8 @@ class WtfTraceFormatTest {
         fun setUp() {
             val path = Paths.get("src/test/resources/wtf/wtf-trace")
 
-            columns = format.getDetails(path, TABLE_TASKS).columns
-            reader = format.newReader(path, TABLE_TASKS, null)
+            columns = format.getDetails(path, TABLE_RESOURCES).columns
+            reader = format.newReader(path, TABLE_RESOURCES, null)
         }
     }
 
@@ -134,8 +134,8 @@ class WtfTraceFormatTest {
         fun setUp() {
             val path = Paths.get("src/test/resources/wtf/shell")
 
-            columns = format.getDetails(path, TABLE_TASKS).columns
-            reader = format.newReader(path, TABLE_TASKS, null)
+            columns = format.getDetails(path, TABLE_RESOURCES).columns
+            reader = format.newReader(path, TABLE_RESOURCES, null)
         }
     }
 }

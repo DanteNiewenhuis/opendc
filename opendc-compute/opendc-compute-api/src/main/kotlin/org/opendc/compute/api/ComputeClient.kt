@@ -54,6 +54,7 @@ public interface ComputeClient : AutoCloseable {
         name: String,
         cpuCount: Int,
         memorySize: Long,
+        dependencies: List<String>? = emptyList(),
         labels: Map<String, String> = emptyMap(),
         meta: Map<String, Any> = emptyMap(),
     ): Flavor

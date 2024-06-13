@@ -38,6 +38,7 @@ import org.opendc.compute.service.ComputeService
 import org.opendc.compute.workload.VirtualMachine
 import org.opendc.experiments.base.scenario.specs.FailureModelSpec
 import org.opendc.experiments.base.scenario.specs.createFailureModel
+import org.opendc.simulator.compute.workload.SimRuntimeWorkload
 import java.time.InstantSource
 import java.util.Random
 import kotlin.coroutines.coroutineContext
@@ -124,15 +125,20 @@ public suspend fun ComputeService.replay(
                 val checkpointTime = checkpointModelSpec?.checkpointTime ?: 0L
                 val checkpointWait = checkpointModelSpec?.checkpointWait ?: 0L
 
-//                val workload = SimRuntimeWorkload(
-//                    entry.duration,
-//                    1.0,
-//                    checkpointTime,
-//                    checkpointWait
-//                )
-
-                val workload = entry.trace.createWorkload(start, checkpointTime, checkpointWait)
-                val meta = mutableMapOf<String, Any>("workload" to workload)
+                var meta: MutableMap<String, Any>;
+                if (entry.trace == null) {
+                    val workload = SimRuntimeWorkload(
+                        entry.durations,
+                        1.0,
+                        checkpointTime,
+                        checkpointWait
+                    )
+                    meta = mutableMapOf("workload" to workload)
+                }
+                else {
+                    val workload = entry.trace!!.createWorkload(start, checkpointTime, checkpointWait)
+                    meta = mutableMapOf("workload" to workload)
+                }
 
                 launch {
                     val server =
@@ -143,6 +149,7 @@ public suspend fun ComputeService.replay(
                                 entry.name,
                                 entry.cpuCount,
                                 entry.memCapacity,
+                                entry.dependencies,
                                 meta = if (entry.cpuCapacity > 0.0) mapOf("cpu-capacity" to entry.cpuCapacity) else emptyMap(),
                             ),
                             meta = meta,

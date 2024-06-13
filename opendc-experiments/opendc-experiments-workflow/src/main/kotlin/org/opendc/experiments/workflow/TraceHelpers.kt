@@ -29,7 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.opendc.simulator.compute.workload.SimWorkloads
 import org.opendc.trace.Trace
-import org.opendc.trace.conv.TABLE_TASKS
+import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TASK_ALLOC_NCPUS
 import org.opendc.trace.conv.TASK_ID
 import org.opendc.trace.conv.TASK_PARENTS
@@ -52,7 +52,7 @@ import kotlin.math.min
  * Convert [Trace] into a list of [Job]s that can be submitted to the workflow service.
  */
 public fun Trace.toJobs(): List<Job> {
-    val table = checkNotNull(getTable(TABLE_TASKS))
+    val table = checkNotNull(getTable(TABLE_RESOURCES))
     val reader = table.newReader()
 
     val jobs = mutableMapOf<Long, Job>()

@@ -25,10 +25,8 @@ package org.opendc.compute.service;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.InstantSource;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -100,7 +98,12 @@ public final class ComputeService implements AutoCloseable {
     /**
      * The servers that should be launched by the service.
      */
-    private final Deque<SchedulingRequest> queue = new ArrayDeque<>();
+    private List<SchedulingRequest> pendingServers = new ArrayList<>();
+
+    /**
+     * The servers that have been successfully finished
+     */
+    private List<String> finishedServers = new ArrayList<>();
 
     /**
      * The active servers in the system.
@@ -319,7 +322,7 @@ public final class ComputeService implements AutoCloseable {
         SchedulingRequest request = new SchedulingRequest(server, now);
 
         server.launchedAt = Instant.ofEpochMilli(now);
-        queue.add(request);
+        pendingServers.add(request);
         serversPending++;
         requestSchedulingCycle();
         return request;
@@ -336,6 +339,7 @@ public final class ComputeService implements AutoCloseable {
     }
 
     void delete(ServiceServer server) {
+        finishedServers.add(server.getName());
         serverById.remove(server.getUid());
         servers.remove(server);
     }
@@ -345,11 +349,23 @@ public final class ComputeService implements AutoCloseable {
      */
     private void requestSchedulingCycle() {
         // Bail out in case the queue is empty.
-        if (queue.isEmpty()) {
+        if (pendingServers.isEmpty()) {
             return;
         }
 
         pacer.enqueue();
+    }
+
+    private boolean canRun(Server server) {
+        Flavor flavor = server.getFlavor();
+
+        for (String dependency : flavor.getDependencies()) {
+            if (!finishedServers.contains(dependency)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -358,16 +374,20 @@ public final class ComputeService implements AutoCloseable {
     private void doSchedule() {
         // reorder tasks
 
-        while (!queue.isEmpty()) {
-            SchedulingRequest request = queue.peek();
-
+        for (int i = 0; i < pendingServers.size(); i++){
+            SchedulingRequest request = pendingServers.get(i);
             if (request.isCancelled) {
-                queue.poll();
+                pendingServers.remove(request);
                 serversPending--;
+                i--;
                 continue;
             }
 
             final ServiceServer server = request.server;
+
+            if (!canRun(server)) {
+                continue;
+            }
             // Check if all dependencies are met
             // otherwise continue
 
@@ -380,7 +400,7 @@ public final class ComputeService implements AutoCloseable {
 
                 if (flavor.getMemorySize() > maxMemory || flavor.getCoreCount() > maxCores) {
                     // Remove the incoming image
-                    queue.poll();
+                    pendingServers.remove(request);
                     serversPending--;
                     attemptsFailure++;
 
@@ -395,8 +415,9 @@ public final class ComputeService implements AutoCloseable {
 
             Host host = hv.getHost();
 
-            // Remove request from queue
-            queue.poll();
+            // Remove request from list
+            pendingServers.remove(request);
+            i--;
             serversPending--;
 
             LOGGER.info("Assigned server {} to host {}", server, host);
@@ -491,13 +512,14 @@ public final class ComputeService implements AutoCloseable {
                 @NotNull String name,
                 int cpuCount,
                 long memorySize,
+                @NotNull List<String> dependencies,
                 @NotNull Map<String, String> labels,
                 @NotNull Map<String, ?> meta) {
             checkOpen();
 
             final ComputeService service = this.service;
             UUID uid = new UUID(service.clock.millis(), service.random.nextLong());
-            ServiceFlavor flavor = new ServiceFlavor(service, uid, name, cpuCount, memorySize, labels, meta);
+            ServiceFlavor flavor = new ServiceFlavor(service, uid, name, cpuCount, memorySize, dependencies, labels, meta);
 
             service.flavorById.put(uid, flavor);
             service.flavors.add(flavor);

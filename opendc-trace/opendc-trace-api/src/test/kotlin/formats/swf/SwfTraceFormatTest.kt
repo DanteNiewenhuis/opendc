@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.opendc.trace.TableColumn
 import org.opendc.trace.TableReader
-import org.opendc.trace.conv.TABLE_TASKS
+import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TASK_ALLOC_NCPUS
 import org.opendc.trace.conv.TASK_ID
 import org.opendc.trace.swf.SwfTraceFormat
@@ -51,13 +51,13 @@ internal class SwfTraceFormatTest {
     fun testTables() {
         val path = Paths.get("src/test/resources/swf/trace.swf")
 
-        assertEquals(listOf(TABLE_TASKS), format.getTables(path))
+        assertEquals(listOf(TABLE_RESOURCES), format.getTables(path))
     }
 
     @Test
     fun testTableExists() {
         val path = Paths.get("src/test/resources/swf/trace.swf")
-        assertDoesNotThrow { format.getDetails(path, TABLE_TASKS) }
+        assertDoesNotThrow { format.getDetails(path, TABLE_RESOURCES) }
     }
 
     @Test
@@ -70,7 +70,7 @@ internal class SwfTraceFormatTest {
     @Test
     fun testReader() {
         val path = Paths.get("src/test/resources/swf/trace.swf")
-        val reader = format.newReader(path, TABLE_TASKS, null)
+        val reader = format.newReader(path, TABLE_RESOURCES, null)
 
         assertAll(
             { assertTrue(reader.nextRow()) },
@@ -94,8 +94,8 @@ internal class SwfTraceFormatTest {
         fun setUp() {
             val path = Paths.get("src/test/resources/swf/trace.swf")
 
-            columns = format.getDetails(path, TABLE_TASKS).columns
-            reader = format.newReader(path, TABLE_TASKS, null)
+            columns = format.getDetails(path, TABLE_RESOURCES).columns
+            reader = format.newReader(path, TABLE_RESOURCES, null)
         }
     }
 }

@@ -22,7 +22,10 @@
 
 package org.opendc.simulator.compute.workload;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.opendc.simulator.compute.SimMachineContext;
 import org.opendc.simulator.compute.SimProcessingUnit;
 import org.opendc.simulator.flow2.FlowGraph;
@@ -35,6 +38,8 @@ import org.opendc.simulator.flow2.OutPort;
  */
 public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
     private long duration;
+    private Map<String, Long> durations;
+
     private final double utilization;
 
     private SimMachineContext ctx;
@@ -48,20 +53,45 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
     private long checkpointWait; // How long to wait until a new checkpoint is made?
     private long totalChecks;
 
+    public SimRuntimeWorkload(Map<String, Long> durations, double utilization) {
+        this(durations, utilization, 0, 0);
+    }
+
+    /**
+     * Construct a new {@link SimRuntimeWorkload}.
+     *
+     * @param duration The duration of the workload in milliseconds.
+     * @param utilization The CPU utilization of the workload.
+     */
+    public SimRuntimeWorkload(Map<String, Long> durations, double utilization, long checkpointTime, long checkpointWait) {
+        this.durations = durations;
+        long duration = durations.entrySet().iterator().next().getValue();
+
+        if (duration < 0) {
+            throw new IllegalArgumentException("Duration must be positive");
+        } else if (utilization <= 0.0 || utilization > 1.0) {
+            throw new IllegalArgumentException("Utilization must be in (0, 1]");
+        }
+
+        this.checkpointTime = checkpointTime;
+        this.checkpointWait = checkpointWait;
+        this.duration = duration;
+
+        if (this.checkpointWait > 0) {
+            // Determine the number of checkpoints that need to be made during the workload
+            // If the total duration is divisible by the wait time between checkpoints, we can remove the last
+            // checkpoint
+            int to_remove = ((this.duration % this.checkpointWait == 0) ? 1 : 0);
+            this.totalChecks = this.duration / this.checkpointWait - to_remove;
+            this.duration += (this.checkpointTime * totalChecks);
+        }
+
+        this.utilization = utilization;
+        this.remainingDuration = duration;
+    }
+
     public SimRuntimeWorkload(long duration, double utilization) {
         this(duration, utilization, 0, 0);
-        //        if (duration < 0) {
-        //            throw new IllegalArgumentException("Duration must be positive");
-        //        } else if (utilization <= 0.0 || utilization > 1.0) {
-        //            throw new IllegalArgumentException("Utilization must be in (0, 1]");
-        //        }
-        //
-        //        this.checkpointTime = 0L;
-        //        this.checkpointWait = 0L;
-        //        this.duration = duration;
-        //
-        //        this.utilization = utilization;
-        //        this.remainingDuration = duration;
     }
 
     /**
@@ -71,6 +101,11 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
      * @param utilization The CPU utilization of the workload.
      */
     public SimRuntimeWorkload(long duration, double utilization, long checkpointTime, long checkpointWait) {
+        this.durations = new HashMap<String, Long>();
+
+        this.durations.put("default", duration);
+
+
         if (duration < 0) {
             throw new IllegalArgumentException("Duration must be positive");
         } else if (utilization <= 0.0 || utilization > 1.0) {
@@ -101,6 +136,16 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
     public void onStart(SimMachineContext ctx) {
         this.ctx = ctx;
 
+        String host_str = ctx.getMeta().get("driver").toString();
+        String host_name = host_str.split(",")[1].split("=")[1];
+
+        if (this.durations.containsKey(host_name)) {
+            this.duration = this.durations.get(host_name);
+        }
+        else {
+            this.duration = this.durations.get("default");
+        }
+
         final FlowGraph graph = ctx.getGraph();
         final FlowStage stage = graph.newStage(this);
         this.stage = stage;
@@ -116,6 +161,8 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
             graph.connect(output, cpu.getInput());
             outputs[i] = output;
         }
+
+
 
         this.remainingDuration = duration;
         this.lastUpdate = graph.getEngine().getClock().millis();
@@ -158,7 +205,7 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
             remaining_time = duration;
         }
 
-        return new SimRuntimeWorkload(remaining_time, utilization, this.checkpointTime, this.checkpointWait);
+        return new SimRuntimeWorkload(durations, utilization, this.checkpointTime, this.checkpointWait);
     }
 
     @Override

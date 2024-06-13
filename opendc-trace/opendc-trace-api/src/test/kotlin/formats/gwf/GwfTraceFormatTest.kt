@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.opendc.trace.TableColumn
 import org.opendc.trace.TableReader
-import org.opendc.trace.conv.TABLE_TASKS
+import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TASK_ID
 import org.opendc.trace.conv.TASK_PARENTS
 import org.opendc.trace.conv.TASK_RUNTIME
@@ -56,13 +56,13 @@ internal class GwfTraceFormatTest {
     fun testTables() {
         val path = Paths.get("src/test/resources/gwf/trace.gwf")
 
-        assertEquals(listOf(TABLE_TASKS), format.getTables(path))
+        assertEquals(listOf(TABLE_RESOURCES), format.getTables(path))
     }
 
     @Test
     fun testTableExists() {
         val path = Paths.get("src/test/resources/gwf/trace.gwf")
-        assertDoesNotThrow { format.getDetails(path, TABLE_TASKS) }
+        assertDoesNotThrow { format.getDetails(path, TABLE_RESOURCES) }
     }
 
     @Test
@@ -75,7 +75,7 @@ internal class GwfTraceFormatTest {
     @Test
     fun testTableReader() {
         val path = Paths.get("src/test/resources/gwf/trace.gwf")
-        val reader = format.newReader(path, TABLE_TASKS, null)
+        val reader = format.newReader(path, TABLE_RESOURCES, null)
 
         assertAll(
             { assertTrue(reader.nextRow()) },
@@ -90,7 +90,7 @@ internal class GwfTraceFormatTest {
     @Test
     fun testReadingRowWithDependencies() {
         val path = Paths.get("src/test/resources/gwf/trace.gwf")
-        val reader = format.newReader(path, TABLE_TASKS, null)
+        val reader = format.newReader(path, TABLE_RESOURCES, null)
 
         // Move to row 7
         for (x in 1..6)
@@ -116,8 +116,8 @@ internal class GwfTraceFormatTest {
         fun setUp() {
             val path = Paths.get("src/test/resources/gwf/trace.gwf")
 
-            columns = format.getDetails(path, TABLE_TASKS).columns
-            reader = format.newReader(path, TABLE_TASKS, null)
+            columns = format.getDetails(path, TABLE_RESOURCES).columns
+            reader = format.newReader(path, TABLE_RESOURCES, null)
         }
     }
 }

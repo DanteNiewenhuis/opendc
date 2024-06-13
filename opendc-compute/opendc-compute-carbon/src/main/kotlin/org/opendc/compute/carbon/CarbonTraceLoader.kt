@@ -27,9 +27,7 @@ import org.opendc.trace.conv.CARBON_INTENSITY_TIMESTAMP
 import org.opendc.trace.conv.CARBON_INTENSITY_VALUE
 import org.opendc.trace.conv.TABLE_CARBON_INTENSITIES
 import java.io.File
-import java.lang.ref.SoftReference
 import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * A helper class for loading compute workload traces into memory.
@@ -37,11 +35,6 @@ import java.util.concurrent.ConcurrentHashMap
  * @param baseDir The directory containing the traces.
  */
 public class CarbonTraceLoader {
-    /**
-     * The cache of workloads.
-     */
-    private val cache = ConcurrentHashMap<String, SoftReference<List<CarbonFragment>>>()
-
     private val builder = CarbonFragmentBuilder()
 
     /**
@@ -80,13 +73,6 @@ public class CarbonTraceLoader {
         val trace = Trace.open(pathToFile, "carbon")
 
         return parseCarbon(trace)
-    }
-
-    /**
-     * Clear the workload cache.
-     */
-    public fun reset() {
-        cache.clear()
     }
 
     /**

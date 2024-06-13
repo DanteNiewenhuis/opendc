@@ -22,13 +22,11 @@
 
 package org.opendc.experiments.base.runner
 
-import getWorkloadType
 import me.tongfei.progressbar.ProgressBarBuilder
 import me.tongfei.progressbar.ProgressBarStyle
 import org.opendc.compute.carbon.CarbonTrace
 import org.opendc.compute.carbon.getCarbonTrace
 import org.opendc.compute.service.ComputeService
-import org.opendc.compute.service.scheduler.ComputeSchedulerEnum
 import org.opendc.compute.service.scheduler.createComputeScheduler
 import org.opendc.compute.simulator.provisioner.Provisioner
 import org.opendc.compute.simulator.provisioner.registerComputeMonitor
@@ -36,7 +34,7 @@ import org.opendc.compute.simulator.provisioner.setupComputeService
 import org.opendc.compute.simulator.provisioner.setupHosts
 import org.opendc.compute.telemetry.export.parquet.ParquetComputeMonitor
 import org.opendc.compute.topology.clusterTopology
-import org.opendc.compute.workload.ComputeWorkloadLoader
+import org.opendc.compute.workload.getWorkloadLoader
 import org.opendc.experiments.base.scenario.Scenario
 import org.opendc.simulator.kotlin.runSimulation
 import java.io.File
@@ -120,13 +118,13 @@ public fun runScenario(
             provisioner.runSteps(
                 setupComputeService(
                     serviceDomain,
-                    { createComputeScheduler(ComputeSchedulerEnum.Mem, Random(it.seeder.nextLong())) },
+                    { createComputeScheduler(scenario.allocationPolicySpec.policyType, Random(it.seeder.nextLong())) },
                 ),
                 setupHosts(serviceDomain, topology, optimize = true),
             )
 
-            val workloadLoader = ComputeWorkloadLoader(File(scenario.workloadSpec.pathToFile))
-            val vms = getWorkloadType(scenario.workloadSpec.type).resolve(workloadLoader, Random(seed))
+            val workloadLoader = getWorkloadLoader(scenario.workloadSpec.type)
+            val vms = workloadLoader.get(File(scenario.workloadSpec.pathToFile))
 
             val carbonTrace = getCarbonTrace(scenario.carbonTracePath)
             val startTime = Duration.ofMillis(vms.minOf { it.startTime }.toEpochMilli())

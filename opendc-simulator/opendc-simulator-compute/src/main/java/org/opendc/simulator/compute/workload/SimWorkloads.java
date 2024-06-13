@@ -23,6 +23,8 @@
 package org.opendc.simulator.compute.workload;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helper methods for constructing {@link SimWorkload}s.
@@ -47,8 +49,8 @@ public class SimWorkloads {
      * @param duration The duration of the workload in milliseconds.
      * @param utilization The CPU utilization of the workload.
      */
-    public static SimWorkload runtime(long duration, double utilization) {
-        return runtime(duration, utilization, 0, 0);
+    public static SimWorkload runtime(Map<String, Long> durations, double utilization) {
+        return runtime(durations, utilization, 0, 0);
     }
 
     /**
@@ -57,8 +59,8 @@ public class SimWorkloads {
      * @param duration The duration of the workload in milliseconds.
      * @param utilization The CPU utilization of the workload.
      */
-    public static SimWorkload runtime(long duration, double utilization, long checkpoint_time, long checkpoint_wait) {
-        return new SimRuntimeWorkload(duration, utilization, checkpoint_time, checkpoint_wait);
+    public static SimWorkload runtime(Map<String, Long> durations, double utilization, long checkpoint_time, long checkpoint_wait) {
+        return new SimRuntimeWorkload(durations, utilization, checkpoint_time, checkpoint_wait);
     }
 
     /**
@@ -69,7 +71,16 @@ public class SimWorkloads {
      */
     public static SimWorkload runtime(
             Duration duration, double utilization, long checkpoint_time, long checkpoint_wait) {
+
         return runtime(duration.toMillis(), utilization, checkpoint_time, checkpoint_wait);
+    }
+
+    public static SimWorkload runtime(long duration, double utilization, long checkpoint_time, long checkpoint_wait) {
+        return new SimRuntimeWorkload(duration, utilization, checkpoint_time, checkpoint_wait);
+    }
+
+    public static SimWorkload runtime(long duration, double utilization) {
+        return new SimRuntimeWorkload(duration, utilization, 0, 0);
     }
 
     /**

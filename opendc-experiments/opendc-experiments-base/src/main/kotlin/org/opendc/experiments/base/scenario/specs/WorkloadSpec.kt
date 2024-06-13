@@ -21,9 +21,7 @@
  */
 
 import kotlinx.serialization.Serializable
-import org.opendc.compute.workload.ComputeWorkload
-import org.opendc.compute.workload.sampleByLoad
-import org.opendc.compute.workload.trace
+import org.opendc.compute.workload.WorkloadLoaderTypeEnum
 import java.io.File
 
 /**
@@ -35,36 +33,11 @@ import java.io.File
 @Serializable
 public data class WorkloadSpec(
     val pathToFile: String,
-    val type: WorkloadTypes,
+    val type: WorkloadLoaderTypeEnum,
 ) {
     public val name: String = File(pathToFile).nameWithoutExtension
 
     init {
         require(File(pathToFile).exists()) { "The provided path to the workload: $pathToFile does not exist " }
-    }
-}
-
-/**
- * specification describing a workload type
- *
- * @constructor Create empty Workload types
- */
-public enum class WorkloadTypes {
-    /**
-     * Compute workload
-     *
-     * @constructor Create empty Compute workload
-     */
-    ComputeWorkload,
-}
-
-/**
- *
- *TODO: move to separate file
- * @param type
- */
-public fun getWorkloadType(type: WorkloadTypes): ComputeWorkload {
-    return when (type) {
-        WorkloadTypes.ComputeWorkload -> trace("trace").sampleByLoad(1.0)
     }
 }

@@ -1,35 +1,7 @@
-/*
- * Copyright (c) 2021 AtLarge Research
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
 package org.opendc.compute.workload
 
-import mu.KotlinLogging
-import org.opendc.simulator.compute.kernel.interference.VmInterferenceModel
 import org.opendc.simulator.compute.workload.SimTrace
 import org.opendc.trace.Trace
-import org.opendc.trace.conv.INTERFERENCE_GROUP_MEMBERS
-import org.opendc.trace.conv.INTERFERENCE_GROUP_SCORE
-import org.opendc.trace.conv.INTERFERENCE_GROUP_TARGET
-import org.opendc.trace.conv.TABLE_INTERFERENCE_GROUPS
 import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TABLE_RESOURCE_STATES
 import org.opendc.trace.conv.resourceCpuCapacity
@@ -42,33 +14,26 @@ import org.opendc.trace.conv.resourceStateDuration
 import org.opendc.trace.conv.resourceStateTimestamp
 import org.opendc.trace.conv.resourceStopTime
 import java.io.File
-import java.lang.ref.SoftReference
 import java.time.Duration
 import java.time.Instant
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.roundToLong
 
-/**
- * A helper class for loading compute workload traces into memory.
- *
- * @param baseDir The directory containing the traces.
- */
-public class ComputeWorkloadLoader(private val baseDir: File) {
-    /**
-     * The logger for this instance.
-     */
-    private val logger = KotlinLogging.logger {}
+public class FragmentWorkloadLoader : ComputeWorkloadLoaderNew() {
+    override fun get(pathToFolder: File): List<VirtualMachine> {
+        val trace = Trace.open(pathToFolder, "opendc-vm")
 
-    /**
-     * The cache of workloads.
-     */
-    private val cache = ConcurrentHashMap<String, SoftReference<List<VirtualMachine>>>()
+        val fragments = parseTaskFragments(trace)
+
+        val vms = parseTaskMeta(trace, fragments)
+
+        return vms
+    }
 
     /**
      * Read the fragments into memory.
      */
-    private fun parseFragments(trace: Trace): Map<String, Builder> {
+    private fun parseTaskFragments(trace: Trace): Map<String, Builder> {
         val reader = checkNotNull(trace.getTable(TABLE_RESOURCE_STATES)).newReader()
 
         val idCol = reader.resolve(resourceID)
@@ -100,10 +65,9 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
     /**
      * Read the metadata into a workload.
      */
-    private fun parseMeta(
+    private fun parseTaskMeta(
         trace: Trace,
         fragments: Map<String, Builder>,
-        interferenceModel: VmInterferenceModel,
     ): List<VirtualMachine> {
         val reader = checkNotNull(trace.getTable(TABLE_RESOURCES)).newReader()
 
@@ -144,7 +108,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
                         totalLoad,
                         submissionTime,
                         endTime,
-                        trace = builder.build(),
+                        trace = builder.build()
                     ),
                 )
             }
@@ -162,77 +126,14 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
     }
 
     /**
-     * Read the interference model associated with the specified [trace].
-     */
-    private fun parseInterferenceModel(trace: Trace): VmInterferenceModel {
-        val reader = checkNotNull(trace.getTable(TABLE_INTERFERENCE_GROUPS)).newReader()
-
-        return try {
-            val membersCol = reader.resolve(INTERFERENCE_GROUP_MEMBERS)
-            val targetCol = reader.resolve(INTERFERENCE_GROUP_TARGET)
-            val scoreCol = reader.resolve(INTERFERENCE_GROUP_SCORE)
-
-            val modelBuilder = VmInterferenceModel.builder()
-
-            while (reader.nextRow()) {
-                val members = reader.getSet(membersCol, String::class.java)!!
-                val target = reader.getDouble(targetCol)
-                val score = reader.getDouble(scoreCol)
-
-                modelBuilder
-                    .addGroup(members, target, score)
-            }
-
-            modelBuilder.build()
-        } finally {
-            reader.close()
-        }
-    }
-
-    /**
-     * Load the trace with the specified [name] and [format].
-     */
-    public fun get(
-        name: String,
-        format: String,
-    ): List<VirtualMachine> {
-        val ref =
-            cache.compute(name) { key, oldVal ->
-                val inst = oldVal?.get()
-                if (inst == null) {
-                    val path = baseDir.resolve(key)
-
-                    logger.info { "Loading trace $key at $path" }
-
-                    val trace = Trace.open(path, format)
-                    val fragments = parseFragments(trace)
-                    val interferenceModel = parseInterferenceModel(trace)
-                    val vms = parseMeta(trace, fragments, interferenceModel)
-
-                    SoftReference(vms)
-                } else {
-                    oldVal
-                }
-            }
-
-        return checkNotNull(ref?.get()) { "Memory pressure" }
-    }
-
-    /**
-     * Clear the workload cache.
-     */
-    public fun reset() {
-        cache.clear()
-    }
-
-    /**
      * A builder for a VM trace.
      */
     private class Builder {
         /**
          * The total load of the trace.
          */
-        @JvmField var totalLoad: Double = 0.0
+        @JvmField
+        var totalLoad: Double = 0.0
 
         /**
          * The internal builder for the trace.
@@ -276,3 +177,4 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         fun build(): SimTrace = builder.build()
     }
 }
+

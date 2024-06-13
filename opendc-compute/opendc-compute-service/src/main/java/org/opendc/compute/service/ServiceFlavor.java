@@ -23,6 +23,7 @@
 package org.opendc.compute.service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,22 +39,25 @@ public final class ServiceFlavor implements Flavor {
     private final String name;
     private final int coreCount;
     private final long memorySize;
+    private final List<String> dependencies;
     private final Map<String, String> labels;
     private final Map<String, ?> meta;
 
     ServiceFlavor(
-            ComputeService service,
-            UUID uid,
-            String name,
-            int coreCount,
-            long memorySize,
-            Map<String, String> labels,
-            Map<String, ?> meta) {
+        ComputeService service,
+        UUID uid,
+        String name,
+        int coreCount,
+        long memorySize,
+        List<String> dependencies,
+        Map<String, String> labels,
+        Map<String, ?> meta) {
         this.service = service;
         this.uid = uid;
         this.name = name;
         this.coreCount = coreCount;
         this.memorySize = memorySize;
+        this.dependencies = dependencies;
         this.labels = labels;
         this.meta = meta;
     }
@@ -118,5 +122,11 @@ public final class ServiceFlavor implements Flavor {
     @Override
     public String toString() {
         return "Flavor[uid=" + uid + ",name=" + name + "]";
+    }
+
+    @NotNull
+    @Override
+    public List<String> getDependencies() {
+        return dependencies;
     }
 }

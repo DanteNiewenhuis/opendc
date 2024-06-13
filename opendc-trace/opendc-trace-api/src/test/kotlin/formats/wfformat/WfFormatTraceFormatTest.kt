@@ -33,7 +33,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.opendc.trace.TableColumn
 import org.opendc.trace.TableReader
-import org.opendc.trace.conv.TABLE_TASKS
+import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TASK_ID
 import org.opendc.trace.conv.TASK_PARENTS
 import org.opendc.trace.conv.TASK_RUNTIME
@@ -53,13 +53,13 @@ class WfFormatTraceFormatTest {
     fun testTables() {
         val path = Paths.get("src/test/resources/wfformat/trace.json")
 
-        assertEquals(listOf(TABLE_TASKS), format.getTables(path))
+        assertEquals(listOf(TABLE_RESOURCES), format.getTables(path))
     }
 
     @Test
     fun testTableExists() {
         val path = Paths.get("src/test/resources/wfformat/trace.json")
-        assertDoesNotThrow { format.getDetails(path, TABLE_TASKS) }
+        assertDoesNotThrow { format.getDetails(path, TABLE_RESOURCES) }
     }
 
     @Test
@@ -75,7 +75,7 @@ class WfFormatTraceFormatTest {
     @Test
     fun testTableReader() {
         val path = Paths.get("src/test/resources/wfformat/trace.json")
-        val reader = format.newReader(path, TABLE_TASKS, null)
+        val reader = format.newReader(path, TABLE_RESOURCES, null)
 
         assertAll(
             { assertTrue(reader.nextRow()) },
@@ -102,7 +102,7 @@ class WfFormatTraceFormatTest {
     @Test
     fun testTableReaderFull() {
         val path = Paths.get("src/test/resources/wfformat/trace.json")
-        val reader = format.newReader(path, TABLE_TASKS, null)
+        val reader = format.newReader(path, TABLE_RESOURCES, null)
 
         assertDoesNotThrow {
             while (reader.nextRow()) {
@@ -122,8 +122,8 @@ class WfFormatTraceFormatTest {
         fun setUp() {
             val path = Paths.get("src/test/resources/wfformat/trace.json")
 
-            columns = format.getDetails(path, TABLE_TASKS).columns
-            reader = format.newReader(path, TABLE_TASKS, null)
+            columns = format.getDetails(path, TABLE_RESOURCES).columns
+            reader = format.newReader(path, TABLE_RESOURCES, null)
         }
     }
 }
