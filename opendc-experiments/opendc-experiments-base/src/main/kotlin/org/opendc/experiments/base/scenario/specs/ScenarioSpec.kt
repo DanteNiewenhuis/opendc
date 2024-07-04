@@ -48,7 +48,7 @@ public data class ScenarioSpec(
     var name: String = "",
     val topologies: List<ScenarioTopologySpec>,
     val workloads: List<WorkloadSpec>,
-    val allocationPolicies: List<AllocationPolicySpec>,
+    val allocationPolicies: List<AllocationPolicySpec> = listOf(AllocationPolicySpec()),
     val failureModels: List<FailureModelSpec?> = listOf(null),
     val checkpointModels: List<CheckpointModelSpec?> = listOf(null),
     val carbonTracePaths: List<String?> = listOf(null),

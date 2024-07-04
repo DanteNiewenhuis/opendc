@@ -27,15 +27,13 @@ import java.lang.ref.SoftReference
 import java.util.concurrent.ConcurrentHashMap
 
 public enum class WorkloadLoaderTypeEnum {
-    Tasks,
-    Fragments,
+    ComputeWorkload,
     Greenifier
 }
 
 public fun getWorkloadLoader(type: WorkloadLoaderTypeEnum): ComputeWorkloadLoaderNew {
     return when(type) {
-        WorkloadLoaderTypeEnum.Tasks -> TaskWorkloadLoader()
-        WorkloadLoaderTypeEnum.Fragments -> FragmentWorkloadLoader()
+        WorkloadLoaderTypeEnum.ComputeWorkload -> FragmentWorkloadLoader()
         WorkloadLoaderTypeEnum.Greenifier -> GreenifierWorkloadLoader()
     }
 }
