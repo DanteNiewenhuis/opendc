@@ -49,7 +49,6 @@ import kotlin.math.max
  *                     Default values are TERMINATED, ERROR, and DELETED.
  */
 public class RunningServerWatcher : ServerWatcher {
-    // TODO: make this changeable
     private val unlockStates: List<ServerState> = listOf(ServerState.DELETED, ServerState.TERMINATED)
 
     private val mutex: Mutex = Mutex()

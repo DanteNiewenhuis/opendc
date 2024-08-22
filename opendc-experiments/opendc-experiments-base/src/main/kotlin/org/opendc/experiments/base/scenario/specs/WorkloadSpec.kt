@@ -58,6 +58,7 @@ public enum class WorkloadTypes {
      * @constructor Create empty Compute workload
      */
     ComputeWorkload,
+    Greenifier
 }
 
 /**
@@ -68,5 +69,6 @@ public enum class WorkloadTypes {
 public fun getWorkloadType(type: WorkloadTypes): ComputeWorkload {
     return when (type) {
         WorkloadTypes.ComputeWorkload -> trace("trace").sampleByLoad(1.0)
+        WorkloadTypes.Greenifier -> trace("trace").sampleByLoad(1.0)
     }
 }

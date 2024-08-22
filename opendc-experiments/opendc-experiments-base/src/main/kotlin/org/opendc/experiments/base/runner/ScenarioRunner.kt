@@ -35,7 +35,10 @@ import org.opendc.compute.simulator.provisioner.setupHosts
 import org.opendc.compute.telemetry.export.parquet.ParquetComputeMonitor
 import org.opendc.compute.topology.clusterTopology
 import org.opendc.compute.workload.ComputeWorkloadLoader
+import org.opendc.compute.workload.greenifier.GreenifierWorkloadLoader
+import org.opendc.compute.workload.VirtualMachine
 import org.opendc.experiments.base.scenario.Scenario
+import org.opendc.experiments.base.scenario.specs.WorkloadTypes
 import org.opendc.experiments.base.scenario.specs.getWorkloadType
 import org.opendc.simulator.kotlin.runSimulation
 import java.io.File
@@ -121,8 +124,15 @@ public fun runScenario(
                 setupHosts(serviceDomain, topology, optimize = true),
             )
 
-            val workloadLoader = ComputeWorkloadLoader(File(scenario.workloadSpec.pathToFile))
-            val vms = getWorkloadType(scenario.workloadSpec.type).resolve(workloadLoader, Random(seed))
+            var vms: List<VirtualMachine> = listOf();
+            if (scenario.workloadSpec.type == WorkloadTypes.ComputeWorkload) {
+                val workloadLoader = ComputeWorkloadLoader(File(scenario.workloadSpec.pathToFile))
+                vms = getWorkloadType(scenario.workloadSpec.type).resolve(workloadLoader, Random(seed))
+            }
+            else if (scenario.workloadSpec.type == WorkloadTypes.Greenifier) {
+                val loader = GreenifierWorkloadLoader(File(scenario.workloadSpec.pathToFile))
+                vms = loader.loadWorkload()
+            }
 
             val carbonTrace = getCarbonTrace(scenario.carbonTracePath)
             val startTime = Duration.ofMillis(vms.minOf { it.startTime }.toEpochMilli())

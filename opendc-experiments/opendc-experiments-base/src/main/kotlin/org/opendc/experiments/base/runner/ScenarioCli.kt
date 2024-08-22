@@ -59,7 +59,5 @@ internal class ScenarioCommand : CliktCommand(name = "scenario") {
     override fun run() {
         val scenarios = getScenarios(scenarioPath)
         runScenarios(scenarios, parallelism)
-
-        // TODO: implement outputResults(scenario) // this will take the results, from a folder, and output them visually
     }
 }
