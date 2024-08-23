@@ -36,4 +36,9 @@ public interface Flavor : Resource {
      * The amount of RAM available to the server (in MB).
      */
     public val memorySize: Long
+
+    /**
+     * List of Servers that need to be finished before this can start
+     **/
+    public val dependencies: List<String>
 }

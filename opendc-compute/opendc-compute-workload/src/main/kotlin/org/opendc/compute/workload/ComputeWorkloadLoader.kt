@@ -144,8 +144,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
                         totalLoad,
                         submissionTime,
                         endTime,
-                        builder.build(),
-                        interferenceModel.getProfile(id),
+                        trace = builder.build(),
                     ),
                 )
             }
