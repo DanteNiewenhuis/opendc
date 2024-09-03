@@ -135,10 +135,12 @@ public suspend fun ComputeService.replay(
 //                val meta = mutableMapOf<String, Any>("workload" to workload)
 
                 var meta: MutableMap<String, Any>;
+
+                val utilization = entry.cpuCapacity / 100000
                 if (entry.trace == null) {
                     val workload = SimRuntimeWorkload(
                         entry.durations,
-                        1.0,
+                        utilization,
                         checkpointTime,
                         checkpointWait
                     )

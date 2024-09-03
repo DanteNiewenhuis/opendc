@@ -60,7 +60,7 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
     /**
      * Construct a new {@link SimRuntimeWorkload}.
      *
-     * @param duration The duration of the workload in milliseconds.
+     * @param durations The duration of the workload in milliseconds.
      * @param utilization The CPU utilization of the workload.
      */
     public SimRuntimeWorkload(Map<String, Long> durations, double utilization, long checkpointTime, long checkpointWait) {
