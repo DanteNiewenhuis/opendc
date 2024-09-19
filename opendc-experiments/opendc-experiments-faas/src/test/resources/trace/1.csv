@@ -1,4 +1,4 @@
-Timestamp [ms],Invocations, Avg Exec time per Invocation,Provisioned CPU [Mhz],Provisioned Memory [mb], Avg cpu usage per Invocation [Mhz], Avg mem usage per Invocation [mb],name
+Timestamp [ms],Invocations, Avg Exec time per Invocation,Provisioned CPU [Mhz],Provisioned Memory [mb], Avg cpuModel usage per Invocation [Mhz], Avg mem usage per Invocation [mb],name
 60000,1,300262,100,256,0.0,2.0,004c1ea5eb15978682b00ab659aed21e2835d5287668da8d5267f751fdfbdd78
 120000,0,300262,100,256,0.0,2.0,004c1ea5eb15978682b00ab659aed21e2835d5287668da8d5267f751fdfbdd78
 180000,0,300262,100,256,0.0,2.0,004c1ea5eb15978682b00ab659aed21e2835d5287668da8d5267f751fdfbdd78

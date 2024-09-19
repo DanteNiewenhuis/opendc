@@ -23,8 +23,8 @@
 package org.opendc.simulator.flow2.mux;
 
 import org.opendc.simulator.flow2.FlowStageLogic;
-import org.opendc.simulator.flow2.Inlet;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.InPort;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * A {@link FlowStageLogic} that multiplexes multiple inputs over (possibly) multiple outputs.
@@ -50,14 +50,14 @@ public interface FlowMultiplexer {
      *
      * @return The identifier of the input for this stage.
      */
-    Inlet newInput();
+    InPort newInput();
 
     /**
      * Release the input at the specified slot.
      *
-     * @param inlet The inlet to release.
+     * @param InPort The InPort to release.
      */
-    void releaseInput(Inlet inlet);
+    void releaseInput(InPort InPort);
 
     /**
      * Return the number of active outputs on this multiplexer.
@@ -67,16 +67,16 @@ public interface FlowMultiplexer {
     /**
      * Allocate a new output on this multiplexer.
      *
-     * @return The outlet for this stage.
+     * @return The OutPort for this stage.
      */
-    Outlet newOutput();
+    OutPort newOutPort();
 
     /**
      * Release the output at the specified slot.
      *
-     * @param outlet The outlet to release.
+     * @param OutPort The OutPort to release.
      */
-    void releaseOutput(Outlet outlet);
+    void releaseOutput(OutPort OutPort);
 
     /**
      * Return the total input capacity of the {@link FlowMultiplexer}.

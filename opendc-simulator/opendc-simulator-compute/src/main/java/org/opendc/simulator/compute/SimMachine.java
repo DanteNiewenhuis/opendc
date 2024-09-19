@@ -22,10 +22,8 @@
 
 package org.opendc.simulator.compute;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.opendc.simulator.compute.device.SimPeripheral;
 import org.opendc.simulator.compute.model.MachineModel;
 import org.opendc.simulator.compute.workload.SimWorkload;
 
@@ -36,12 +34,7 @@ public interface SimMachine {
     /**
      * Return the model of the machine containing its specifications.
      */
-    MachineModel getModel();
-
-    /**
-     * Return the peripherals attached to the machine.
-     */
-    List<? extends SimPeripheral> getPeripherals();
+    MachineModel getMachineModel();
 
     /**
      * Start the specified {@link SimWorkload} on this machine.

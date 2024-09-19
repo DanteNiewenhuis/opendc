@@ -28,7 +28,7 @@ package org.opendc.simulator.flow2;
  */
 public interface FlowStageLogic {
     /**
-     * This method is invoked when the one of the stage's inlets or outlets is invalidated.
+     * This method is invoked when the one of the stage's InPorts or OutPorts is invalidated.
      *
      * @param ctx The context in which the stage runs.
      * @param now The virtual timestamp in milliseconds after epoch at which the update is occurring.

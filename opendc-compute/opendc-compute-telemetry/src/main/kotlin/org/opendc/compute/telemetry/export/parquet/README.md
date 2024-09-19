@@ -8,9 +8,9 @@ The 'default' columns are defined in `DfltHostExportcolumns`, `DfltTaskExportCol
 Each `ExportColumn` has a `Regex`, used for deserialization. If no custom regex is provided, the default one is used. The default regex matches the column name in case-insensitive manner, either with `_` as in the name or with ` ` (blank space).
 
 ###### E.g.:  
-***column name*** = "cpu\_count"  
-***default column regex*** = "\\s*(?:cpu_count|cpu count)\\s*" (case insensitive)   
-***matches*** = "cpu\_count", "cpu count", "CpU/_cOuNt" etc.
+***column name*** = "cpuModel\_count"  
+***default column regex*** = "\\s*(?:cpu_count|cpuModel count)\\s*" (case insensitive)   
+***matches*** = "cpuModel\_count", "cpuModel count", "CpU/_cOuNt" etc.
 
 ### JSON Schema
 ```json

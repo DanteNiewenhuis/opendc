@@ -27,10 +27,10 @@ package org.opendc.simulator.flow2;
  */
 public interface OutHandler {
     /**
-     * This method is invoked when another {@link FlowStageLogic} changes the capacity of the outlet.
+     * This method is invoked when another {@link FlowStageLogic} changes the capacity of the OutPort.
      *
      * @param port     The output port of which the capacity was changed.
-     * @param capacity The new capacity of the outlet.
+     * @param capacity The new capacity of the OutPort.
      */
     void onPull(OutPort port, float capacity);
 
@@ -39,7 +39,7 @@ public interface OutHandler {
      * <p>
      * After this callback no other callbacks will be called for this port.
      *
-     * @param port  The outlet that no longer accepts any flow.
+     * @param port  The OutPort that no longer accepts any flow.
      * @param cause The cause of the output port no longer accepting any flow or <code>null</code> if the port closed
      *              successfully.
      */

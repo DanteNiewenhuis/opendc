@@ -94,9 +94,9 @@ public class SimHost(
 
     private val model: HostModel =
         HostModel(
-            machine.model.cpu.totalCapacity,
-            machine.model.cpu.coreCount,
-            machine.model.memory.size,
+            machine.machineModel.cpu.totalCapacity,
+            machine.machineModel.cpu.coreCount,
+            machine.machineModel.memory.size,
         )
 
     /**
@@ -346,14 +346,14 @@ public class SimHost(
      * Convert flavor to machine model.
      */
     private fun Flavor.toMachineModel(): MachineModel {
-        return MachineModel(machine.model.cpu, MemoryUnit("Generic", "Generic", 3200.0, memorySize))
+        return MachineModel(machine.machineModel.cpu, MemoryUnit("Generic", "Generic", 3200.0, memorySize))
     }
 
     private var localLastReport = clock.millis()
     private var localUptime = 0L
     private var localDowntime = 0L
     private var localBootTime: Instant? = null
-    private val localCpuLimit = machine.model.cpu.totalCapacity
+    private val localCpuLimit = machine.machineModel.cpu.totalCapacity
 
     /**
      * Helper function to track the uptime of a machine.

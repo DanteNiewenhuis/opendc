@@ -25,7 +25,7 @@ package org.opendc.simulator.compute
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.opendc.simulator.compute.kernel.SimHypervisor
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
 import org.opendc.simulator.compute.model.ProcessingNode
@@ -60,7 +60,7 @@ class SimMachineBenchmarks {
             MachineModel(
                 // cpus
                 List(cpuNode.coreCount) {
-                    Cpu(
+                    CpuModel(
                         cpuNode,
                         it,
                         1000.0,

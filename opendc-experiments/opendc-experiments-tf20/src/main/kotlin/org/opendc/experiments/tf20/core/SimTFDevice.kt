@@ -28,11 +28,10 @@ import org.opendc.common.Dispatcher
 import org.opendc.simulator.compute.SimBareMetalMachine
 import org.opendc.simulator.compute.SimMachine
 import org.opendc.simulator.compute.SimMachineContext
-import org.opendc.simulator.compute.SimPsuFactories
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.power.CpuPowerModel
+import org.opendc.simulator.compute.cpu.CpuPowerModel
 import org.opendc.simulator.compute.workload.SimWorkload
 import org.opendc.simulator.flow2.FlowEngine
 import org.opendc.simulator.flow2.FlowStage
@@ -52,7 +51,7 @@ public class SimTFDevice(
     override val uid: UUID,
     override val isGpu: Boolean,
     dispatcher: Dispatcher,
-    pu: Cpu,
+    pu: CpuModel,
     private val memory: MemoryUnit,
     powerModel: CpuPowerModel,
 ) : TFDevice {
@@ -63,7 +62,7 @@ public class SimTFDevice(
         SimBareMetalMachine.create(
             FlowEngine.create(dispatcher).newGraph(),
             MachineModel(pu, memory),
-            SimPsuFactories.simple(powerModel),
+            powerModel,
         )
 
     /**
@@ -105,7 +104,7 @@ public class SimTFDevice(
             override fun onStart(ctx: SimMachineContext) {
                 val stage = ctx.graph.newStage(this)
                 this.stage = stage
-                output = stage.getOutlet("out")
+                output = stage.getOutPort("out")
                 lastPull = ctx.graph.engine.clock.millis()
 
                 ctx.graph.connect(output, ctx.cpu.input)

@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.opendc.simulator.compute.SimBareMetalMachine
 import org.opendc.simulator.compute.SimMachineContext
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
 import org.opendc.simulator.compute.runWorkload
@@ -50,7 +50,7 @@ class SimChainWorkloadTest {
     fun setUp() {
         machineModel =
             MachineModel(
-                Cpu(
+                CpuModel(
                     0,
                     2,
                     1000.0,

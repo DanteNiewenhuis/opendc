@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * A single logical compute unit of processor node, either virtual or physical.
  */
-public final class Cpu {
+public final class CpuModel {
     private final int id;
     private final int coreCount;
     private final double coreSpeed;
@@ -38,7 +38,7 @@ public final class Cpu {
     private final String arch;
 
     /**
-     * Construct a {@link Cpu} instance.
+     * Construct a {@link CpuModel} instance.
      *
      * @param id The identifier of the CPU core within the processing node.
      * @param coreCount The number of cores present in the CPU
@@ -47,7 +47,7 @@ public final class Cpu {
      * @param modelName The name of the CPU
      * @param arch The architecture of the CPU
      */
-    public Cpu(int id, int coreCount, double coreSpeed, String vendor, String modelName, String arch) {
+    public CpuModel(int id, int coreCount, double coreSpeed, String vendor, String modelName, String arch) {
         this.id = id;
         this.coreCount = coreCount;
         this.coreSpeed = coreSpeed;
@@ -57,7 +57,7 @@ public final class Cpu {
         this.arch = arch;
     }
 
-    public Cpu(int id, int coreCount, double coreSpeed) {
+    public CpuModel(int id, int coreCount, double coreSpeed) {
         this(id, coreCount, coreSpeed, "unkown", "unkown", "unkown");
     }
 
@@ -114,7 +114,7 @@ public final class Cpu {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Cpu that = (Cpu) o;
+        CpuModel that = (CpuModel) o;
         return id == that.id
                 && Double.compare(that.totalCapacity, totalCapacity) == 0
                 && Double.compare(that.coreSpeed, coreSpeed) == 0

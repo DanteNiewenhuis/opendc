@@ -22,7 +22,7 @@
 
 package org.opendc.simulator.compute.kernel.cpufreq;
 
-import org.opendc.simulator.compute.SimProcessingUnit;
+import org.opendc.simulator.compute.cpu.SimProcessingUnit;
 
 /**
  * An interface that holds the state managed by a {@link ScalingGovernor} and used by the underlying machine to control

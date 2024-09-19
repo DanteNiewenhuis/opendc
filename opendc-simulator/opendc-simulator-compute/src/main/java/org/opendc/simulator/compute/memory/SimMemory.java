@@ -20,19 +20,22 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.flow2;
+package org.opendc.simulator.compute.memory;
+
+import org.opendc.simulator.compute.model.MemoryUnit;
+import org.opendc.simulator.flow2.sink.FlowSink;
 
 /**
- * An out-going edge in a {@link FlowGraph}.
+ * An interface to control the memory usage of simulated workloads.
  */
-public interface Outlet {
+public interface SimMemory extends FlowSink {
     /**
-     * Return the {@link FlowGraph} to which the outlet is exposed.
+     * Return the total capacity of the memory (in MBs).
      */
-    FlowGraph getGraph();
+    double getCapacity();
 
     /**
-     * Return the name of the outlet.
+     * Return the models representing the static information of the memory units supporting this interface.
      */
-    String getName();
+    MemoryUnit getMemoryUnit();
 }

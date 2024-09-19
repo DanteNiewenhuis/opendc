@@ -27,7 +27,7 @@ import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.InHandler;
 import org.opendc.simulator.flow2.InPort;
-import org.opendc.simulator.flow2.Inlet;
+import org.opendc.simulator.flow2.InPort;
 
 /**
  * A sink with a fixed capacity.
@@ -46,17 +46,17 @@ public final class SimpleFlowSink implements FlowSink, FlowStageLogic {
     public SimpleFlowSink(FlowGraph graph, float initialCapacity) {
         this.stage = graph.newStage(this);
         this.handler = new Handler();
-        this.input = stage.getInlet("in");
+        this.input = stage.getInPort("in");
         this.input.pull(initialCapacity);
         this.input.setMask(true);
         this.input.setHandler(handler);
     }
 
     /**
-     * Return the {@link Inlet} of this sink.
+     * Return the {@link InPort} of this sink.
      */
     @Override
-    public Inlet getInput() {
+    public InPort getInput() {
         return input;
     }
 

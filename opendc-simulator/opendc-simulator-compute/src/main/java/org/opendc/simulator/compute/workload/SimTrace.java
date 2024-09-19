@@ -26,7 +26,7 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.List;
 import org.opendc.simulator.compute.SimMachineContext;
-import org.opendc.simulator.compute.SimProcessingUnit;
+import org.opendc.simulator.compute.cpu.SimProcessingUnit;
 import org.opendc.simulator.flow2.FlowGraph;
 import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
@@ -324,7 +324,7 @@ public final class SimTrace {
             stage = graph.newStage(this);
 
             final SimProcessingUnit cpu = ctx.getCpu();
-            final OutPort output = stage.getOutlet("cpu");
+            final OutPort output = stage.getOutPort("cpu");
             this.output = output;
 
             graph.connect(output, cpu.getInput());

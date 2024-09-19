@@ -28,7 +28,7 @@ import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.OutHandler;
 import org.opendc.simulator.flow2.OutPort;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * A flow source that replays a sequence of fragments, each indicating the flow rate for some period of time.
@@ -52,7 +52,7 @@ public final class TraceFlowSource implements FlowSource, FlowStageLogic {
      */
     public TraceFlowSource(FlowGraph graph, Trace trace, Consumer<TraceFlowSource> completionHandler) {
         this.stage = graph.newStage(this);
-        this.output = stage.getOutlet("out");
+        this.output = stage.getOutPort("out");
         this.output.setHandler(new OutHandler() {
             @Override
             public void onPull(OutPort port, float capacity) {}
@@ -80,7 +80,7 @@ public final class TraceFlowSource implements FlowSource, FlowStageLogic {
     }
 
     @Override
-    public Outlet getOutput() {
+    public OutPort getOutput() {
         return output;
     }
 

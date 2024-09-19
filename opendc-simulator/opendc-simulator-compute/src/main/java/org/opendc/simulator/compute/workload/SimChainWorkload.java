@@ -23,13 +23,10 @@
 package org.opendc.simulator.compute.workload;
 
 import java.time.InstantSource;
-import java.util.List;
 import java.util.Map;
 import org.opendc.simulator.compute.SimMachineContext;
-import org.opendc.simulator.compute.SimMemory;
-import org.opendc.simulator.compute.SimNetworkInterface;
-import org.opendc.simulator.compute.SimProcessingUnit;
-import org.opendc.simulator.compute.SimStorageInterface;
+import org.opendc.simulator.compute.memory.SimMemory;
+import org.opendc.simulator.compute.cpu.SimProcessingUnit;
 import org.opendc.simulator.flow2.FlowGraph;
 import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
@@ -254,16 +251,6 @@ final class SimChainWorkload implements SimWorkload {
         @Override
         public SimMemory getMemory() {
             return ctx.getMemory();
-        }
-
-        @Override
-        public List<? extends SimNetworkInterface> getNetworkInterfaces() {
-            return ctx.getNetworkInterfaces();
-        }
-
-        @Override
-        public List<? extends SimStorageInterface> getStorageInterfaces() {
-            return ctx.getStorageInterfaces();
         }
 
         @Override

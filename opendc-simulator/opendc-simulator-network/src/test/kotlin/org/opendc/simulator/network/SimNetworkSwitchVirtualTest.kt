@@ -53,7 +53,7 @@ class SimNetworkSwitchVirtualTest {
             assertAll(
                 { assertTrue(sink.isConnected) },
                 { assertTrue(source.isConnected) },
-                { assertEquals(100.0f, source.outlet.capacity) },
+                { assertEquals(100.0f, source.OutPort.capacity) },
             )
 
             verify { source.logic.onUpdate(any(), any()) }

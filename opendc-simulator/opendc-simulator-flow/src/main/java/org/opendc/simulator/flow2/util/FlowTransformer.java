@@ -27,7 +27,7 @@ import org.opendc.simulator.flow2.sink.FlowSink;
 import org.opendc.simulator.flow2.source.FlowSource;
 
 /**
- * Helper class to transform flow from outlet to inlet.
+ * Helper class to transform flow from OutPort to InPort.
  */
 public final class FlowTransformer implements FlowStageLogic, FlowSource, FlowSink {
     private final FlowStage stage;
@@ -39,8 +39,8 @@ public final class FlowTransformer implements FlowStageLogic, FlowSource, FlowSi
      */
     public FlowTransformer(FlowGraph graph, FlowTransform transform) {
         this.stage = graph.newStage(this);
-        this.input = stage.getInlet("in");
-        this.output = stage.getOutlet("out");
+        this.input = stage.getInPort("in");
+        this.output = stage.getOutPort("out");
 
         this.input.setHandler(new ForwardInHandler(output, transform));
         this.input.setMask(true);
@@ -49,18 +49,18 @@ public final class FlowTransformer implements FlowStageLogic, FlowSource, FlowSi
     }
 
     /**
-     * Return the {@link Outlet} of the transformer.
+     * Return the {@link OutPort} of the transformer.
      */
     @Override
-    public Outlet getOutput() {
+    public OutPort getOutput() {
         return output;
     }
 
     /**
-     * Return the {@link Inlet} of the transformer.
+     * Return the {@link InPort} of the transformer.
      */
     @Override
-    public Inlet getInput() {
+    public InPort getInput() {
         return input;
     }
 

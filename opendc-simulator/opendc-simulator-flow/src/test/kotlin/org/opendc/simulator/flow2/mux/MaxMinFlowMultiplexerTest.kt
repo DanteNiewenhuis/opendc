@@ -42,7 +42,7 @@ class MaxMinFlowMultiplexerTest {
 
             val sinks = List(2) { SimpleFlowSink(graph, 2000.0f) }
             for (source in sinks) {
-                graph.connect(switch.newOutput(), source.input)
+                graph.connect(switch.newOutPort(), source.input)
             }
 
             val source = SimpleFlowSource(graph, 2000.0f, 1.0f)

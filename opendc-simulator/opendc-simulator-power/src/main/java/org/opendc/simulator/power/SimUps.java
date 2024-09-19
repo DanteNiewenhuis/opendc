@@ -24,8 +24,8 @@ package org.opendc.simulator.power;
 
 import org.jetbrains.annotations.NotNull;
 import org.opendc.simulator.flow2.FlowGraph;
-import org.opendc.simulator.flow2.Inlet;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.InPort;
+import org.opendc.simulator.flow2.OutPort;
 import org.opendc.simulator.flow2.mux.FlowMultiplexer;
 import org.opendc.simulator.flow2.mux.MaxMinFlowMultiplexer;
 import org.opendc.simulator.flow2.util.FlowTransform;
@@ -36,14 +36,14 @@ import org.opendc.simulator.flow2.util.FlowTransformer;
  * <p>
  * This model aggregates multiple power sources into a single source in order to ensure that power is always available.
  */
-public final class SimUps extends SimPowerOutlet {
+public final class SimUps extends SimPowerOutPort {
     /**
-     * The {@link FlowMultiplexer} that distributes the electricity over the PDU outlets.
+     * The {@link FlowMultiplexer} that distributes the electricity over the PDU OutPorts.
      */
     private final MaxMinFlowMultiplexer mux;
 
     /**
-     * A {@link FlowTransformer} that applies the power loss to the PDU's power inlet.
+     * A {@link FlowTransformer} that applies the power loss to the PDU's power InPort.
      */
     private final FlowTransformer transformer;
 
@@ -82,14 +82,14 @@ public final class SimUps extends SimPowerOutlet {
     }
 
     /**
-     * Create a new UPS inlet.
+     * Create a new UPS InPort.
      */
-    public PowerInlet newInlet() {
-        return new PowerInlet(mux);
+    public PowerInPort newInPort() {
+        return new PowerInPort(mux);
     }
 
     @Override
-    protected Inlet getFlowInlet() {
+    protected InPort getFlowInPort() {
         return transformer.getInput();
     }
 
@@ -99,39 +99,39 @@ public final class SimUps extends SimPowerOutlet {
     }
 
     /**
-     * A UPS inlet.
+     * A UPS InPort.
      */
-    public static final class PowerInlet extends SimPowerInlet implements AutoCloseable {
+    public static final class PowerInPort extends SimPowerInPort implements AutoCloseable {
         private final FlowMultiplexer mux;
-        private final Outlet outlet;
+        private final OutPort OutPort;
         private boolean isClosed;
 
-        private PowerInlet(FlowMultiplexer mux) {
+        private PowerInPort(FlowMultiplexer mux) {
             this.mux = mux;
-            this.outlet = mux.newOutput();
+            this.OutPort = mux.newOutPort();
         }
 
         /**
-         * Remove the inlet from the PDU.
+         * Remove the InPort from the PDU.
          */
         @Override
         public void close() {
             isClosed = true;
-            mux.releaseOutput(outlet);
+            mux.releaseOutput(OutPort);
         }
 
         @Override
         public String toString() {
-            return "SimPdu.Inlet";
+            return "SimPdu.InPort";
         }
 
         @NotNull
         @Override
-        protected Outlet getFlowOutlet() {
+        protected OutPort getFlowOutPort() {
             if (isClosed) {
-                throw new IllegalStateException("Inlet is closed");
+                throw new IllegalStateException("InPort is closed");
             }
-            return outlet;
+            return OutPort;
         }
     }
 }

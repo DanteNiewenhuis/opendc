@@ -33,7 +33,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.opendc.simulator.compute.SimBareMetalMachine
 import org.opendc.simulator.compute.kernel.cpufreq.ScalingGovernors
 import org.opendc.simulator.compute.kernel.interference.VmInterferenceModel
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
 import org.opendc.simulator.compute.runWorkload
@@ -54,7 +54,7 @@ internal class SimFairShareHypervisorTest {
     fun setUp() {
         model =
             MachineModel(
-                Cpu(
+                CpuModel(
                     0,
                     1,
                     3200.0,
@@ -173,7 +173,7 @@ internal class SimFairShareHypervisorTest {
         runSimulation {
             val model =
                 MachineModel(
-                    Cpu(
+                    CpuModel(
                         0,
                         2,
                         3200.0,
@@ -208,7 +208,7 @@ internal class SimFairShareHypervisorTest {
         runSimulation {
             val model =
                 MachineModel(
-                    Cpu(
+                    CpuModel(
                         0,
                         2,
                         3200.0,

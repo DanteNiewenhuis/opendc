@@ -20,43 +20,34 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.compute;
+package org.opendc.simulator.power;
 
-import org.opendc.simulator.compute.model.Cpu;
-import org.opendc.simulator.flow2.sink.FlowSink;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
- * A simulated processing unit.
+ * An abstract InPort that consumes electricity from a power OutPort.
  */
-public interface SimProcessingUnit extends FlowSink {
-    /**
-     * Return the base clock frequency of the processing unit (in MHz).
-     */
-    double getFrequency();
+public abstract class SimPowerInPort {
+    SimPowerOutPort OutPort;
 
     /**
-     * Adjust the base clock frequency of the processing unit.
+     * Determine whether the InPort is connected to a {@link SimPowerOutPort}.
      *
-     * <p>
-     * The CPU may or may not round the new frequency to one of its pre-defined frequency steps.
-     *
-     * @param frequency The new frequency to set the clock of the processing unit to.
-     * @throws UnsupportedOperationException if the base clock cannot be adjusted.
+     * @return <code>true</code> if the InPort is connected to an OutPort, <code>false</code> otherwise.
      */
-    void setFrequency(double frequency);
+    public boolean isConnected() {
+        return OutPort != null;
+    }
 
     /**
-     * The demand on the processing unit.
+     * Return the {@link SimPowerOutPort} to which the InPort is connected.
      */
-    double getDemand();
+    public SimPowerOutPort getOutPort() {
+        return OutPort;
+    }
 
     /**
-     * The speed of the processing unit.
+     * Return the flow {@link OutPort} that models the consumption of a power InPort as flow output.
      */
-    double getSpeed();
-
-    /**
-     *  The model representing the static properties of the processing unit.
-     */
-    Cpu getCpuModel();
+    protected abstract OutPort getFlowOutPort();
 }

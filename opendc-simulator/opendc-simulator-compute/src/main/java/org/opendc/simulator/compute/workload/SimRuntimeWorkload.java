@@ -23,7 +23,7 @@
 package org.opendc.simulator.compute.workload;
 
 import org.opendc.simulator.compute.SimMachineContext;
-import org.opendc.simulator.compute.SimProcessingUnit;
+import org.opendc.simulator.compute.cpu.SimProcessingUnit;
 import org.opendc.simulator.flow2.FlowGraph;
 import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
@@ -125,7 +125,7 @@ public class SimRuntimeWorkload implements SimWorkload, FlowStageLogic {
         this.outputs = outputs;
 
         final SimProcessingUnit cpu = ctx.getCpu();
-        final OutPort output = stage.getOutlet("cpu");
+        final OutPort output = stage.getOutPort("cpu");
 
         graph.connect(output, cpu.getInput());
         outputs[0] = output;

@@ -32,20 +32,20 @@ interface FlowGraphInternal extends FlowGraph {
     void detach(FlowStage stage);
 
     /**
-     * Helper method to connect an outlet to an inlet.
+     * Helper method to connect an OutPort to an InPort.
      */
-    static void connect(FlowGraph graph, Outlet outlet, Inlet inlet) {
-        if (!(outlet instanceof OutPort) || !(inlet instanceof InPort)) {
-            throw new IllegalArgumentException("Invalid outlet or inlet passed to graph");
+    static void connect(FlowGraph graph, OutPort OutPort, InPort InPort) {
+        if (!(OutPort instanceof OutPort) || !(InPort instanceof InPort)) {
+            throw new IllegalArgumentException("Invalid OutPort or InPort passed to graph");
         }
 
-        InPort inPort = (InPort) inlet;
-        OutPort outPort = (OutPort) outlet;
+        InPort inPort = (InPort) InPort;
+        OutPort outPort = (OutPort) OutPort;
 
         if (!graph.equals(outPort.getGraph()) || !graph.equals(inPort.getGraph())) {
-            throw new IllegalArgumentException("Outlet or inlet does not belong to graph");
+            throw new IllegalArgumentException("OutPort or InPort does not belong to graph");
         } else if (outPort.input != null || inPort.output != null) {
-            throw new IllegalStateException("Inlet or outlet already connected");
+            throw new IllegalStateException("InPort or OutPort already connected");
         }
 
         outPort.input = inPort;
@@ -56,17 +56,17 @@ interface FlowGraphInternal extends FlowGraph {
     }
 
     /**
-     * Helper method to disconnect an outlet.
+     * Helper method to disconnect an OutPort.
      */
-    static void disconnect(FlowGraph graph, Outlet outlet) {
-        if (!(outlet instanceof OutPort)) {
-            throw new IllegalArgumentException("Invalid outlet passed to graph");
+    static void disconnect(FlowGraph graph, OutPort OutPort) {
+        if (!(OutPort instanceof OutPort)) {
+            throw new IllegalArgumentException("Invalid OutPort passed to graph");
         }
 
-        OutPort outPort = (OutPort) outlet;
+        OutPort outPort = (OutPort) OutPort;
 
         if (!graph.equals(outPort.getGraph())) {
-            throw new IllegalArgumentException("Outlet or inlet does not belong to graph");
+            throw new IllegalArgumentException("OutPort or InPort does not belong to graph");
         }
 
         outPort.cancel(null);
@@ -74,17 +74,17 @@ interface FlowGraphInternal extends FlowGraph {
     }
 
     /**
-     * Helper method to disconnect an inlet.
+     * Helper method to disconnect an InPort.
      */
-    static void disconnect(FlowGraph graph, Inlet inlet) {
-        if (!(inlet instanceof InPort)) {
-            throw new IllegalArgumentException("Invalid outlet passed to graph");
+    static void disconnect(FlowGraph graph, InPort InPort) {
+        if (!(InPort instanceof InPort)) {
+            throw new IllegalArgumentException("Invalid OutPort passed to graph");
         }
 
-        InPort inPort = (InPort) inlet;
+        InPort inPort = (InPort) InPort;
 
         if (!graph.equals(inPort.getGraph())) {
-            throw new IllegalArgumentException("Outlet or inlet does not belong to graph");
+            throw new IllegalArgumentException("OutPort or InPort does not belong to graph");
         }
 
         inPort.finish(null);

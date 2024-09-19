@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.opendc.simulator.flow2.FlowGraph;
-import org.opendc.simulator.flow2.Inlet;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.InPort;
+import org.opendc.simulator.flow2.OutPort;
 import org.opendc.simulator.flow2.mux.FlowMultiplexer;
 import org.opendc.simulator.flow2.mux.MaxMinFlowMultiplexer;
 
@@ -70,37 +70,37 @@ public final class SimNetworkSwitchVirtual implements SimNetworkSwitch {
      */
     public class Port extends SimNetworkPort implements AutoCloseable {
         private final FlowMultiplexer mux;
-        private final Inlet inlet;
-        private final Outlet outlet;
+        private final InPort InPort;
+        private final OutPort OutPort;
         private boolean isClosed;
 
         private Port(FlowMultiplexer mux) {
             this.mux = mux;
-            this.inlet = mux.newInput();
-            this.outlet = mux.newOutput();
+            this.InPort = mux.newInput();
+            this.OutPort = mux.newOutPort();
         }
 
         @Override
-        protected Outlet getOutlet() {
+        protected OutPort getOutPort() {
             if (isClosed) {
                 throw new IllegalStateException("Port is closed");
             }
-            return outlet;
+            return OutPort;
         }
 
         @Override
-        protected Inlet getInlet() {
+        protected InPort getInPort() {
             if (isClosed) {
                 throw new IllegalStateException("Port is closed");
             }
-            return inlet;
+            return InPort;
         }
 
         @Override
         public void close() {
             isClosed = true;
-            mux.releaseInput(inlet);
-            mux.releaseOutput(outlet);
+            mux.releaseInput(InPort);
+            mux.releaseOutput(OutPort);
             ports.remove(this);
         }
     }

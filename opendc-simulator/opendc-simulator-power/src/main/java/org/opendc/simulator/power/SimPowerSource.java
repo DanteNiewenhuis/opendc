@@ -23,13 +23,13 @@
 package org.opendc.simulator.power;
 
 import org.opendc.simulator.flow2.FlowGraph;
-import org.opendc.simulator.flow2.Inlet;
+import org.opendc.simulator.flow2.InPort;
 import org.opendc.simulator.flow2.sink.SimpleFlowSink;
 
 /**
- * A {@link SimPowerOutlet} that represents a source of electricity with a maximum capacity.
+ * A {@link SimPowerOutPort} that represents a source of electricity with a maximum capacity.
  */
-public final class SimPowerSource extends SimPowerOutlet {
+public final class SimPowerSource extends SimPowerOutPort {
     /**
      * The resource source that drives this power source.
      */
@@ -60,7 +60,7 @@ public final class SimPowerSource extends SimPowerOutlet {
     }
 
     @Override
-    protected Inlet getFlowInlet() {
+    protected InPort getFlowInPort() {
         return sink.getInput();
     }
 

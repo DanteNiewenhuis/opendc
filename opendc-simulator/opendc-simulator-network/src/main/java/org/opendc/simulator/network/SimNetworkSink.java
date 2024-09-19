@@ -23,8 +23,8 @@
 package org.opendc.simulator.network;
 
 import org.opendc.simulator.flow2.FlowGraph;
-import org.opendc.simulator.flow2.Inlet;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.InPort;
+import org.opendc.simulator.flow2.OutPort;
 import org.opendc.simulator.flow2.sink.SimpleFlowSink;
 import org.opendc.simulator.flow2.source.EmptyFlowSource;
 
@@ -54,12 +54,12 @@ public final class SimNetworkSink extends SimNetworkPort {
     }
 
     @Override
-    protected Outlet getOutlet() {
+    protected OutPort getOutPort() {
         return source.getOutput();
     }
 
     @Override
-    protected Inlet getInlet() {
+    protected InPort getInPort() {
         return sink.getInput();
     }
 

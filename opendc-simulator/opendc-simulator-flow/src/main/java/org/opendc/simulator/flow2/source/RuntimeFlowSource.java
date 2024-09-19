@@ -28,7 +28,7 @@ import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.OutHandler;
 import org.opendc.simulator.flow2.OutPort;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * A {@link FlowSource} that ensures a flow is emitted for a specified amount of time at some utilization.
@@ -48,7 +48,7 @@ public class RuntimeFlowSource implements FlowSource, FlowStageLogic {
      *
      * @param graph The {@link FlowGraph} to which this source belongs.
      * @param duration The duration of the source.
-     * @param utilization The utilization of the capacity of the outlet.
+     * @param utilization The utilization of the capacity of the OutPort.
      * @param completionHandler A callback invoked when the source completes.
      */
     public RuntimeFlowSource(
@@ -62,7 +62,7 @@ public class RuntimeFlowSource implements FlowSource, FlowStageLogic {
         }
 
         this.stage = graph.newStage(this);
-        this.output = stage.getOutlet("out");
+        this.output = stage.getOutPort("out");
         this.output.setHandler(new OutHandler() {
             @Override
             public void onPull(OutPort port, float capacity) {}
@@ -84,17 +84,17 @@ public class RuntimeFlowSource implements FlowSource, FlowStageLogic {
      *
      * @param graph The {@link FlowGraph} to which this source belongs.
      * @param duration The duration of the source.
-     * @param utilization The utilization of the capacity of the outlet.
+     * @param utilization The utilization of the capacity of the OutPort.
      */
     public RuntimeFlowSource(FlowGraph graph, long duration, float utilization) {
         this(graph, duration, utilization, RuntimeFlowSource::close);
     }
 
     /**
-     * Return the {@link Outlet} of the source.
+     * Return the {@link OutPort} of the source.
      */
     @Override
-    public Outlet getOutput() {
+    public OutPort getOutput() {
         return output;
     }
 

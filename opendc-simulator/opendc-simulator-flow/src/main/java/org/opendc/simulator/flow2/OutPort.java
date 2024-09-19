@@ -30,7 +30,7 @@ import java.util.Objects;
  * <p>
  * Output ports are represented as out-going edges in the flow graph.
  */
-public final class OutPort implements Outlet {
+public final class OutPort {
     private final int id;
 
     private float capacity;
@@ -51,12 +51,11 @@ public final class OutPort implements Outlet {
         this.clock = stage.clock;
     }
 
-    @Override
+
     public FlowGraph getGraph() {
         return stage.parentGraph;
     }
 
-    @Override
     public String getName() {
         return name;
     }
@@ -163,7 +162,6 @@ public final class OutPort implements Outlet {
         }
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -171,25 +169,24 @@ public final class OutPort implements Outlet {
         return stage.equals(port.stage) && name.equals(port.name);
     }
 
-    @Override
     public int hashCode() {
         return Objects.hash(stage.parentGraph, name);
     }
 
     /**
-     * This method is invoked when the outlet is connected to an inlet.
+     * This method is invoked when the OutPort is connected to an InPort.
      */
     void connect() {
         input.push(demand);
     }
 
     /**
-     * Pull from this outlet with a specified capacity.
+     * Pull from this OutPort with a specified capacity.
      *
-     * @param capacity The capacity of the inlet.
+     * @param capacity The capacity of the InPort.
      */
     void pull(float capacity) {
-        // No-op when outlet is not active or the rate is unchanged
+        // No-op when OutPort is not active or the rate is unchanged
         if (this.capacity == capacity) {
             return;
         }

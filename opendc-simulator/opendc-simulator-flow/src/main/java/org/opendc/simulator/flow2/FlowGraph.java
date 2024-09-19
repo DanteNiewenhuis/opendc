@@ -40,24 +40,24 @@ public interface FlowGraph {
     FlowStage newStage(FlowStageLogic logic);
 
     /**
-     * Add an edge between the specified outlet port and inlet port in this graph.
+     * Add an edge between the specified OutPort port and InPort port in this graph.
      *
-     * @param outlet The outlet of the source from which the flow originates.
-     * @param inlet The inlet of the sink that should receive the flow.
+     * @param OutPort The OutPort of the source from which the flow originates.
+     * @param InPort The InPort of the sink that should receive the flow.
      */
-    void connect(Outlet outlet, Inlet inlet);
+    void connect(OutPort OutPort, InPort InPort);
 
     /**
-     * Disconnect the specified {@link Outlet} (if connected).
+     * Disconnect the specified {@link OutPort} (if connected).
      *
-     * @param outlet The outlet to disconnect.
+     * @param OutPort The OutPort to disconnect.
      */
-    void disconnect(Outlet outlet);
+    void disconnect(OutPort OutPort);
 
     /**
-     * Disconnect the specified {@link Inlet} (if connected).
+     * Disconnect the specified {@link InPort} (if connected).
      *
-     * @param inlet The inlet to disconnect.
+     * @param InPort The InPort to disconnect.
      */
-    void disconnect(Inlet inlet);
+    void disconnect(InPort InPort);
 }

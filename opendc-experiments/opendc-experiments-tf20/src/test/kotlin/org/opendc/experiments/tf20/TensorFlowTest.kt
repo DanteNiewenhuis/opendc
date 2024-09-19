@@ -28,7 +28,7 @@ import org.opendc.experiments.tf20.core.SimTFDevice
 import org.opendc.experiments.tf20.distribute.MirroredStrategy
 import org.opendc.experiments.tf20.distribute.OneDeviceStrategy
 import org.opendc.experiments.tf20.util.MLEnvironmentReader
-import org.opendc.simulator.compute.power.CpuPowerModels
+import org.opendc.simulator.compute.cpu.CpuPowerModels
 import org.opendc.simulator.kotlin.runSimulation
 import java.util.UUID
 

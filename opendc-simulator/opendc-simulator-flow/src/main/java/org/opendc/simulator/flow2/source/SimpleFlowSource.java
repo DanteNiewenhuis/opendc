@@ -28,7 +28,7 @@ import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.OutHandler;
 import org.opendc.simulator.flow2.OutPort;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * A flow source that contains a fixed amount and is pushed with a given utilization.
@@ -46,8 +46,8 @@ public final class SimpleFlowSource implements FlowSource, FlowStageLogic {
      * Construct a new {@link SimpleFlowSource}.
      *
      * @param graph The {@link FlowGraph} to which this source belongs.
-     * @param amount The amount to transfer via the outlet.
-     * @param utilization The utilization of the capacity of the outlet.
+     * @param amount The amount to transfer via the OutPort.
+     * @param utilization The utilization of the capacity of the OutPort.
      * @param completionHandler A callback invoked when the source completes.
      */
     public SimpleFlowSource(
@@ -61,7 +61,7 @@ public final class SimpleFlowSource implements FlowSource, FlowStageLogic {
         }
 
         this.stage = graph.newStage(this);
-        this.output = stage.getOutlet("out");
+        this.output = stage.getOutPort("out");
         this.output.setHandler(new OutHandler() {
             @Override
             public void onPull(OutPort port, float capacity) {}
@@ -82,18 +82,18 @@ public final class SimpleFlowSource implements FlowSource, FlowStageLogic {
      * Construct a new {@link SimpleFlowSource}.
      *
      * @param graph The {@link FlowGraph} to which this source belongs.
-     * @param amount The amount to transfer via the outlet.
-     * @param utilization The utilization of the capacity of the outlet.
+     * @param amount The amount to transfer via the OutPort.
+     * @param utilization The utilization of the capacity of the OutPort.
      */
     public SimpleFlowSource(FlowGraph graph, float amount, float utilization) {
         this(graph, amount, utilization, SimpleFlowSource::close);
     }
 
     /**
-     * Return the {@link Outlet} of the source.
+     * Return the {@link OutPort} of the source.
      */
     @Override
-    public Outlet getOutput() {
+    public OutPort getOutput() {
         return output;
     }
 

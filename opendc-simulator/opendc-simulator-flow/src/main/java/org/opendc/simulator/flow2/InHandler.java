@@ -37,7 +37,7 @@ public interface InHandler {
     }
 
     /**
-     * This method is invoked when another {@link FlowStageLogic} changes the rate of flow to the specified inlet.
+     * This method is invoked when another {@link FlowStageLogic} changes the rate of flow to the specified InPort.
      *
      * @param port   The input port to which the flow was pushed.
      * @param demand The rate of flow the output attempted to push to the port.

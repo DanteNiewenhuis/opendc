@@ -20,31 +20,52 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.compute;
+package org.opendc.simulator.compute.cpu;
 
-import org.opendc.simulator.flow2.Inlet;
+import org.opendc.simulator.compute.model.CpuModel;
+import org.opendc.simulator.flow2.FlowStageLogic;
+import org.opendc.simulator.flow2.InPort;
+import org.opendc.simulator.flow2.sink.FlowSink;
 
 /**
- * A firmware interface to a storage device.
+ * A simulated processing unit.
  */
-public interface SimStorageInterface {
+public interface SimProcessingUnit extends FlowStageLogic {
     /**
-     * Return the name of the network interface.
+     * Return the base clock frequency of the processing unit (in MHz).
      */
-    String getName();
+    double getFrequency();
 
     /**
-     * Return the capacity of the storage device in MBs.
+     * Adjust the base clock frequency of the processing unit.
+     *
+     * <p>
+     * The CPU may or may not round the new frequency to one of its pre-defined frequency steps.
+     *
+     * @param frequency The new frequency to set the clock of the processing unit to.
+     * @throws UnsupportedOperationException if the base clock cannot be adjusted.
      */
-    double getCapacity();
+    void setFrequency(double frequency);
+
+    double getPowerDraw();
+
+    double getEnergyUsage();
+
+    InPort getInput();
+
 
     /**
-     * Return the inlet for the read operations of the storage device.
+     * The demand on the processing unit.
      */
-    Inlet getRead();
+    double getDemand();
 
     /**
-     * Return the inlet for the write operation of the storage device.
+     * The speed of the processing unit.
      */
-    Inlet getWrite();
+    double getSpeed();
+
+    /**
+     *  The model representing the static properties of the processing unit.
+     */
+    CpuModel getCpuModel();
 }

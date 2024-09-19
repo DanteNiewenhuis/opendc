@@ -52,10 +52,14 @@ public final class FlowStage {
     private static final int STAGE_UPDATE_ACTIVE = 1 << 4; // An update for the connection is active
     private static final int STAGE_UPDATE_PENDING = 1 << 5; // An (immediate) update of the connection is pending
 
+    private enum StageState {STAGE_PENDING, STAGE_ACTIVE, STAGE_CLOSED}
+    private enum FlowState {STAGE_INVALIDATE, STAGE_CLOSE, STAGE_UPDATE_ACTIVE, STAGE_UPDATE_PENDING}
+
     /**
      * The flags representing the state and pending actions for the stage.
      */
-    private int flags = STAGE_PENDING;
+    private StageState stageFlag = StageState.STAGE_PENDING;
+    private FlowState flowFlag = FlowState.STAGE_UPDATE_PENDING;
 
     /**
      * The deadline of the stage after which an update should run.
@@ -72,10 +76,10 @@ public final class FlowStage {
     final FlowGraphInternal parentGraph;
     private final FlowEngine engine;
 
-    private final Map<String, InPort> inlets = new HashMap<>();
-    private final Map<String, OutPort> outlets = new HashMap<>();
-    private int nextInlet = 0;
-    private int nextOutlet = 0;
+    private final Map<String, InPort> InPorts = new HashMap<>();
+    private final Map<String, OutPort> OutPorts = new HashMap<>();
+    private int nextInPort = 0;
+    private int nextOutPort = 0;
 
     /**
      * Construct a new {@link FlowStage} instance.
@@ -98,25 +102,33 @@ public final class FlowStage {
     }
 
     /**
-     * Return the {@link Inlet} (an in-going edge) with the specified <code>name</code> for this {@link FlowStage}.
-     * If an inlet with that name does not exist, a new one is allocated for the stage.
+     * Return the {@link InPort} (an in-going edge) with the specified <code>name</code> for this {@link FlowStage}.
+     * If an InPort with that name does not exist, a new one is allocated for the stage.
      *
-     * @param name The name of the inlet.
-     * @return The {@link InPort} representing an {@link Inlet} with the specified <code>name</code>.
+     * @param name The name of the InPort.
+     * @return The {@link InPort} representing an {@link InPort} with the specified <code>name</code>.
      */
-    public InPort getInlet(String name) {
-        return inlets.computeIfAbsent(name, (key) -> new InPort(this, key, nextInlet++));
+    public InPort getInPort(String name, int id) {
+        return InPorts.computeIfAbsent(name, (key) -> new InPort(this, key, id));
+    }
+
+    public InPort getInPort(String name) {
+        return InPorts.computeIfAbsent(name, (key) -> new InPort(this, key, nextInPort));
     }
 
     /**
-     * Return the {@link Outlet} (an out-going edge) with the specified <code>name</code> for this {@link FlowStage}.
-     * If an outlet with that name does not exist, a new one is allocated for the stage.
+     * Return the {@link OutPort} (an out-going edge) with the specified <code>name</code> for this {@link FlowStage}.
+     * If an OutPort with that name does not exist, a new one is allocated for the stage.
      *
-     * @param name The name of the outlet.
-     * @return The {@link OutPort} representing an {@link Outlet} with the specified <code>name</code>.
+     * @param name The name of the OutPort.
+     * @return The {@link OutPort} representing an {@link OutPort} with the specified <code>name</code>.
      */
-    public OutPort getOutlet(String name) {
-        return outlets.computeIfAbsent(name, (key) -> new OutPort(this, key, nextOutlet++));
+    public OutPort getOutPort(String name, int id) {
+        return OutPorts.computeIfAbsent(name, (key) -> new OutPort(this, key, id));
+    }
+
+    public OutPort getOutPort(String name) {
+        return OutPorts.computeIfAbsent(name, (key) -> new OutPort(this, key, nextOutPort));
     }
 
     /**
@@ -134,7 +146,7 @@ public final class FlowStage {
     public void setDeadline(long deadline) {
         this.deadline = deadline;
 
-        if ((flags & STAGE_UPDATE_ACTIVE) == 0) {
+        if (flowFlag == FlowState.STAGE_UPDATE_ACTIVE) {
             // Update the timer queue with the new deadline
             engine.scheduleDelayed(this);
         }
@@ -144,10 +156,8 @@ public final class FlowStage {
      * Invalidate the {@link FlowStage} forcing the stage to update.
      */
     public void invalidate() {
-        int flags = this.flags;
-
-        if ((flags & STAGE_UPDATE_ACTIVE) == 0) {
-            scheduleImmediate(clock.millis(), flags | STAGE_INVALIDATE);
+        if (this.flowFlag == FlowState.STAGE_UPDATE_ACTIVE) {
+            scheduleImmediate(clock.millis(), FlowState.STAGE_UPDATE_ACTIVE);
         }
     }
 
@@ -155,26 +165,24 @@ public final class FlowStage {
      * Synchronously update the {@link FlowStage} at the current timestamp.
      */
     public void sync() {
-        this.flags |= STAGE_INVALIDATE;
+        this.flowFlag = FlowState.STAGE_INVALIDATE;
         onUpdate(clock.millis());
         engine.scheduleDelayed(this);
     }
 
     /**
-     * Close the {@link FlowStage} and disconnect all inlets and outlets.
+     * Close the {@link FlowStage} and disconnect all InPorts and OutPorts.
      */
     public void close() {
-        int flags = this.flags;
-
-        if ((flags & STAGE_STATE) == STAGE_CLOSED) {
+        if (this.stageFlag == StageState.STAGE_CLOSED) {
             return;
         }
 
         // Toggle the close bit. In case no update is active, schedule a new update.
-        if ((flags & STAGE_UPDATE_ACTIVE) != 0) {
-            this.flags = flags | STAGE_CLOSE;
+        if (this.flowFlag == FlowState.STAGE_UPDATE_ACTIVE) {
+            this.flowFlag = FlowState.STAGE_CLOSE;
         } else {
-            scheduleImmediate(clock.millis(), flags | STAGE_CLOSE);
+            scheduleImmediate(clock.millis(), FlowState.STAGE_CLOSE);
         }
     }
 
@@ -184,13 +192,10 @@ public final class FlowStage {
      * @param now The current virtual timestamp.
      */
     void onUpdate(long now) {
-        int flags = this.flags;
-        int state = flags & STAGE_STATE;
-
-        if (state == STAGE_ACTIVE) {
-            doUpdate(now, flags);
-        } else if (state == STAGE_PENDING) {
-            doStart(now, flags);
+        if (this.stageFlag == StageState.STAGE_ACTIVE) {
+            doUpdate(now, this.flowFlag);
+        } else if (this.stageFlag == StageState.STAGE_PENDING) {
+            doStart(now, this.flowFlag);
         }
     }
 
@@ -208,7 +213,7 @@ public final class FlowStage {
     /**
      * Schedule an immediate update for this stage.
      */
-    private void scheduleImmediate(long now, int flags) {
+    private void scheduleImmediate(long now, FlowState flowFlag) {
         // In case an immediate update is already scheduled, no need to do anything
         if ((flags & STAGE_UPDATE_PENDING) != 0) {
             this.flags = flags;
@@ -224,17 +229,16 @@ public final class FlowStage {
     /**
      * Start the stage.
      */
-    private void doStart(long now, int flags) {
-        // Update state before calling into the outside world, so it observes a consistent state
-        flags = flags | STAGE_ACTIVE | STAGE_UPDATE_ACTIVE;
+    private void doStart(long now, FlowState flowFlag) {
+        this.stageFlag = StageState.STAGE_ACTIVE;
 
-        doUpdate(now, flags);
+        doUpdate(now, FlowState.STAGE_UPDATE_ACTIVE);
     }
 
     /**
      * Update the state of the stage.
      */
-    private void doUpdate(long now, int flags) {
+    private void doUpdate(long now, FlowState flowFlag) {
         long deadline = this.deadline;
         long newDeadline = deadline;
 
@@ -296,14 +300,14 @@ public final class FlowStage {
         setDeadline(Long.MAX_VALUE);
 
         // Cancel all input ports
-        for (InPort port : inlets.values()) {
+        for (InPort port : InPorts.values()) {
             if (port != null) {
                 port.cancel(cause);
             }
         }
 
         // Cancel all output ports
-        for (OutPort port : outlets.values()) {
+        for (OutPort port : OutPorts.values()) {
             if (port != null) {
                 port.fail(cause);
             }

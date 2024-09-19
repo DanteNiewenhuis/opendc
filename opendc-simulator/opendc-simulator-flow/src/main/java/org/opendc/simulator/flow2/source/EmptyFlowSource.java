@@ -26,7 +26,7 @@ import org.opendc.simulator.flow2.FlowGraph;
 import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.OutPort;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * An empty {@link FlowSource}.
@@ -40,14 +40,14 @@ public final class EmptyFlowSource implements FlowSource, FlowStageLogic {
      */
     public EmptyFlowSource(FlowGraph graph) {
         this.stage = graph.newStage(this);
-        this.output = stage.getOutlet("out");
+        this.output = stage.getOutPort("out");
     }
 
     /**
-     * Return the {@link Outlet} of the source.
+     * Return the {@link OutPort} of the source.
      */
     @Override
-    public Outlet getOutput() {
+    public OutPort getOutput() {
         return output;
     }
 

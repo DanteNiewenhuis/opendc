@@ -36,7 +36,7 @@ import org.opendc.faas.service.router.RandomRoutingPolicy
 import org.opendc.faas.simulator.delay.ColdStartModel
 import org.opendc.faas.simulator.delay.StochasticDelayInjector
 import org.opendc.faas.simulator.workload.SimFaaSWorkload
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
 import org.opendc.simulator.compute.workload.SimWorkload
@@ -55,7 +55,7 @@ internal class SimFaaSServiceTest {
     fun setUp() {
         machineModel =
             MachineModel(
-                Cpu(
+                CpuModel(
                     0,
                     2,
                     1000.0,

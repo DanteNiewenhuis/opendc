@@ -30,7 +30,7 @@ import java.util.Objects;
  * <p>
  * Input ports are represented as in-going edges in the flow graph.
  */
-public final class InPort implements Inlet {
+public final class InPort {
     private final int id;
 
     private float capacity;
@@ -51,12 +51,10 @@ public final class InPort implements Inlet {
         this.clock = stage.clock;
     }
 
-    @Override
     public FlowGraph getGraph() {
         return stage.parentGraph;
     }
 
-    @Override
     public String getName() {
         return name;
     }
@@ -134,9 +132,9 @@ public final class InPort implements Inlet {
     }
 
     /**
-     * Disconnect the input port from its (potentially) connected outlet.
+     * Disconnect the input port from its (potentially) connected OutPort.
      * <p>
-     * The inlet can still be used and re-connected to another outlet.
+     * The InPort can still be used and re-connected to another OutPort.
      *
      * @param cause The cause for disconnecting the port or <code>null</code> when no more flow is needed.
      */
@@ -151,7 +149,6 @@ public final class InPort implements Inlet {
         }
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -159,13 +156,12 @@ public final class InPort implements Inlet {
         return stage.equals(port.stage) && name.equals(port.name);
     }
 
-    @Override
     public int hashCode() {
         return Objects.hash(stage.parentGraph, name);
     }
 
     /**
-     * This method is invoked when the inlet is connected to an outlet.
+     * This method is invoked when the InPort is connected to an OutPort.
      */
     void connect() {
         OutPort output = this.output;
@@ -173,7 +169,7 @@ public final class InPort implements Inlet {
     }
 
     /**
-     * Push a flow from an outlet to this inlet.
+     * Push a flow from an OutPort to this InPort.
      *
      * @param demand The rate of flow to push.
      */

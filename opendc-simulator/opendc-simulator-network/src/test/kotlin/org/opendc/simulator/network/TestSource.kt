@@ -27,9 +27,9 @@ import org.opendc.simulator.flow2.FlowGraph
 import org.opendc.simulator.flow2.FlowStage
 import org.opendc.simulator.flow2.FlowStageLogic
 import org.opendc.simulator.flow2.InPort
-import org.opendc.simulator.flow2.Inlet
+import org.opendc.simulator.flow2.InPort
 import org.opendc.simulator.flow2.OutPort
-import org.opendc.simulator.flow2.Outlet
+import org.opendc.simulator.flow2.OutPort
 
 /**
  * A [SimNetworkPort] that acts as a test source.
@@ -38,11 +38,11 @@ class TestSource(graph: FlowGraph) : SimNetworkPort(), FlowStageLogic {
     val logic = spyk(this)
     private val stage = graph.newStage(logic)
 
-    val outlet: OutPort = stage.getOutlet("out")
-    val inlet: InPort = stage.getInlet("in")
+    val OutPort: OutPort = stage.getOutPort("out")
+    val InPort: InPort = stage.getInPort("in")
 
     init {
-        outlet.push(80.0f)
+        OutPort.push(80.0f)
     }
 
     override fun onUpdate(
@@ -50,7 +50,7 @@ class TestSource(graph: FlowGraph) : SimNetworkPort(), FlowStageLogic {
         now: Long,
     ): Long = Long.MAX_VALUE
 
-    override fun getOutlet(): Outlet = outlet
+    override fun getOutPort(): OutPort = OutPort
 
-    override fun getInlet(): Inlet = inlet
+    override fun getInPort(): InPort = InPort
 }

@@ -25,17 +25,17 @@ package org.opendc.simulator.power
 import org.opendc.simulator.flow2.FlowGraph
 import org.opendc.simulator.flow2.FlowStage
 import org.opendc.simulator.flow2.FlowStageLogic
-import org.opendc.simulator.flow2.Outlet
+import org.opendc.simulator.flow2.OutPort
 
 /**
- * A test inlet.
+ * A test InPort.
  */
-class TestInlet(graph: FlowGraph) : SimPowerInlet(), FlowStageLogic {
+class TestInPort(graph: FlowGraph) : SimPowerInPort(), FlowStageLogic {
     private val stage = graph.newStage(this)
-    val flowOutlet = stage.getOutlet("out")
+    val flowOutPort = stage.getOutPort("out")
 
     init {
-        flowOutlet.push(100.0f)
+        flowOutPort.push(100.0f)
     }
 
     override fun onUpdate(
@@ -43,7 +43,7 @@ class TestInlet(graph: FlowGraph) : SimPowerInlet(), FlowStageLogic {
         now: Long,
     ): Long = Long.MAX_VALUE
 
-    override fun getFlowOutlet(): Outlet {
-        return flowOutlet
+    override fun getFlowOutPort(): OutPort {
+        return flowOutPort
     }
 }

@@ -24,8 +24,8 @@ package org.opendc.simulator.power;
 
 import org.jetbrains.annotations.NotNull;
 import org.opendc.simulator.flow2.FlowGraph;
-import org.opendc.simulator.flow2.Inlet;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.InPort;
+import org.opendc.simulator.flow2.OutPort;
 import org.opendc.simulator.flow2.mux.FlowMultiplexer;
 import org.opendc.simulator.flow2.mux.MaxMinFlowMultiplexer;
 import org.opendc.simulator.flow2.util.FlowTransform;
@@ -34,14 +34,14 @@ import org.opendc.simulator.flow2.util.FlowTransformer;
 /**
  * A model of a Power Distribution Unit (PDU).
  */
-public final class SimPdu extends SimPowerInlet {
+public final class SimPdu extends SimPowerInPort {
     /**
-     * The {@link FlowMultiplexer} that distributes the electricity over the PDU outlets.
+     * The {@link FlowMultiplexer} that distributes the electricity over the PDU OutPorts.
      */
     private final MaxMinFlowMultiplexer mux;
 
     /**
-     * A {@link FlowTransformer} that applies the power loss to the PDU's power inlet.
+     * A {@link FlowTransformer} that applies the power loss to the PDU's power InPort.
      */
     private final FlowTransformer transformer;
 
@@ -72,7 +72,7 @@ public final class SimPdu extends SimPowerInlet {
             }
         });
 
-        graph.connect(mux.newOutput(), transformer.getInput());
+        graph.connect(mux.newOutPort(), transformer.getInput());
     }
 
     /**
@@ -85,15 +85,15 @@ public final class SimPdu extends SimPowerInlet {
     }
 
     /**
-     * Create a new PDU outlet.
+     * Create a new PDU OutPort.
      */
-    public PowerOutlet newOutlet() {
-        return new PowerOutlet(mux);
+    public PowerOutPort newOutPort() {
+        return new PowerOutPort(mux);
     }
 
     @NotNull
     @Override
-    public Outlet getFlowOutlet() {
+    public OutPort getFlowOutPort() {
         return transformer.getOutput();
     }
 
@@ -103,39 +103,39 @@ public final class SimPdu extends SimPowerInlet {
     }
 
     /**
-     * A PDU outlet.
+     * A PDU OutPort.
      */
-    public static final class PowerOutlet extends SimPowerOutlet implements AutoCloseable {
+    public static final class PowerOutPort extends SimPowerOutPort implements AutoCloseable {
         private final FlowMultiplexer mux;
-        private final Inlet inlet;
+        private final InPort InPort;
         private boolean isClosed;
 
-        private PowerOutlet(FlowMultiplexer mux) {
+        private PowerOutPort(FlowMultiplexer mux) {
             this.mux = mux;
-            this.inlet = mux.newInput();
+            this.InPort = mux.newInput();
         }
 
         /**
-         * Remove the outlet from the PDU.
+         * Remove the OutPort from the PDU.
          */
         @Override
         public void close() {
             isClosed = true;
-            mux.releaseInput(inlet);
+            mux.releaseInput(InPort);
         }
 
         @Override
         public String toString() {
-            return "SimPdu.Outlet";
+            return "SimPdu.OutPort";
         }
 
         @NotNull
         @Override
-        protected Inlet getFlowInlet() {
+        protected InPort getFlowInPort() {
             if (isClosed) {
-                throw new IllegalStateException("Outlet is closed");
+                throw new IllegalStateException("OutPort is closed");
             }
-            return inlet;
+            return InPort;
         }
     }
 }

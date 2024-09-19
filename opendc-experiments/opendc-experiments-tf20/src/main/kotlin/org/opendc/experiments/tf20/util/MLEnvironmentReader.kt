@@ -25,10 +25,10 @@ package org.opendc.experiments.tf20.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.power.CpuPowerModels
+import org.opendc.simulator.compute.cpu.CpuPowerModels
 import java.io.InputStream
 import java.util.UUID
 
@@ -57,7 +57,7 @@ public class MLEnvironmentReader {
                                     when (id) {
                                         1 -> {
                                             // ref: https://www.guru3d.com/articles-pages/nvidia-geforce-gtx-titan-x-review,8.html#:~:text=GeForce%20GTX%20Titan%20X%20%2D%20On,power%20supply%20unit%20as%20minimum.
-                                            Cpu(
+                                            CpuModel(
                                                 0,
                                                 4992,
                                                 824.0,
@@ -68,7 +68,7 @@ public class MLEnvironmentReader {
                                         }
                                         2 -> {
                                             // ref: https://www.microway.com/hpc-tech-tips/nvidia-tesla-p100-pci-e-16gb-gpu-accelerator-pascal-gp100-close/
-                                            Cpu(
+                                            CpuModel(
                                                 0,
                                                 3584,
                                                 1190.0,
@@ -79,7 +79,7 @@ public class MLEnvironmentReader {
                                         }
                                         3 -> {
                                             // ref: https://www.anandtech.com/show/10923/openpower-saga-tyans-1u-power8-gt75/7
-                                            Cpu(
+                                            CpuModel(
                                                 0,
                                                 24,
                                                 3498.0,
@@ -89,7 +89,7 @@ public class MLEnvironmentReader {
                                             )
                                         }
                                         4 -> {
-                                            Cpu(
+                                            CpuModel(
                                                 0,
                                                 10,
                                                 143000.0,

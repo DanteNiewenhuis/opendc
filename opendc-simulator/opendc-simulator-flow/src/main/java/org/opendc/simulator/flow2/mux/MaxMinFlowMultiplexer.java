@@ -22,6 +22,7 @@
 
 package org.opendc.simulator.flow2.mux;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import org.opendc.simulator.flow2.FlowGraph;
@@ -29,10 +30,8 @@ import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.InHandler;
 import org.opendc.simulator.flow2.InPort;
-import org.opendc.simulator.flow2.Inlet;
 import org.opendc.simulator.flow2.OutHandler;
 import org.opendc.simulator.flow2.OutPort;
-import org.opendc.simulator.flow2.Outlet;
 
 /**
  * A {@link FlowMultiplexer} implementation that distributes the available capacity of the outputs over the inputs
@@ -48,17 +47,14 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
     static FlowMultiplexerFactory FACTORY = MaxMinFlowMultiplexer::new;
 
     private final FlowStage stage;
-    private final BitSet activeInputs;
-    private final BitSet activeOutputs;
 
     private float capacity = 0.f;
     private float demand = 0.f;
     private float rate = 0.f;
 
-    private InPort[] inlets;
-    private long[] inputs;
-    private float[] rates;
-    private OutPort[] outlets;
+    private final ArrayList<InPort> demandPorts;
+    private final ArrayList<Float> rates;
+    private final ArrayList<OutPort> capacityPorts;
 
     private final MultiplexerInHandler inHandler = new MultiplexerInHandler();
     private final MultiplexerOutHandler outHandler = new MultiplexerOutHandler();
@@ -70,13 +66,10 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
      */
     public MaxMinFlowMultiplexer(FlowGraph graph) {
         this.stage = graph.newStage(this);
-        this.activeInputs = new BitSet();
-        this.activeOutputs = new BitSet();
 
-        this.inlets = new InPort[4];
-        this.inputs = new long[4];
-        this.rates = new float[4];
-        this.outlets = new OutPort[4];
+        this.demandPorts = new ArrayList<>(4);
+        this.rates = new ArrayList<>(4);
+        this.capacityPorts = new ArrayList<>(4);
     }
 
     @Override
@@ -111,14 +104,14 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
         float rate = demand;
 
         if (demand > capacity) {
-            rate = redistributeCapacity(inlets, inputs, rates, capacity);
+            rate = redistributeCapacity(demandPorts, rates, capacity);
         }
 
         if (this.rate != rate) {
             // Only update the outputs if the output rate has changed
             this.rate = rate;
 
-            changeRate(activeOutputs, outlets, capacity, rate);
+            changeRate(capacityPorts, capacity, rate);
         }
 
         return Long.MAX_VALUE;
@@ -126,85 +119,70 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
 
     @Override
     public int getInputCount() {
-        return activeInputs.length();
+        return demandPorts.size();
     }
 
     @Override
-    public Inlet newInput() {
-        final BitSet activeInputs = this.activeInputs;
-        int slot = activeInputs.nextClearBit(0);
+    public InPort newInput() {
+        int slot = this.demandPorts.size();
 
-        InPort port = stage.getInlet("in" + slot);
+        InPort port = stage.getInPort("in_" + slot, slot);
         port.setHandler(inHandler);
         port.pull(this.capacity);
 
-        InPort[] inlets = this.inlets;
-        if (slot >= inlets.length) {
-            int newLength = inlets.length + (inlets.length >> 1);
-            inlets = Arrays.copyOf(inlets, newLength);
-            inputs = Arrays.copyOf(inputs, newLength);
-            rates = Arrays.copyOf(rates, newLength);
-            this.inlets = inlets;
-        }
-        inlets[slot] = port;
+        this.demandPorts.add(port);
+        this.rates.add(0.0f);
 
-        activeInputs.set(slot);
         return port;
     }
 
     @Override
-    public void releaseInput(Inlet inlet) {
-        InPort port = (InPort) inlet;
+    public void releaseInput(InPort inPort) {
+        int idx = this.demandPorts.indexOf(inPort);
 
-        activeInputs.clear(port.getId());
-        port.cancel(null);
+        this.demandPorts.remove(idx);
+        this.rates.remove(idx);
+        inPort.cancel(null);
     }
 
     @Override
     public int getOutputCount() {
-        return activeOutputs.length();
+        return capacityPorts.size();
     }
 
     @Override
-    public Outlet newOutput() {
-        final BitSet activeOutputs = this.activeOutputs;
-        int slot = activeOutputs.nextClearBit(0);
+    public OutPort newOutPort() {
+        int slot = this.capacityPorts.size();
 
-        OutPort port = stage.getOutlet("out" + slot);
+        OutPort port = stage.getOutPort("out_" + slot, slot);
         port.setHandler(outHandler);
 
-        OutPort[] outlets = this.outlets;
-        if (slot >= outlets.length) {
-            int newLength = outlets.length + (outlets.length >> 1);
-            outlets = Arrays.copyOf(outlets, newLength);
-            this.outlets = outlets;
-        }
-        outlets[slot] = port;
-
-        activeOutputs.set(slot);
+        this.capacityPorts.add(port);
         return port;
     }
 
     @Override
-    public void releaseOutput(Outlet outlet) {
-        OutPort port = (OutPort) outlet;
-        activeInputs.clear(port.getId());
-        port.complete();
+    public void releaseOutput(OutPort OutPort) {
+        this.capacityPorts.remove(OutPort);
+        OutPort.complete();
     }
 
     /**
-     * Helper function to redistribute the specified capacity across the inlets.
+     * Helper function to redistribute the specified capacity across the InPorts.
      */
-    private static float redistributeCapacity(InPort[] inlets, long[] inputs, float[] rates, float capacity) {
+    private static float redistributeCapacity(ArrayList<InPort> InPorts, ArrayList<Float> rates, float capacity) {
+
+        final long[] inputs = new long[InPorts.size()];
+
         // If the demand is higher than the capacity, we need use max-min fair sharing to distribute the
         // constrained capacity across the inputs.
         for (int i = 0; i < inputs.length; i++) {
-            InPort inlet = inlets[i];
-            if (inlet == null) {
+            InPort InPort = InPorts.get(i);
+            if (InPort == null) {
                 break;
             }
 
-            inputs[i] = ((long) Float.floatToRawIntBits(inlet.getDemand()) << 32) | (i & 0xFFFFFFFFL);
+            inputs[i] = ((long) Float.floatToRawIntBits(InPort.getDemand()) << 32) | (i & 0xFFFFFFFFL);
         }
         Arrays.sort(inputs);
 
@@ -224,7 +202,7 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
             float availableShare = availableCapacity / (inputSize - i);
             float r = Math.min(d, availableShare);
 
-            rates[slot] = r;
+            rates.set(slot, r); // Update the rates
             availableCapacity -= r;
         }
 
@@ -232,14 +210,13 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
     }
 
     /**
-     * Helper method to change the rate of the outlets.
+     * Helper method to change the rate of the OutPorts.
      */
-    private static void changeRate(BitSet activeOutputs, OutPort[] outlets, float capacity, float rate) {
+    private static void changeRate(ArrayList<OutPort> OutPorts, float capacity, float rate) {
         // Divide the requests over the available capacity of the input resources fairly
-        for (int i = activeOutputs.nextSetBit(0); i != -1; i = activeOutputs.nextSetBit(i + 1)) {
-            OutPort outlet = outlets[i];
-            float fraction = outlet.getCapacity() / capacity;
-            outlet.push(rate * fraction);
+        for (OutPort OutPort : OutPorts) {
+            float fraction = OutPort.getCapacity() / capacity;
+            OutPort.push(rate * fraction);
         }
     }
 
@@ -249,20 +226,21 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
     private class MultiplexerInHandler implements InHandler {
         @Override
         public float getRate(InPort port) {
-            return rates[port.getId()];
+            return rates.get(demandPorts.indexOf(port));
         }
 
         @Override
         public void onPush(InPort port, float demand) {
             MaxMinFlowMultiplexer.this.demand += -port.getDemand() + demand;
-            rates[port.getId()] = demand;
+
+            rates.set(demandPorts.indexOf(port), demand);
         }
 
         @Override
         public void onUpstreamFinish(InPort port, Throwable cause) {
             MaxMinFlowMultiplexer.this.demand -= port.getDemand();
             releaseInput(port);
-            rates[port.getId()] = 0.f;
+            rates.set(demandPorts.indexOf(port), 0.f);
         }
     }
 
@@ -274,7 +252,7 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
         public void onPull(OutPort port, float capacity) {
             float newCapacity = MaxMinFlowMultiplexer.this.capacity - port.getCapacity() + capacity;
             MaxMinFlowMultiplexer.this.capacity = newCapacity;
-            changeInletCapacity(newCapacity);
+            changeInPortCapacity(newCapacity);
         }
 
         @Override
@@ -282,15 +260,12 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
             float newCapacity = MaxMinFlowMultiplexer.this.capacity - port.getCapacity();
             MaxMinFlowMultiplexer.this.capacity = newCapacity;
             releaseOutput(port);
-            changeInletCapacity(newCapacity);
+            changeInPortCapacity(newCapacity);
         }
 
-        private void changeInletCapacity(float capacity) {
-            BitSet activeInputs = MaxMinFlowMultiplexer.this.activeInputs;
-            InPort[] inlets = MaxMinFlowMultiplexer.this.inlets;
-
-            for (int i = activeInputs.nextSetBit(0); i != -1; i = activeInputs.nextSetBit(i + 1)) {
-                inlets[i].pull(capacity);
+        private void changeInPortCapacity(float capacity) {
+            for (InPort inPort : MaxMinFlowMultiplexer.this.demandPorts) {
+                inPort.pull(capacity);
             }
         }
     }

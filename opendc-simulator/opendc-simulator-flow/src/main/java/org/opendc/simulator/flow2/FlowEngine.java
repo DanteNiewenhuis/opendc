@@ -231,18 +231,18 @@ public final class FlowEngine implements Runnable {
         }
 
         @Override
-        public void connect(Outlet outlet, Inlet inlet) {
-            FlowGraphInternal.connect(this, outlet, inlet);
+        public void connect(OutPort OutPort, InPort InPort) {
+            FlowGraphInternal.connect(this, OutPort, InPort);
         }
 
         @Override
-        public void disconnect(Outlet outlet) {
-            FlowGraphInternal.disconnect(this, outlet);
+        public void disconnect(OutPort OutPort) {
+            FlowGraphInternal.disconnect(this, OutPort);
         }
 
         @Override
-        public void disconnect(Inlet inlet) {
-            FlowGraphInternal.disconnect(this, inlet);
+        public void disconnect(InPort InPort) {
+            FlowGraphInternal.disconnect(this, InPort);
         }
 
         /**

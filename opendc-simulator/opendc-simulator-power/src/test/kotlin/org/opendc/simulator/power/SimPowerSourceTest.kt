@@ -51,7 +51,7 @@ internal class SimPowerSourceTest {
 
             assertAll(
                 { assertFalse(source.isConnected) },
-                { assertNull(source.inlet) },
+                { assertNull(source.InPort) },
                 { assertEquals(100.0f, source.capacity) },
             )
         }
@@ -73,17 +73,17 @@ internal class SimPowerSourceTest {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
             val source = SimPowerSource(graph, 100.0f)
-            val inlet = TestInlet(graph)
+            val InPort = TestInPort(graph)
 
-            source.connect(inlet)
+            source.connect(InPort)
 
             yield()
 
             assertAll(
                 { assertTrue(source.isConnected) },
-                { assertEquals(inlet, source.inlet) },
-                { assertTrue(inlet.isConnected) },
-                { assertEquals(source, inlet.outlet) },
+                { assertEquals(InPort, source.InPort) },
+                { assertTrue(InPort.isConnected) },
+                { assertEquals(source, InPort.OutPort) },
                 { assertEquals(100.0f, source.powerDraw) },
             )
         }
@@ -94,14 +94,14 @@ internal class SimPowerSourceTest {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
             val source = SimPowerSource(graph, 100.0f)
-            val inlet = TestInlet(graph)
+            val InPort = TestInPort(graph)
 
-            source.connect(inlet)
+            source.connect(InPort)
             source.disconnect()
 
             yield()
 
-            assertEquals(0.0f, inlet.flowOutlet.capacity)
+            assertEquals(0.0f, InPort.flowOutPort.capacity)
         }
 
     @Test
@@ -111,12 +111,12 @@ internal class SimPowerSourceTest {
             val graph = engine.newGraph()
             val source = SimPowerSource(graph, 100.0f)
 
-            val inlet = mockk<SimPowerInlet>(relaxUnitFun = true)
-            every { inlet.isConnected } returns false
-            every { inlet.flowOutlet } returns TestInlet(graph).flowOutlet
+            val InPort = mockk<SimPowerInPort>(relaxUnitFun = true)
+            every { InPort.isConnected } returns false
+            every { InPort.flowOutPort } returns TestInPort(graph).flowOutPort
 
-            source.connect(inlet)
-            inlet.outlet = null
+            source.connect(InPort)
+            InPort.OutPort = null
 
             assertThrows<AssertionError> {
                 source.disconnect()
@@ -124,32 +124,32 @@ internal class SimPowerSourceTest {
         }
 
     @Test
-    fun testOutletAlreadyConnected() =
+    fun testOutPortAlreadyConnected() =
         runSimulation {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
             val source = SimPowerSource(graph, 100.0f)
-            val inlet = TestInlet(graph)
+            val InPort = TestInPort(graph)
 
-            source.connect(inlet)
+            source.connect(InPort)
             assertThrows<IllegalStateException> {
-                source.connect(TestInlet(graph))
+                source.connect(TestInPort(graph))
             }
 
-            assertEquals(inlet, source.inlet)
+            assertEquals(InPort, source.InPort)
         }
 
     @Test
-    fun testInletAlreadyConnected() =
+    fun testInPortAlreadyConnected() =
         runSimulation {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
             val source = SimPowerSource(graph, 100.0f)
-            val inlet = mockk<SimPowerInlet>(relaxUnitFun = true)
-            every { inlet.isConnected } returns true
+            val InPort = mockk<SimPowerInPort>(relaxUnitFun = true)
+            every { InPort.isConnected } returns true
 
             assertThrows<IllegalStateException> {
-                source.connect(inlet)
+                source.connect(InPort)
             }
         }
 }

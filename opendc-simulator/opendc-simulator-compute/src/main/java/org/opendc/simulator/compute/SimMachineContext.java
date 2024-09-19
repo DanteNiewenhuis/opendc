@@ -22,9 +22,11 @@
 
 package org.opendc.simulator.compute;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+
+import org.opendc.simulator.compute.cpu.SimProcessingUnit;
+import org.opendc.simulator.compute.memory.SimMemory;
 import org.opendc.simulator.compute.workload.SimWorkload;
 import org.opendc.simulator.flow2.FlowGraph;
 
@@ -57,16 +59,6 @@ public interface SimMachineContext {
      * Return the memory interface of the machine.
      */
     SimMemory getMemory();
-
-    /**
-     * Return the network interfaces available to the workload.
-     */
-    List<? extends SimNetworkInterface> getNetworkInterfaces();
-
-    /**
-     * Return the storage devices available to the workload.
-     */
-    List<? extends SimStorageInterface> getStorageInterfaces();
 
     /**
      * Create a snapshot of the {@link SimWorkload} running on this machine.

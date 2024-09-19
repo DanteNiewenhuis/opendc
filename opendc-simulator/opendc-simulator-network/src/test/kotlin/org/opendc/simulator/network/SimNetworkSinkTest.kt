@@ -125,7 +125,7 @@ class SimNetworkSinkTest {
             assertAll(
                 { assertTrue(sink.isConnected) },
                 { assertTrue(source.isConnected) },
-                { assertEquals(100.0f, source.outlet.capacity) },
+                { assertEquals(100.0f, source.OutPort.capacity) },
             )
 
             verify { source.logic.onUpdate(any(), any()) }
@@ -147,7 +147,7 @@ class SimNetworkSinkTest {
             assertAll(
                 { assertFalse(sink.isConnected) },
                 { assertFalse(source.isConnected) },
-                { assertEquals(0.0f, source.outlet.capacity) },
+                { assertEquals(0.0f, source.OutPort.capacity) },
             )
         }
 }

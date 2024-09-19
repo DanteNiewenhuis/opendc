@@ -27,9 +27,9 @@ import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.power.CpuPowerModels
+import org.opendc.simulator.compute.cpu.CpuPowerModels
 import org.opendc.simulator.kotlin.runSimulation
 import java.util.UUID
 
@@ -40,7 +40,14 @@ internal class SimTFDeviceTest {
     @Test
     fun testSmoke() =
         runSimulation {
-            val pu = Cpu(0, 1, 960 * 1230.0, "NVIDIA", "Tesla V100", "unknown")
+            val pu = CpuModel(
+                0,
+                1,
+                960 * 1230.0,
+                "NVIDIA",
+                "Tesla V100",
+                "unknown"
+            )
             val memory = MemoryUnit("NVIDIA", "Tesla V100", 877.0, 32_000)
 
             val device =

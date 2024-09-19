@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.compute.power
+package org.opendc.simulator.compute.cpu
 
 // TODO: couple this correctly
 public enum class CPUPowerModel {

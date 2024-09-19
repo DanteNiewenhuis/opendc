@@ -46,7 +46,7 @@ class ForwardingFlowMultiplexerTest {
 
             val switch = ForwardingFlowMultiplexer(graph)
             val sink = SimpleFlowSink(graph, 3200.0f)
-            graph.connect(switch.newOutput(), sink.input)
+            graph.connect(switch.newOutPort(), sink.input)
 
             yield()
 

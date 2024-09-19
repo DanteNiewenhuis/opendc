@@ -34,7 +34,7 @@ import org.opendc.simulator.kotlin.runSimulation
  */
 internal class SimPduTest {
     @Test
-    fun testZeroOutlets() =
+    fun testZeroOutPorts() =
         runSimulation {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
@@ -48,14 +48,14 @@ internal class SimPduTest {
         }
 
     @Test
-    fun testSingleOutlet() =
+    fun testSingleOutPort() =
         runSimulation {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
             val source = SimPowerSource(graph, 100.0f)
             val pdu = SimPdu(graph)
             source.connect(pdu)
-            pdu.newOutlet().connect(TestInlet(graph))
+            pdu.newOutPort().connect(TestInPort(graph))
 
             yield()
 
@@ -63,7 +63,7 @@ internal class SimPduTest {
         }
 
     @Test
-    fun testDoubleOutlet() =
+    fun testDoubleOutPort() =
         runSimulation {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
@@ -71,8 +71,8 @@ internal class SimPduTest {
             val pdu = SimPdu(graph)
             source.connect(pdu)
 
-            pdu.newOutlet().connect(TestInlet(graph))
-            pdu.newOutlet().connect(TestInlet(graph))
+            pdu.newOutPort().connect(TestInPort(graph))
+            pdu.newOutPort().connect(TestInPort(graph))
 
             yield()
 
@@ -88,9 +88,9 @@ internal class SimPduTest {
             val pdu = SimPdu(graph)
             source.connect(pdu)
 
-            val outlet = pdu.newOutlet()
-            outlet.connect(TestInlet(graph))
-            outlet.disconnect()
+            val OutPort = pdu.newOutPort()
+            OutPort.connect(TestInPort(graph))
+            OutPort.disconnect()
 
             yield()
 
@@ -106,7 +106,7 @@ internal class SimPduTest {
             // https://download.schneider-electric.com/files?p_Doc_Ref=SPD_NRAN-66CK3D_EN
             val pdu = SimPdu(graph, 1.5f, 0.015f)
             source.connect(pdu)
-            pdu.newOutlet().connect(TestInlet(graph))
+            pdu.newOutPort().connect(TestInPort(graph))
 
             yield()
 
@@ -114,20 +114,20 @@ internal class SimPduTest {
         }
 
     @Test
-    fun testOutletClose() =
+    fun testOutPortClose() =
         runSimulation {
             val engine = FlowEngine.create(dispatcher)
             val graph = engine.newGraph()
             val source = SimPowerSource(graph, 100.0f)
             val pdu = SimPdu(graph)
             source.connect(pdu)
-            val outlet = pdu.newOutlet()
-            outlet.close()
+            val OutPort = pdu.newOutPort()
+            OutPort.close()
 
             yield()
 
             assertThrows<IllegalStateException> {
-                outlet.connect(TestInlet(graph))
+                OutPort.connect(TestInPort(graph))
             }
         }
 }

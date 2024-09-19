@@ -23,7 +23,7 @@
 package org.opendc.simulator.flow2.sink;
 
 import org.opendc.simulator.flow2.FlowStage;
-import org.opendc.simulator.flow2.Inlet;
+import org.opendc.simulator.flow2.InPort;
 
 /**
  * A {@link FlowStage} with a single input.
@@ -32,5 +32,5 @@ public interface FlowSink {
     /**
      * Return the input of this {@link FlowSink}.
      */
-    Inlet getInput();
+    InPort getInput();
 }

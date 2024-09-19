@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.opendc.simulator.compute.SimBareMetalMachine
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
 import org.opendc.simulator.compute.runWorkload
@@ -44,7 +44,7 @@ class SimTraceWorkloadTest {
     fun setUp() {
         machineModel =
             MachineModel(
-                Cpu(
+                CpuModel(
                     0,
                     2,
                     1000.0,

@@ -22,8 +22,8 @@
 
 package org.opendc.simulator.network;
 
-import org.opendc.simulator.flow2.Inlet;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.InPort;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * A network port allows network devices to be connected to network through links.
@@ -66,11 +66,11 @@ public abstract class SimNetworkPort {
         port.link = link;
 
         // Start bidirectional flow channel between the two ports
-        final Outlet outlet = getOutlet();
-        final Inlet inlet = getInlet();
+        final OutPort OutPort = getOutPort();
+        final InPort InPort = getInPort();
 
-        outlet.getGraph().connect(outlet, port.getInlet());
-        inlet.getGraph().connect(port.getOutlet(), inlet);
+        OutPort.getGraph().connect(OutPort, port.getInPort());
+        InPort.getGraph().connect(port.getOutPort(), InPort);
     }
 
     /**
@@ -86,22 +86,22 @@ public abstract class SimNetworkPort {
         this.link = null;
         opposite.link = null;
 
-        final Outlet outlet = getOutlet();
-        final Inlet inlet = getInlet();
+        final OutPort OutPort = getOutPort();
+        final InPort InPort = getInPort();
 
-        outlet.getGraph().disconnect(outlet);
-        inlet.getGraph().disconnect(inlet);
+        OutPort.getGraph().disconnect(OutPort);
+        InPort.getGraph().disconnect(InPort);
     }
 
     /**
-     * Return the {@link Outlet} representing the outgoing traffic of this port.
+     * Return the {@link OutPort} representing the outgoing traffic of this port.
      */
-    protected abstract Outlet getOutlet();
+    protected abstract OutPort getOutPort();
 
     /**
-     * An [Inlet] representing the ingoing traffic of this port.
+     * An [InPort] representing the ingoing traffic of this port.
      */
-    protected abstract Inlet getInlet();
+    protected abstract InPort getInPort();
 
     @Override
     public String toString() {

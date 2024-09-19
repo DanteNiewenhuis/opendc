@@ -224,7 +224,7 @@ internal class Guest(
     private var localDowntime = 0L
     private var localLastReport = clock.millis()
     private var localBootTime: Instant? = null
-    private val localCpuLimit = machine.model.cpu.totalCapacity
+    private val localCpuLimit = machine.machineModel.cpu.totalCapacity
 
     /**
      * Helper function to track the uptime and downtime of the guest.

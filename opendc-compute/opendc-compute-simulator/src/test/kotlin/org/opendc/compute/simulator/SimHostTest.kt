@@ -38,7 +38,7 @@ import org.opendc.compute.service.driver.Host
 import org.opendc.compute.service.driver.HostListener
 import org.opendc.simulator.compute.SimBareMetalMachine
 import org.opendc.simulator.compute.kernel.SimHypervisor
-import org.opendc.simulator.compute.model.Cpu
+import org.opendc.simulator.compute.model.CpuModel
 import org.opendc.simulator.compute.model.MachineModel
 import org.opendc.simulator.compute.model.MemoryUnit
 import org.opendc.simulator.compute.workload.SimTrace
@@ -61,7 +61,7 @@ internal class SimHostTest {
     fun setUp() {
         machineModel =
             MachineModel(
-                Cpu(
+                CpuModel(
                     0,
                     2,
                     3200.0,

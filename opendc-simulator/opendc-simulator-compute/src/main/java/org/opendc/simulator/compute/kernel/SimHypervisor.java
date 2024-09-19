@@ -30,20 +30,19 @@ import java.util.Map;
 import java.util.SplittableRandom;
 import java.util.function.Consumer;
 import org.opendc.simulator.compute.SimAbstractMachine;
+import org.opendc.simulator.compute.SimAbstractMachineContext;
 import org.opendc.simulator.compute.SimMachine;
 import org.opendc.simulator.compute.SimMachineContext;
-import org.opendc.simulator.compute.SimMemory;
-import org.opendc.simulator.compute.SimNetworkInterface;
-import org.opendc.simulator.compute.SimProcessingUnit;
-import org.opendc.simulator.compute.SimStorageInterface;
-import org.opendc.simulator.compute.device.SimPeripheral;
+import org.opendc.simulator.compute.kernel.cpufreq.ScalingPolicyImpl;
+import org.opendc.simulator.compute.memory.Memory;
+import org.opendc.simulator.compute.memory.SimMemory;
+import org.opendc.simulator.compute.cpu.SimProcessingUnit;
 import org.opendc.simulator.compute.kernel.cpufreq.ScalingGovernor;
 import org.opendc.simulator.compute.kernel.cpufreq.ScalingGovernorFactory;
-import org.opendc.simulator.compute.kernel.cpufreq.ScalingPolicy;
 import org.opendc.simulator.compute.kernel.interference.VmInterferenceDomain;
 import org.opendc.simulator.compute.kernel.interference.VmInterferenceMember;
 import org.opendc.simulator.compute.kernel.interference.VmInterferenceProfile;
-import org.opendc.simulator.compute.model.Cpu;
+import org.opendc.simulator.compute.model.CpuModel;
 import org.opendc.simulator.compute.model.MachineModel;
 import org.opendc.simulator.compute.workload.SimWorkload;
 import org.opendc.simulator.flow2.FlowGraph;
@@ -51,7 +50,6 @@ import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.InHandler;
 import org.opendc.simulator.flow2.InPort;
-import org.opendc.simulator.flow2.Inlet;
 import org.opendc.simulator.flow2.OutHandler;
 import org.opendc.simulator.flow2.OutPort;
 import org.opendc.simulator.flow2.mux.FlowMultiplexer;
@@ -323,7 +321,7 @@ public final class SimHypervisor implements SimWorkload {
             final FlowGraph graph = ctx.getGraph();
             final FlowMultiplexer multiplexer = this.multiplexer;
 
-            graph.connect(multiplexer.newOutput(), ctx.getCpu().getInput());
+            graph.connect(multiplexer.newOutPort(), ctx.getCpu().getInput());
 
             if (this.scalingGovernor != null) {
                 this.scalingGovernor.onStart();
@@ -405,42 +403,6 @@ public final class SimHypervisor implements SimWorkload {
     }
 
     /**
-     * A {@link ScalingPolicy} for a physical CPU of the hypervisor.
-     */
-    private static final class ScalingPolicyImpl implements ScalingPolicy {
-        private final SimProcessingUnit cpu;
-
-        private ScalingPolicyImpl(SimProcessingUnit cpu) {
-            this.cpu = cpu;
-        }
-
-        @Override
-        public SimProcessingUnit getCpu() {
-            return cpu;
-        }
-
-        @Override
-        public double getTarget() {
-            return cpu.getFrequency();
-        }
-
-        @Override
-        public void setTarget(double target) {
-            cpu.setFrequency(target);
-        }
-
-        @Override
-        public double getMin() {
-            return 0;
-        }
-
-        @Override
-        public double getMax() {
-            return cpu.getCpuModel().getTotalCapacity();
-        }
-    }
-
-    /**
      * A virtual machine running on the hypervisor.
      */
     public class SimVirtualMachine extends SimAbstractMachine {
@@ -486,12 +448,7 @@ public final class SimHypervisor implements SimWorkload {
         }
 
         @Override
-        public List<? extends SimPeripheral> getPeripherals() {
-            return Collections.emptyList();
-        }
-
-        @Override
-        protected SimAbstractMachineContext createContext(
+        protected VmContext createContext(
                 SimWorkload workload, Map<String, Object> meta, Consumer<Exception> completion) {
             if (isClosed) {
                 throw new IllegalStateException("Virtual machine does not exist anymore");
@@ -530,9 +487,9 @@ public final class SimHypervisor implements SimWorkload {
     }
 
     /**
-     * A {@link SimAbstractMachine.SimAbstractMachineContext} for a virtual machine instance.
+     * A {@link SimAbstractMachineContext} for a virtual machine instance.
      */
-    private static final class VmContext extends SimAbstractMachine.SimAbstractMachineContext
+    private static final class VmContext extends SimAbstractMachineContext
             implements FlowStageLogic {
         private final SimHyperVisorContext simHyperVisorContext;
         private final SplittableRandom random;
@@ -543,12 +500,10 @@ public final class SimHypervisor implements SimWorkload {
         private final FlowMultiplexer multiplexer;
         private final InstantSource clock;
 
-        private final VCpu cpu;
-        private final SimAbstractMachine.Memory memory;
-        private final List<SimAbstractMachine.NetworkAdapter> net;
-        private final List<SimAbstractMachine.StorageDevice> disk;
+        private final VCpu vCpu;
+        private final Memory memory;
 
-        private final Inlet[] muxInlets;
+        private final InPort[] muxInPorts;
         private long lastUpdate;
         private long lastCounterUpdate;
         private final double d;
@@ -595,43 +550,29 @@ public final class SimHypervisor implements SimWorkload {
             final FlowMultiplexer multiplexer = simHyperVisorContext.multiplexer;
             this.multiplexer = multiplexer;
 
-            final MachineModel model = machine.getModel();
-            final Cpu cpuModel = model.getCpu();
-            final Inlet[] muxInlets = new Inlet[1];
+            final MachineModel model = machine.getMachineModel();
+            final CpuModel cpuModel = model.getCpu();
+            final InPort[] muxInPorts = new InPort[1];
 
-            this.muxInlets = muxInlets;
+            this.muxInPorts = muxInPorts;
 
-            final Inlet muxInlet = multiplexer.newInput();
-            muxInlets[0] = muxInlet;
+            final InPort muxInPort = multiplexer.newInput();
+            muxInPorts[0] = muxInPort;
 
-            final InPort input = stage.getInlet("cpu");
-            final OutPort output = stage.getOutlet("mux");
+            final InPort cpuInPort = stage.getInPort("cpu");
+            final OutPort muxOutPort = stage.getOutPort("mux");
 
-            final Handler handler = new Handler(this, input, output);
-            input.setHandler(handler);
-            output.setHandler(handler);
+            final Handler handler = new Handler(this, cpuInPort, muxOutPort);
+            cpuInPort.setHandler(handler);
+            muxOutPort.setHandler(handler);
 
-            this.cpu = new VCpu(cpuModel, input);
+            this.vCpu = new VCpu(cpuModel, cpuInPort);
 
-            graph.connect(output, muxInlet);
+            graph.connect(muxOutPort, muxInPort);
 
             this.d = 1 / cpuModel.getTotalCapacity();
 
-            this.memory = new SimAbstractMachine.Memory(graph, model.getMemory());
-
-            int netIndex = 0;
-            final ArrayList<SimAbstractMachine.NetworkAdapter> net = new ArrayList<>();
-            this.net = net;
-            for (org.opendc.simulator.compute.model.NetworkAdapter adapter : model.getNetwork()) {
-                net.add(new SimAbstractMachine.NetworkAdapter(graph, adapter, netIndex++));
-            }
-
-            int diskIndex = 0;
-            final ArrayList<SimAbstractMachine.StorageDevice> disk = new ArrayList<>();
-            this.disk = disk;
-            for (org.opendc.simulator.compute.model.StorageDevice device : model.getStorage()) {
-                disk.add(new SimAbstractMachine.StorageDevice(graph, device, diskIndex++));
-            }
+            this.memory = new Memory(graph, model.getMemory());
         }
 
         /**
@@ -674,7 +615,7 @@ public final class SimHypervisor implements SimWorkload {
 
         @Override
         public SimProcessingUnit getCpu() {
-            return cpu;
+            return vCpu;
         }
 
         @Override
@@ -683,20 +624,10 @@ public final class SimHypervisor implements SimWorkload {
         }
 
         @Override
-        public List<? extends SimNetworkInterface> getNetworkInterfaces() {
-            return net;
-        }
-
-        @Override
-        public List<? extends SimStorageInterface> getStorageInterfaces() {
-            return disk;
-        }
-
-        @Override
         public long onUpdate(FlowStage ctx, long now) {
             float usage = 0.f;
-            for (Inlet inlet : muxInlets) {
-                usage += ((InPort) inlet).getRate();
+            for (InPort InPort : muxInPorts) {
+                usage += ((InPort) InPort).getRate();
             }
             this.usage = usage;
             this.previousDemand = demand;
@@ -739,8 +670,8 @@ public final class SimHypervisor implements SimWorkload {
             stage.close();
 
             final FlowMultiplexer multiplexer = this.multiplexer;
-            for (Inlet muxInlet : muxInlets) {
-                multiplexer.releaseInput(muxInlet);
+            for (InPort muxInPort : muxInPorts) {
+                multiplexer.releaseInput(muxInPort);
             }
 
             final VmInterferenceMember interferenceMember = this.interferenceMember;
@@ -754,10 +685,10 @@ public final class SimHypervisor implements SimWorkload {
      * A {@link SimProcessingUnit} of a virtual machine.
      */
     private static final class VCpu implements SimProcessingUnit {
-        private final Cpu model;
+        private final CpuModel model;
         private final InPort input;
 
-        private VCpu(Cpu model, InPort input) {
+        private VCpu(CpuModel model, InPort input) {
             this.model = model;
             this.input = input;
 
@@ -775,6 +706,16 @@ public final class SimHypervisor implements SimWorkload {
         }
 
         @Override
+        public double getPowerDraw() {
+            return 0;
+        }
+
+        @Override
+        public double getEnergyUsage() {
+            return 0;
+        }
+
+        @Override
         public double getDemand() {
             return input.getDemand();
         }
@@ -785,12 +726,12 @@ public final class SimHypervisor implements SimWorkload {
         }
 
         @Override
-        public Cpu getCpuModel() {
+        public CpuModel getCpuModel() {
             return model;
         }
 
         @Override
-        public Inlet getInput() {
+        public InPort getInput() {
             return input;
         }
 
@@ -798,10 +739,15 @@ public final class SimHypervisor implements SimWorkload {
         public String toString() {
             return "SimHypervisor.VCpu[model" + model + "]";
         }
+
+        @Override
+        public long onUpdate(FlowStage ctx, long now) {
+            return 0;
+        }
     }
 
     /**
-     * A handler for forwarding flow between an inlet and outlet.
+     * A handler for forwarding flow between an InPort and OutPort.
      */
     private static class Handler implements InHandler, OutHandler {
         private final InPort input;

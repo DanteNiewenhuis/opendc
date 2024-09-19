@@ -20,17 +20,25 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.compute.device;
+package org.opendc.simulator.compute.cpu;
 
 import org.opendc.simulator.compute.SimMachine;
-import org.opendc.simulator.network.SimNetworkPort;
 
 /**
- * A simulated network interface card (NIC or network adapter) that can be attached to a {@link SimMachine}.
+ * A model for estimating the power usage of a {@link SimMachine} based on the CPU usage.
  */
-public abstract class SimNetworkAdapter extends SimNetworkPort implements SimPeripheral {
+public interface CpuPowerModel {
     /**
-     * Return the unidirectional bandwidth of the network adapter (in Mbps).
+     * Computes CPU power consumption for each host.
+     *
+     * @param utilization The CPU utilization percentage.
+     * @return A double value of CPU power consumption (in W).
      */
-    public abstract double getBandwidth();
+    double computePower(double utilization);
+
+    String getName();
+
+    default String getFullName() {
+        return getName();
+    }
 }

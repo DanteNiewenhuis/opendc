@@ -29,10 +29,10 @@ import org.opendc.simulator.flow2.FlowStage;
 import org.opendc.simulator.flow2.FlowStageLogic;
 import org.opendc.simulator.flow2.InHandler;
 import org.opendc.simulator.flow2.InPort;
-import org.opendc.simulator.flow2.Inlet;
+import org.opendc.simulator.flow2.InPort;
 import org.opendc.simulator.flow2.OutHandler;
 import org.opendc.simulator.flow2.OutPort;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * A {@link FlowMultiplexer} implementation that allocates inputs to the outputs of the multiplexer exclusively.
@@ -50,8 +50,8 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
 
     private final FlowStage stage;
 
-    private InPort[] inlets;
-    private OutPort[] outlets;
+    private InPort[] InPorts;
+    private OutPort[] OutPorts;
     private final BitSet activeInputs;
     private final BitSet activeOutputs;
     private final BitSet availableOutputs;
@@ -62,9 +62,9 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
     public ForwardingFlowMultiplexer(FlowGraph graph) {
         this.stage = graph.newStage(this);
 
-        this.inlets = new InPort[4];
+        this.InPorts = new InPort[4];
         this.activeInputs = new BitSet();
-        this.outlets = new OutPort[4];
+        this.OutPorts = new OutPort[4];
         this.activeOutputs = new BitSet();
         this.availableOutputs = new BitSet();
     }
@@ -82,10 +82,10 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
     @Override
     public float getRate() {
         final BitSet activeOutputs = this.activeOutputs;
-        final OutPort[] outlets = this.outlets;
+        final OutPort[] OutPorts = this.OutPorts;
         float rate = 0.f;
         for (int i = activeOutputs.nextSetBit(0); i != -1; i = activeOutputs.nextSetBit(i + 1)) {
-            rate += outlets[i].getRate();
+            rate += OutPorts[i].getRate();
         }
         return rate;
     }
@@ -106,18 +106,18 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
     }
 
     @Override
-    public Inlet newInput() {
+    public InPort newInput() {
         final BitSet activeInputs = this.activeInputs;
         int slot = activeInputs.nextClearBit(0);
 
-        InPort inPort = stage.getInlet("in" + slot);
+        InPort inPort = stage.getInPort("in" + slot);
         inPort.setMask(true);
 
-        InPort[] inlets = this.inlets;
-        if (slot >= inlets.length) {
-            int newLength = inlets.length + (inlets.length >> 1);
-            inlets = Arrays.copyOf(inlets, newLength);
-            this.inlets = inlets;
+        InPort[] InPorts = this.InPorts;
+        if (slot >= InPorts.length) {
+            int newLength = InPorts.length + (InPorts.length >> 1);
+            InPorts = Arrays.copyOf(InPorts, newLength);
+            this.InPorts = InPorts;
         }
 
         final BitSet availableOutputs = this.availableOutputs;
@@ -127,10 +127,10 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
             throw new IllegalStateException("No capacity available for a new input");
         }
 
-        inlets[slot] = inPort;
+        InPorts[slot] = inPort;
         activeInputs.set(slot);
 
-        OutPort outPort = outlets[outSlot];
+        OutPort outPort = OutPorts[outSlot];
         availableOutputs.clear(outSlot);
 
         inPort.setHandler(new ForwardingInHandler(outPort));
@@ -142,8 +142,8 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
     }
 
     @Override
-    public void releaseInput(Inlet inlet) {
-        InPort port = (InPort) inlet;
+    public void releaseInput(InPort InPort) {
+        InPort port = (InPort) InPort;
         int slot = port.getId();
 
         final BitSet activeInputs = this.activeInputs;
@@ -167,18 +167,18 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
     }
 
     @Override
-    public Outlet newOutput() {
+    public OutPort newOutPort() {
         final BitSet activeOutputs = this.activeOutputs;
         int slot = activeOutputs.nextClearBit(0);
 
-        OutPort port = stage.getOutlet("out" + slot);
-        OutPort[] outlets = this.outlets;
-        if (slot >= outlets.length) {
-            int newLength = outlets.length + (outlets.length >> 1);
-            outlets = Arrays.copyOf(outlets, newLength);
-            this.outlets = outlets;
+        OutPort port = stage.getOutPort("out" + slot);
+        OutPort[] OutPorts = this.OutPorts;
+        if (slot >= OutPorts.length) {
+            int newLength = OutPorts.length + (OutPorts.length >> 1);
+            OutPorts = Arrays.copyOf(OutPorts, newLength);
+            this.OutPorts = OutPorts;
         }
-        outlets[slot] = port;
+        OutPorts[slot] = port;
 
         activeOutputs.set(slot);
         availableOutputs.set(slot);
@@ -189,8 +189,8 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
     }
 
     @Override
-    public void releaseOutput(Outlet outlet) {
-        OutPort port = (OutPort) outlet;
+    public void releaseOutput(OutPort OutPort) {
+        OutPort port = (OutPort) OutPort;
         int slot = port.getId();
         activeInputs.clear(slot);
         availableOutputs.clear(slot);
@@ -266,7 +266,7 @@ public final class ForwardingFlowMultiplexer implements FlowMultiplexer, FlowSta
 
         @Override
         public void onPush(InPort port, float rate) {
-            port.cancel(new IllegalStateException("Inlet is not allocated"));
+            port.cancel(new IllegalStateException("InPort is not allocated"));
         }
 
         @Override

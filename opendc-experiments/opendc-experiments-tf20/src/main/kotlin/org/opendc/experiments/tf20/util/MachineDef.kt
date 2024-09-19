@@ -23,7 +23,7 @@
 package org.opendc.experiments.tf20.util
 
 import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.power.CpuPowerModel
+import org.opendc.simulator.compute.cpu.CpuPowerModel
 import java.util.UUID
 
 /**

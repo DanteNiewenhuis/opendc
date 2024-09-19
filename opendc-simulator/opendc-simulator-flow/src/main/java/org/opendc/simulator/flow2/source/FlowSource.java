@@ -23,7 +23,7 @@
 package org.opendc.simulator.flow2.source;
 
 import org.opendc.simulator.flow2.FlowStage;
-import org.opendc.simulator.flow2.Outlet;
+import org.opendc.simulator.flow2.OutPort;
 
 /**
  * A {@link FlowStage} with a single output.
@@ -32,5 +32,5 @@ public interface FlowSource {
     /**
      * Return the output of this {@link FlowSource}.
      */
-    Outlet getOutput();
+    OutPort getOutput();
 }
