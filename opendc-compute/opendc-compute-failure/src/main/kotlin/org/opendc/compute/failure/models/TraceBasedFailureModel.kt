@@ -71,7 +71,7 @@ public class TraceBasedFailureModel(
     service: ComputeService,
     random: RandomGenerator,
     pathToTrace: String,
-    private val repeat: Boolean = true,
+    private val repeat: Boolean = false,
 ) : FailureModel(context, clock, service, random) {
     private val failureList = loadTrace(pathToTrace)
 

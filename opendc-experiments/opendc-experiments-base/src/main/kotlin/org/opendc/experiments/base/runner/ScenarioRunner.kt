@@ -89,14 +89,14 @@ public fun runScenario(
                     { createComputeScheduler(scenario.allocationPolicySpec.policyType, Random(it.seeder.nextLong())) },
                     maxNumFailures = scenario.maxNumFailures,
                 ),
-                setupHosts(serviceDomain, topology, optimize = true),
+                setupHosts(serviceDomain, topology),
             )
 
             val workloadLoader = ComputeWorkloadLoader(File(scenario.workloadSpec.pathToFile))
             val tasks = getWorkloadType(scenario.workloadSpec.type).resolve(workloadLoader, Random(seed))
 
             val carbonTrace = getCarbonTrace(scenario.carbonTracePath)
-            val startTime = Duration.ofMillis(tasks.minOf { it.startTime }.toEpochMilli())
+            val startTime = Duration.ofMillis(tasks.minOf { it.submissionTime }.toEpochMilli())
             addExportModel(provisioner, serviceDomain, scenario, seed, startTime, carbonTrace, scenario.id)
 
             val service = provisioner.registry.resolve(serviceDomain, ComputeService::class.java)!!

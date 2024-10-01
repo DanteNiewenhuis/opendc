@@ -140,6 +140,10 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
     public void releaseInput(InPort inPort) {
         int idx = this.demandPorts.indexOf(inPort);
 
+        if (idx == -1) {
+            return;
+        }
+
         this.demandPorts.remove(idx);
         this.rates.remove(idx);
         inPort.cancel(null);
@@ -240,7 +244,6 @@ public final class MaxMinFlowMultiplexer implements FlowMultiplexer, FlowStageLo
         public void onUpstreamFinish(InPort port, Throwable cause) {
             MaxMinFlowMultiplexer.this.demand -= port.getDemand();
             releaseInput(port);
-            rates.set(demandPorts.indexOf(port), 0.f);
         }
     }
 

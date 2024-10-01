@@ -25,14 +25,14 @@ package org.opendc.compute.service.driver;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.opendc.compute.api.Task;
+import org.opendc.compute.service.ServiceTask;
 import org.opendc.compute.service.driver.telemetry.GuestCpuStats;
 import org.opendc.compute.service.driver.telemetry.GuestSystemStats;
 import org.opendc.compute.service.driver.telemetry.HostCpuStats;
 import org.opendc.compute.service.driver.telemetry.HostSystemStats;
 
 /**
- * Base interface for representing compute resources that host virtualized {@link Task} instances.
+ * Base interface for representing compute resources that host virtualized {@link ServiceTask} instances.
  */
 public interface Host {
     /**
@@ -61,43 +61,43 @@ public interface Host {
     Map<String, ?> getMeta();
 
     /**
-     * Return the {@link Task} instances known to the host.
+     * Return the {@link ServiceTask} instances known to the host.
      */
-    Set<Task> getInstances();
+    Set<ServiceTask> getInstances();
 
     /**
-     * Determine whether the specified <code>task</code> can still fit on this host.
+     * Determine whether the specified <code>ServiceTask</code> can still fit on this host.
      */
-    boolean canFit(Task task);
+    boolean canFit(ServiceTask ServiceTask);
 
     /**
      * Register the specified <code>task</code> on the host.
      */
-    void spawn(Task task);
+    void spawn(ServiceTask task);
 
     /**
      * Determine whether the specified <code>task</code> exists on the host.
      */
-    boolean contains(Task task);
+    boolean contains(ServiceTask task);
 
     /**
      * Start the task if it is currently not running on this host.
      *
      * @throws IllegalArgumentException if the task is not present on the host.
      */
-    void start(Task task);
+    void start(ServiceTask task);
 
     /**
      * Stop the task if it is currently running on this host.
      *
      * @throws IllegalArgumentException if the task is not present on the host.
      */
-    void stop(Task task);
+    void stop(ServiceTask task);
 
     /**
      * Delete the specified <code>task</code> on this host and cleanup all resources associated with it.
      */
-    void delete(Task task);
+    void delete(ServiceTask task);
 
     /**
      * Add a [HostListener] to this host.
@@ -115,12 +115,12 @@ public interface Host {
     HostSystemStats getSystemStats();
 
     /**
-     * Query the system statistics of a {@link Task} that is located on this host.
+     * Query the system statistics of a {@link ServiceTask} that is located on this host.
      *
-     * @param task The {@link Task} to obtain the system statistics of.
+     * @param task The {@link ServiceTask} to obtain the system statistics of.
      * @throws IllegalArgumentException if the task is not present on the host.
      */
-    GuestSystemStats getSystemStats(Task task);
+    GuestSystemStats getSystemStats(ServiceTask task);
 
     /**
      * Query the CPU statistics of the host.
@@ -128,10 +128,10 @@ public interface Host {
     HostCpuStats getCpuStats();
 
     /**
-     * Query the CPU statistics of a {@link Task} that is located on this host.
+     * Query the CPU statistics of a {@link ServiceTask} that is located on this host.
      *
-     * @param task The {@link Task} to obtain the CPU statistics of.
+     * @param task The {@link ServiceTask} to obtain the CPU statistics of.
      * @throws IllegalArgumentException if the task is not present on the host.
      */
-    GuestCpuStats getCpuStats(Task task);
+    GuestCpuStats getCpuStats(ServiceTask task);
 }

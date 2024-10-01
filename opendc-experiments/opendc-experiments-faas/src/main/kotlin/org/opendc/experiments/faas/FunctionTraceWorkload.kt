@@ -23,9 +23,9 @@
 package org.opendc.experiments.faas
 
 import org.opendc.faas.simulator.workload.SimFaaSWorkload
-import org.opendc.simulator.compute.workload.SimTrace
-import org.opendc.simulator.compute.workload.SimTraceFragment
-import org.opendc.simulator.compute.workload.SimWorkload
+import org.opendc.simulator.compute.old.workload.SimTrace
+import org.opendc.simulator.compute.old.workload.SimTraceFragment
+import org.opendc.simulator.compute.old.workload.SimWorkload
 
 /**
  * A [SimFaaSWorkload] for a [FunctionTrace].

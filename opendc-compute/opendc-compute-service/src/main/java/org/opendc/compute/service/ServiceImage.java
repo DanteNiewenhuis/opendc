@@ -61,12 +61,6 @@ public final class ServiceImage implements Image {
 
     @NotNull
     @Override
-    public Map<String, String> getLabels() {
-        return Collections.unmodifiableMap(labels);
-    }
-
-    @NotNull
-    @Override
     public Map<String, Object> getMeta() {
         return Collections.unmodifiableMap(meta);
     }

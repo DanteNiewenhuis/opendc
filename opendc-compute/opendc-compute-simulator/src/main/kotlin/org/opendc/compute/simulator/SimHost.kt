@@ -23,8 +23,8 @@
 package org.opendc.compute.simulator
 
 import org.opendc.compute.api.Flavor
-import org.opendc.compute.api.Task
 import org.opendc.compute.api.TaskState
+import org.opendc.compute.service.ServiceTask
 import org.opendc.compute.service.driver.Host
 import org.opendc.compute.service.driver.HostListener
 import org.opendc.compute.service.driver.HostModel
@@ -33,21 +33,19 @@ import org.opendc.compute.service.driver.telemetry.GuestCpuStats
 import org.opendc.compute.service.driver.telemetry.GuestSystemStats
 import org.opendc.compute.service.driver.telemetry.HostCpuStats
 import org.opendc.compute.service.driver.telemetry.HostSystemStats
-import org.opendc.compute.simulator.internal.DefaultWorkloadMapper
 import org.opendc.compute.simulator.internal.Guest
 import org.opendc.compute.simulator.internal.GuestListener
-import org.opendc.simulator.compute.SimBareMetalMachine
-import org.opendc.simulator.compute.SimMachineContext
-import org.opendc.simulator.compute.kernel.SimHypervisor
-import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.workload.SimWorkload
-import org.opendc.simulator.compute.workload.SimWorkloads
+import org.opendc.simulator.compute.old.SimBareMetalMachine
+import org.opendc.simulator.compute.old.SimMachineContext
+import org.opendc.simulator.compute.old.kernel.SimHypervisor
+import org.opendc.simulator.compute.old.model.MachineModel
+import org.opendc.simulator.compute.old.model.MemoryUnit
+import org.opendc.simulator.compute.old.workload.SimWorkload
+import org.opendc.simulator.compute.v2.machine.SimMachineNew
 import java.time.Duration
 import java.time.Instant
 import java.time.InstantSource
 import java.util.UUID
-import java.util.function.Supplier
 
 /**
  * A [Host] implementation that simulates virtual machines on a physical machine using [SimHypervisor].
@@ -59,8 +57,6 @@ import java.util.function.Supplier
  * @param machine The [SimBareMetalMachine] on which the host runs.
  * @param hypervisor The [SimHypervisor] to run on top of the machine.
  * @param mapper A [SimWorkloadMapper] to map a [Task] to a [SimWorkload].
- * @param bootModel A [Supplier] providing the [SimWorkload] to execute during the boot procedure of the hypervisor.
- * @param optimize A flag to indicate to optimize the machine models of the virtual machines.
  */
 public class SimHost(
     private val uid: UUID,
@@ -69,25 +65,23 @@ public class SimHost(
     private val clock: InstantSource,
     private val machine: SimBareMetalMachine,
     private val hypervisor: SimHypervisor,
-    private val mapper: SimWorkloadMapper = DefaultWorkloadMapper,
-    private val bootModel: Supplier<SimWorkload?> = Supplier { null },
-    private val optimize: Boolean = false,
+    private val machineNew: SimMachineNew,
 ) : Host, AutoCloseable {
     /**
      * The event listeners registered with this host.
      */
-    private val listeners = mutableListOf<HostListener>()
+    private val hostListeners = mutableListOf<HostListener>()
 
     /**
      * The virtual machines running on the hypervisor.
      */
-    private val guests = HashMap<Task, Guest>()
-    private val localGuests = mutableListOf<Guest>()
+    private val taskToGuestMap = HashMap<ServiceTask, Guest>()
+    private val guests = mutableListOf<Guest>()
 
-    private var localState: HostState = HostState.DOWN
+    private var hostState: HostState = HostState.DOWN
         set(value) {
             if (value != field) {
-                listeners.forEach { it.onStateChanged(this, value) }
+                hostListeners.forEach { it.onStateChanged(this, value) }
             }
             field = value
         }
@@ -105,13 +99,19 @@ public class SimHost(
     private val guestListener =
         object : GuestListener {
             override fun onStart(guest: Guest) {
-                listeners.forEach { it.onStateChanged(this@SimHost, guest.task, guest.state) }
+                hostListeners.forEach { it.onStateChanged(this@SimHost, guest.task, guest.state) }
             }
 
             override fun onStop(guest: Guest) {
-                listeners.forEach { it.onStateChanged(this@SimHost, guest.task, guest.state) }
+                hostListeners.forEach { it.onStateChanged(this@SimHost, guest.task, guest.state) }
             }
         }
+
+    private var lastReport = clock.millis()
+    private var totalUptime = 0L
+    private var totalDowntime = 0L
+    private var bootTime: Instant? = null
+    private val cpuLimit = machine.machineModel.cpu.totalCapacity
 
     init {
         launch()
@@ -134,14 +134,14 @@ public class SimHost(
     }
 
     override fun getState(): HostState {
-        return localState
+        return hostState
     }
 
-    override fun getInstances(): Set<Task> {
-        return guests.keys
+    override fun getInstances(): Set<ServiceTask> {
+        return taskToGuestMap.keys
     }
 
-    override fun canFit(task: Task): Boolean {
+    override fun canFit(task: ServiceTask): Boolean {
         val sufficientMemory = model.memoryCapacity >= task.flavor.memorySize
         val enoughCpus = model.coreCount >= task.flavor.coreCount
         val canFit = hypervisor.canFit(task.flavor.toMachineModel())
@@ -149,55 +149,62 @@ public class SimHost(
         return sufficientMemory && enoughCpus && canFit
     }
 
-    override fun spawn(task: Task) {
-        guests.computeIfAbsent(task) { key ->
+    /**
+     * Spawn A Virtual machine that run the Task and put this Task as a Guest on it
+     *
+     * @param task
+     */
+    override fun spawn(task: ServiceTask) {
+        taskToGuestMap.computeIfAbsent(task) { key ->
             require(canFit(key)) { "Task does not fit" }
 
             val machine = hypervisor.newMachine(key.flavor.toMachineModel())
+            val virtualMachine = machineNew.newMachine(key.flavor.toMachineModel())
             val newGuest =
                 Guest(
                     clock,
                     this,
                     hypervisor,
-                    mapper,
                     guestListener,
                     task,
                     machine,
+                    virtualMachine
                 )
 
-            localGuests.add(newGuest)
+            guests.add(newGuest)
+            newGuest.start()
             newGuest
         }
     }
 
-    override fun contains(task: Task): Boolean {
-        return task in guests
+    override fun contains(task: ServiceTask): Boolean {
+        return task in taskToGuestMap
     }
 
-    override fun start(task: Task) {
-        val guest = requireNotNull(guests[task]) { "Unknown task ${task.uid} at host $uid" }
+    override fun start(task: ServiceTask) {
+        val guest = requireNotNull(taskToGuestMap[task]) { "Unknown task ${task.uid} at host $uid" }
         guest.start()
     }
 
-    override fun stop(task: Task) {
-        val guest = requireNotNull(guests[task]) { "Unknown task ${task.uid} at host $uid" }
+    override fun stop(task: ServiceTask) {
+        val guest = requireNotNull(taskToGuestMap[task]) { "Unknown task ${task.uid} at host $uid" }
         guest.stop()
     }
 
-    override fun delete(task: Task) {
-        val guest = guests[task] ?: return
+    override fun delete(task: ServiceTask) {
+        val guest = taskToGuestMap[task] ?: return
         guest.delete()
 
-        guests.remove(task)
-        localGuests.remove(guest)
+        taskToGuestMap.remove(task)
+        guests.remove(guest)
     }
 
     override fun addListener(listener: HostListener) {
-        listeners.add(listener)
+        hostListeners.add(listener)
     }
 
     override fun removeListener(listener: HostListener) {
-        listeners.remove(listener)
+        hostListeners.remove(listener)
     }
 
     override fun close() {
@@ -213,7 +220,7 @@ public class SimHost(
         var error = 0
         var invalid = 0
 
-        val guests = localGuests.listIterator()
+        val guests = guests.listIterator()
         for (guest in guests) {
             when (guest.state) {
                 TaskState.TERMINATED -> terminated++
@@ -221,7 +228,7 @@ public class SimHost(
                 TaskState.ERROR -> error++
                 TaskState.DELETED -> {
                     // Remove guests that have been deleted
-                    this.guests.remove(guest.task)
+                    this.taskToGuestMap.remove(guest.task)
                     guests.remove()
                 }
                 else -> invalid++
@@ -229,9 +236,9 @@ public class SimHost(
         }
 
         return HostSystemStats(
-            Duration.ofMillis(localUptime),
-            Duration.ofMillis(localDowntime),
-            localBootTime,
+            Duration.ofMillis(totalUptime),
+            Duration.ofMillis(totalDowntime),
+            bootTime,
             machine.psu.powerDraw,
             machine.psu.energyUsage,
             terminated,
@@ -241,8 +248,8 @@ public class SimHost(
         )
     }
 
-    override fun getSystemStats(task: Task): GuestSystemStats {
-        val guest = requireNotNull(guests[task]) { "Unknown task ${task.uid} at host $uid" }
+    override fun getSystemStats(task: ServiceTask): GuestSystemStats {
+        val guest = requireNotNull(taskToGuestMap[task]) { "Unknown task ${task.uid} at host $uid" }
         return guest.getSystemStats()
     }
 
@@ -258,12 +265,12 @@ public class SimHost(
             hypervisor.cpuCapacity,
             hypervisor.cpuDemand,
             hypervisor.cpuUsage,
-            hypervisor.cpuUsage / localCpuLimit,
+            hypervisor.cpuUsage / cpuLimit,
         )
     }
 
-    override fun getCpuStats(task: Task): GuestCpuStats {
-        val guest = requireNotNull(guests[task]) { "Unknown task ${task.uid} at host $uid" }
+    override fun getCpuStats(task: ServiceTask): GuestCpuStats {
+        val guest = requireNotNull(taskToGuestMap[task]) { "Unknown task ${task.uid} at host $uid" }
         return guest.getCpuStats()
     }
 
@@ -278,7 +285,7 @@ public class SimHost(
     public fun fail() {
         reset(HostState.ERROR)
 
-        for (guest in localGuests) {
+        for (guest in guests) {
             guest.fail()
         }
     }
@@ -300,33 +307,32 @@ public class SimHost(
     private fun launch() {
         check(ctx == null) { "Concurrent hypervisor running" }
 
-        val bootWorkload = bootModel.get()
         val hypervisor = hypervisor
         val hypervisorWorkload =
             object : SimWorkload by hypervisor {
                 override fun onStart(ctx: SimMachineContext) {
                     try {
-                        localBootTime = clock.instant()
-                        localState = HostState.UP
+                        bootTime = clock.instant()
+                        hostState = HostState.UP
                         hypervisor.onStart(ctx)
 
                         // Recover the guests that were running on the hypervisor.
-                        for (guest in localGuests) {
+                        for (guest in guests) {
                             guest.recover()
                         }
                     } catch (cause: Throwable) {
-                        localState = HostState.ERROR
+                        hostState = HostState.ERROR
                         throw cause
                     }
                 }
             }
 
-        val workload = if (bootWorkload != null) SimWorkloads.chain(bootWorkload, hypervisorWorkload) else hypervisorWorkload
+        val workload = hypervisorWorkload
 
         // Launch hypervisor onto machine
         ctx =
             machine.startWorkload(workload, emptyMap()) { cause ->
-                localState = if (cause != null) HostState.ERROR else HostState.DOWN
+                hostState = if (cause != null) HostState.ERROR else HostState.DOWN
                 ctx = null
             }
     }
@@ -339,7 +345,7 @@ public class SimHost(
 
         // Stop the hypervisor
         ctx?.shutdown()
-        localState = state
+        hostState = state
     }
 
     /**
@@ -349,28 +355,22 @@ public class SimHost(
         return MachineModel(machine.machineModel.cpu, MemoryUnit("Generic", "Generic", 3200.0, memorySize))
     }
 
-    private var localLastReport = clock.millis()
-    private var localUptime = 0L
-    private var localDowntime = 0L
-    private var localBootTime: Instant? = null
-    private val localCpuLimit = machine.machineModel.cpu.totalCapacity
-
     /**
      * Helper function to track the uptime of a machine.
      */
     private fun updateUptime() {
         val now = clock.millis()
-        val duration = now - localLastReport
-        localLastReport = now
+        val duration = now - lastReport
+        lastReport = now
 
-        if (localState == HostState.UP) {
-            localUptime += duration
-        } else if (localState == HostState.ERROR) {
+        if (hostState == HostState.UP) {
+            totalUptime += duration
+        } else if (hostState == HostState.ERROR) {
             // Only increment downtime if the machine is in a failure state
-            localDowntime += duration
+            totalDowntime += duration
         }
 
-        val guests = localGuests
+        val guests = guests
         for (i in guests.indices) {
             guests[i].updateUptime()
         }

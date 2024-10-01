@@ -36,11 +36,11 @@ import org.opendc.faas.service.router.RandomRoutingPolicy
 import org.opendc.faas.simulator.delay.ColdStartModel
 import org.opendc.faas.simulator.delay.StochasticDelayInjector
 import org.opendc.faas.simulator.workload.SimFaaSWorkload
-import org.opendc.simulator.compute.model.CpuModel
-import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.workload.SimWorkload
-import org.opendc.simulator.compute.workload.SimWorkloads
+import org.opendc.simulator.compute.old.model.CpuModel
+import org.opendc.simulator.compute.old.model.MachineModel
+import org.opendc.simulator.compute.old.model.MemoryUnit
+import org.opendc.simulator.compute.old.workload.SimWorkload
+import org.opendc.simulator.compute.old.workload.SimWorkloads
 import org.opendc.simulator.kotlin.runSimulation
 import java.time.Duration
 import java.util.Random

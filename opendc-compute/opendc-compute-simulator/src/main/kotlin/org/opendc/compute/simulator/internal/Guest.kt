@@ -23,18 +23,19 @@
 package org.opendc.compute.simulator.internal
 
 import mu.KotlinLogging
-import org.opendc.compute.api.Task
 import org.opendc.compute.api.TaskState
+import org.opendc.compute.service.ServiceTask
 import org.opendc.compute.service.driver.telemetry.GuestCpuStats
 import org.opendc.compute.service.driver.telemetry.GuestSystemStats
 import org.opendc.compute.simulator.SimHost
-import org.opendc.compute.simulator.SimWorkloadMapper
-import org.opendc.simulator.compute.SimMachineContext
-import org.opendc.simulator.compute.kernel.SimHypervisor
-import org.opendc.simulator.compute.workload.SimWorkload
+import org.opendc.simulator.compute.old.SimMachineContext
+import org.opendc.simulator.compute.old.kernel.SimHypervisor
+import org.opendc.simulator.compute.v2.machine.VirtualMachineNew
+import org.opendc.simulator.compute.v2.workload.ChainWorkload
 import java.time.Duration
 import java.time.Instant
 import java.time.InstantSource
+import java.util.LinkedList
 
 /**
  * A virtual machine instance that is managed by a [SimHost].
@@ -43,10 +44,10 @@ internal class Guest(
     private val clock: InstantSource,
     val host: SimHost,
     private val hypervisor: SimHypervisor,
-    private val mapper: SimWorkloadMapper,
     private val listener: GuestListener,
-    val task: Task,
+    val task: ServiceTask,
     val machine: SimHypervisor.SimVirtualMachine,
+    val virtualMachine: VirtualMachineNew,
 ) {
     /**
      * The state of the [Guest].
@@ -56,6 +57,19 @@ internal class Guest(
      */
     var state: TaskState = TaskState.TERMINATED
         private set
+
+
+    /**
+     * The [SimMachineContext] representing the current active virtual machine instance or `null` if no virtual machine
+     * is active.
+     */
+    private var machineContext: SimMachineContext? = null
+
+    private var localUptime = 0L
+    private var localDowntime = 0L
+    private var localLastReport = clock.millis()
+    private var localBootTime: Instant? = null
+    private val localCpuLimit = machine.machineModel.cpu.totalCapacity
 
     /**
      * Start the guest.
@@ -76,15 +90,73 @@ internal class Guest(
     }
 
     /**
+     * Launch the guest on the simulated Virtual machine
+     */
+    private fun doStart() {
+        assert(machineContext == null) { "Concurrent job running" }
+
+        onStart()
+
+        val workload = task.workload;
+        workload.setOffset(clock.millis())
+
+        val meta = mapOf("driver" to host, "task" to task) + task.meta
+        machineContext =
+            machine.startWorkload(workload, meta) { cause ->
+                onStop(if (cause != null) TaskState.ERROR else TaskState.TERMINATED)
+                machineContext = null
+            }
+
+        val newChainWorkload = ChainWorkload(LinkedList(listOf(task.workloadNew)))
+
+        virtualMachine.startWorkload(newChainWorkload);
+    }
+
+    /**
+     * This method is invoked when the guest was started on the host and has booted into a running state.
+     */
+    private fun onStart() {
+        localBootTime = clock.instant()
+        state = TaskState.RUNNING
+        listener.onStart(this)
+    }
+
+    /**
      * Stop the guest.
      */
     fun stop() {
         when (state) {
             TaskState.RUNNING -> doStop(TaskState.TERMINATED)
-            TaskState.ERROR -> doRecover()
+            TaskState.ERROR -> state = TaskState.TERMINATED
             TaskState.TERMINATED, TaskState.DELETED -> return
             else -> assert(false) { "Invalid state transition" }
         }
+    }
+
+    /**
+     * Attempt to stop the task and put it into [target] state.
+     */
+    private fun doStop(target: TaskState) {
+        assert(machineContext != null) { "Invalid job state" }
+
+        val machineContext = this.machineContext ?: return
+        if (target == TaskState.ERROR) {
+            machineContext.shutdown(Exception("Stopped because of ERROR"))
+        } else {
+            machineContext.shutdown()
+        }
+
+        this.state = target
+    }
+
+    /**
+     * This method is invoked when the guest stopped.
+     */
+    private fun onStop(target: TaskState) {
+        updateUptime()
+
+        state = target
+        listener.onStop(this)
     }
 
     /**
@@ -141,7 +213,7 @@ internal class Guest(
      * Obtain the CPU statistics of this guest.
      */
     fun getCpuStats(): GuestCpuStats {
-        val counters = machine.counters
+        val counters = machine.vmCounters
         counters.sync()
 
         return GuestCpuStats(
@@ -154,77 +226,6 @@ internal class Guest(
             machine.cpuUsage / localCpuLimit,
         )
     }
-
-    /**
-     * The [SimMachineContext] representing the current active virtual machine instance or `null` if no virtual machine
-     * is active.
-     */
-    private var ctx: SimMachineContext? = null
-
-    /**
-     * Launch the guest on the simulated
-     */
-    private fun doStart() {
-        assert(ctx == null) { "Concurrent job running" }
-
-        onStart()
-
-        val workload: SimWorkload = mapper.createWorkload(task)
-        workload.setOffset(clock.millis())
-        val meta = mapOf("driver" to host, "task" to task) + task.meta
-        ctx =
-            machine.startWorkload(workload, meta) { cause ->
-                onStop(if (cause != null) TaskState.ERROR else TaskState.TERMINATED)
-                ctx = null
-            }
-    }
-
-    /**
-     * Attempt to stop the task and put it into [target] state.
-     */
-    private fun doStop(target: TaskState) {
-        assert(ctx != null) { "Invalid job state" }
-        val ctx = ctx ?: return
-        if (target == TaskState.ERROR) {
-            ctx.shutdown(Exception("Stopped because of ERROR"))
-        } else {
-            ctx.shutdown()
-        }
-
-        state = target
-    }
-
-    /**
-     * Attempt to recover from an error state.
-     */
-    private fun doRecover() {
-        state = TaskState.TERMINATED
-    }
-
-    /**
-     * This method is invoked when the guest was started on the host and has booted into a running state.
-     */
-    private fun onStart() {
-        localBootTime = clock.instant()
-        state = TaskState.RUNNING
-        listener.onStart(this)
-    }
-
-    /**
-     * This method is invoked when the guest stopped.
-     */
-    private fun onStop(target: TaskState) {
-        updateUptime()
-
-        state = target
-        listener.onStop(this)
-    }
-
-    private var localUptime = 0L
-    private var localDowntime = 0L
-    private var localLastReport = clock.millis()
-    private var localBootTime: Instant? = null
-    private val localCpuLimit = machine.machineModel.cpu.totalCapacity
 
     /**
      * Helper function to track the uptime and downtime of the guest.

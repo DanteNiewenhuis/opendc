@@ -23,8 +23,8 @@
 package org.opendc.compute.workload
 
 import mu.KotlinLogging
-import org.opendc.simulator.compute.kernel.interference.VmInterferenceModel
-import org.opendc.simulator.compute.workload.SimTrace
+import org.opendc.simulator.compute.old.kernel.interference.VmInterferenceModel
+import org.opendc.simulator.compute.old.workload.SimTrace
 import org.opendc.trace.Trace
 import org.opendc.trace.conv.INTERFERENCE_GROUP_MEMBERS
 import org.opendc.trace.conv.INTERFERENCE_GROUP_SCORE
@@ -61,7 +61,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
     /**
      * The cache of workloads.
      */
-    private val cache = ConcurrentHashMap<String, SoftReference<List<VirtualMachine>>>()
+    private val cache = ConcurrentHashMap<String, SoftReference<List<Task>>>()
 
     /**
      * Read the fragments into memory.
@@ -100,7 +100,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         trace: Trace,
         fragments: Map<String, Builder>,
         interferenceModel: VmInterferenceModel,
-    ): List<VirtualMachine> {
+    ): List<Task> {
         val reader = checkNotNull(trace.getTable(TABLE_RESOURCES)).newReader()
 
         val idCol = reader.resolve(resourceID)
@@ -111,7 +111,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         val memCol = reader.resolve(resourceMemCapacity)
 
         var counter = 0
-        val entries = mutableListOf<VirtualMachine>()
+        val entries = mutableListOf<Task>()
 
         return try {
             while (reader.nextRow()) {
@@ -131,7 +131,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
                 val totalLoad = builder.totalLoad
 
                 entries.add(
-                    VirtualMachine(
+                    Task(
                         uid,
                         id,
                         cpuCount,
@@ -147,7 +147,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
             }
 
             // Make sure the virtual machines are ordered by start time
-            entries.sortBy { it.startTime }
+            entries.sortBy { it.submissionTime }
 
             entries
         } catch (e: Exception) {
@@ -192,7 +192,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
     public fun get(
         name: String,
         format: String,
-    ): List<VirtualMachine> {
+    ): List<Task> {
         val ref =
             cache.compute(name) { key, oldVal ->
                 val inst = oldVal?.get()
@@ -239,8 +239,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         /**
          * Add a fragment to the trace.
          *
-         * @param timestamp Timestamp at which the fragment starts (in epoch millis).
-         * @param deadline Timestamp at which the fragment ends (in epoch millis).
+         * @param duration The duration of the fragment (in epoch millis).
          * @param usage CPU usage of this fragment.
          * @param cores Number of cores used.
          */

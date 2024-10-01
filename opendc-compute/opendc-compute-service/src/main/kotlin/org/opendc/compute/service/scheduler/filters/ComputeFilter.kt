@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.scheduler.filters
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 import org.opendc.compute.service.driver.HostState
 
 /**
@@ -32,7 +32,7 @@ import org.opendc.compute.service.driver.HostState
 public class ComputeFilter : HostFilter {
     override fun test(
         host: HostView,
-        task: Task,
+        task: ServiceTask,
     ): Boolean {
         val result = host.host.state == HostState.UP
         return result

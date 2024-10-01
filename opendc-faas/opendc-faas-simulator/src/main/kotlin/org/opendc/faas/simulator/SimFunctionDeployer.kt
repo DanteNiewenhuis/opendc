@@ -41,10 +41,10 @@ import org.opendc.faas.service.deployer.FunctionInstanceState
 import org.opendc.faas.simulator.delay.DelayInjector
 import org.opendc.faas.simulator.workload.SimFaaSWorkloadMapper
 import org.opendc.faas.simulator.workload.SimMetaFaaSWorkloadMapper
-import org.opendc.simulator.compute.SimBareMetalMachine
-import org.opendc.simulator.compute.SimMachine
-import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.runWorkload
+import org.opendc.simulator.compute.old.SimBareMetalMachine
+import org.opendc.simulator.compute.old.SimMachine
+import org.opendc.simulator.compute.old.model.MachineModel
+import org.opendc.simulator.compute.old.runWorkload
 import org.opendc.simulator.flow2.FlowEngine
 import java.util.ArrayDeque
 import kotlin.coroutines.Continuation

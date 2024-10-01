@@ -25,9 +25,11 @@ package org.opendc.compute.simulator.provisioner
 import org.opendc.compute.service.ComputeService
 import org.opendc.compute.simulator.SimHost
 import org.opendc.compute.topology.specs.HostSpec
-import org.opendc.simulator.compute.SimBareMetalMachine
-import org.opendc.simulator.compute.kernel.SimHypervisor
+import org.opendc.simulator.compute.old.SimBareMetalMachine
+import org.opendc.simulator.compute.old.kernel.SimHypervisor
+import org.opendc.simulator.compute.v2.machine.SimMachineNew
 import org.opendc.simulator.flow2.FlowEngine
+import org.opendc.simulator.flow3.engine.FlowEngineNew
 import java.util.SplittableRandom
 
 /**
@@ -40,7 +42,6 @@ import java.util.SplittableRandom
 public class HostsProvisioningStep internal constructor(
     private val serviceDomain: String,
     private val specs: List<HostSpec>,
-    private val optimize: Boolean,
 ) : ProvisioningStep {
     override fun apply(ctx: ProvisioningContext): AutoCloseable {
         val service =
@@ -51,7 +52,12 @@ public class HostsProvisioningStep internal constructor(
         val graph = engine.newGraph()
         val hosts = mutableSetOf<SimHost>()
 
+        val engineNew = FlowEngineNew.create(ctx.dispatcher)
+        val graphNew = engineNew.newGraph()
+
         for (spec in specs) {
+            val machineNew = SimMachineNew(graphNew, spec.model, spec.psuFactory)
+
             val machine = SimBareMetalMachine.create(graph, spec.model, spec.psuFactory)
             val hypervisor = SimHypervisor.create(spec.multiplexerFactory, SplittableRandom(ctx.seeder.nextLong()))
 
@@ -63,7 +69,7 @@ public class HostsProvisioningStep internal constructor(
                     ctx.dispatcher.timeSource,
                     machine,
                     hypervisor,
-                    optimize = optimize,
+                    machineNew = machineNew
                 )
 
             require(hosts.add(host)) { "Host with uid ${spec.uid} already exists" }

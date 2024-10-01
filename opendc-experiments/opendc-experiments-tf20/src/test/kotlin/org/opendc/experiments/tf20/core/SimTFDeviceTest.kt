@@ -27,9 +27,9 @@ import kotlinx.coroutines.launch
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.opendc.simulator.compute.model.CpuModel
-import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.cpu.CpuPowerModels
+import org.opendc.simulator.compute.old.model.CpuModel
+import org.opendc.simulator.compute.old.model.MemoryUnit
+import org.opendc.simulator.compute.old.cpu.CpuPowerModels
 import org.opendc.simulator.kotlin.runSimulation
 import java.util.UUID
 

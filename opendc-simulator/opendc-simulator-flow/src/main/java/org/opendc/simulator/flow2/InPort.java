@@ -38,7 +38,7 @@ public final class InPort {
 
     private boolean mask;
 
-    OutPort output;
+    public OutPort output;
     private InHandler handler = InHandlers.noop();
     private final InstantSource clock;
     private final String name;
@@ -163,7 +163,7 @@ public final class InPort {
     /**
      * This method is invoked when the InPort is connected to an OutPort.
      */
-    void connect() {
+    public void connect() {
         OutPort output = this.output;
         output.pull(capacity);
     }
@@ -194,7 +194,7 @@ public final class InPort {
     /**
      * This method is invoked by the connected {@link OutPort} when it finishes.
      */
-    void finish(Throwable cause) {
+    public void finish(Throwable cause) {
         try {
             long now = clock.millis();
             handler.onUpstreamFinish(this, cause);

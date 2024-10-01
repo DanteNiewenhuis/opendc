@@ -41,10 +41,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.opendc.common.Dispatcher;
 import org.opendc.common.util.Pacer;
-import org.opendc.compute.api.ComputeClient;
 import org.opendc.compute.api.Flavor;
 import org.opendc.compute.api.Image;
-import org.opendc.compute.api.Task;
 import org.opendc.compute.api.TaskState;
 import org.opendc.compute.service.driver.Host;
 import org.opendc.compute.service.driver.HostListener;
@@ -52,7 +50,9 @@ import org.opendc.compute.service.driver.HostModel;
 import org.opendc.compute.service.driver.HostState;
 import org.opendc.compute.service.scheduler.ComputeScheduler;
 import org.opendc.compute.service.telemetry.SchedulerStats;
-import org.opendc.simulator.compute.workload.SimWorkload;
+import org.opendc.simulator.compute.old.workload.SimWorkload;
+import org.opendc.simulator.compute.v2.workload.SimWorkloadNew;
+import org.opendc.simulator.compute.v2.workload.Workload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +107,7 @@ public final class ComputeService implements AutoCloseable {
     /**
      * The active tasks in the system.
      */
-    private final Map<Task, Host> activeTasks = new HashMap<>();
+    private final Map<ServiceTask, Host> activeTasks = new HashMap<>();
 
     /**
      * The registered flavors for this compute service.
@@ -153,16 +153,14 @@ public final class ComputeService implements AutoCloseable {
         }
 
         @Override
-        public void onStateChanged(@NotNull Host host, @NotNull Task task, @NotNull TaskState newState) {
-            final ServiceTask serviceTask = (ServiceTask) task;
-
-            if (serviceTask.getHost() != host) {
+        public void onStateChanged(@NotNull Host host, @NotNull ServiceTask task, @NotNull TaskState newState) {
+            if (task.getHost() != host) {
                 // This can happen when a task is rescheduled and started on another machine, while being deleted from
                 // the old machine.
                 return;
             }
 
-            serviceTask.setState(newState);
+            task.setState(newState);
 
             // TODO: move the removal of tasks when max Failures are reached to here
             if (newState == TaskState.TERMINATED || newState == TaskState.DELETED || newState == TaskState.ERROR) {
@@ -173,7 +171,7 @@ public final class ComputeService implements AutoCloseable {
                 }
 
                 HostView hv = hostToView.get(host);
-                final ServiceFlavor flavor = serviceTask.getFlavor();
+                final ServiceFlavor flavor = task.getFlavor();
                 if (hv != null) {
                     hv.provisionedCores -= flavor.getCoreCount();
                     hv.instanceCount--;
@@ -220,13 +218,13 @@ public final class ComputeService implements AutoCloseable {
         if (isClosed) {
             throw new IllegalStateException("Service is closed");
         }
-        return new Client(this);
+        return new ComputeClient(this);
     }
 
     /**
-     * Return the {@link Task}s hosted by this service.
+     * Return the {@link ServiceTask}s hosted by this service.
      */
-    public List<Task> getTasks() {
+    public List<ServiceTask> getTasks() {
         return Collections.unmodifiableList(tasks);
     }
 
@@ -267,15 +265,10 @@ public final class ComputeService implements AutoCloseable {
     }
 
     /**
-     * Lookup the {@link Host} that currently hosts the specified {@link Task}.
+     * Lookup the {@link Host} that currently hosts the specified {@link ServiceTask}.
      */
-    public Host lookupHost(Task task) {
-        if (task instanceof ServiceTask) {
-            return ((ServiceTask) task).getHost();
-        }
-
-        ServiceTask internal = Objects.requireNonNull(taskById.get(task.getUid()), "Invalid task passed to lookupHost");
-        return internal.getHost();
+    public Host lookupHost(ServiceTask task) {
+        return task.getHost();
     }
 
     /**
@@ -413,7 +406,7 @@ public final class ComputeService implements AutoCloseable {
                 task.host = host;
 
                 host.spawn(task);
-                host.start(task);
+//                host.start(task);
 
                 tasksActive++;
                 attemptsSuccess++;
@@ -468,11 +461,11 @@ public final class ComputeService implements AutoCloseable {
     /**
      * Implementation of {@link ComputeClient} using a {@link ComputeService}.
      */
-    private static class Client implements ComputeClient {
+    public static class ComputeClient {
         private final ComputeService service;
         private boolean isClosed;
 
-        Client(ComputeService service) {
+        ComputeClient(ComputeService service) {
             this.service = service;
         }
 
@@ -486,13 +479,11 @@ public final class ComputeService implements AutoCloseable {
         }
 
         @NotNull
-        @Override
         public List<Flavor> queryFlavors() {
             checkOpen();
             return new ArrayList<>(service.flavors);
         }
 
-        @Override
         public Flavor findFlavor(@NotNull UUID id) {
             checkOpen();
 
@@ -500,18 +491,16 @@ public final class ComputeService implements AutoCloseable {
         }
 
         @NotNull
-        @Override
         public Flavor newFlavor(
                 @NotNull String name,
                 int cpuCount,
                 long memorySize,
-                @NotNull Map<String, String> labels,
                 @NotNull Map<String, ?> meta) {
             checkOpen();
 
             final ComputeService service = this.service;
             UUID uid = new UUID(service.clock.millis(), service.random.nextLong());
-            ServiceFlavor flavor = new ServiceFlavor(service, uid, name, cpuCount, memorySize, labels, meta);
+            ServiceFlavor flavor = new ServiceFlavor(service, uid, name, cpuCount, memorySize, meta);
 
             service.flavorById.put(uid, flavor);
             service.flavors.add(flavor);
@@ -520,18 +509,20 @@ public final class ComputeService implements AutoCloseable {
         }
 
         @NotNull
-        @Override
         public List<Image> queryImages() {
             checkOpen();
 
             return new ArrayList<>(service.images);
         }
 
-        @Override
         public Image findImage(@NotNull UUID id) {
             checkOpen();
 
             return service.imageById.get(id);
+        }
+
+        public Image newImage(@NotNull String name) {
+            return newImage(name, Collections.emptyMap(), Collections.emptyMap());
         }
 
         @NotNull
@@ -550,14 +541,13 @@ public final class ComputeService implements AutoCloseable {
         }
 
         @NotNull
-        @Override
-        public Task newTask(
+        public ServiceTask newTask(
                 @NotNull String name,
                 @NotNull Image image,
                 @NotNull Flavor flavor,
-                @NotNull Map<String, String> labels,
-                @NotNull Map<String, ?> meta,
-                boolean start) {
+                @NotNull SimWorkload workload,
+                @NotNull Workload workloadNew,
+                @NotNull Map<String, ?> meta) {
             checkOpen();
 
             final ComputeService service = this.service;
@@ -568,34 +558,30 @@ public final class ComputeService implements AutoCloseable {
             final ServiceImage internalImage =
                     Objects.requireNonNull(service.imageById.get(image.getUid()), "Unknown image");
 
-            ServiceTask task = new ServiceTask(service, uid, name, internalFlavor, internalImage, labels, meta);
+            ServiceTask task = new ServiceTask(service, uid, name, internalFlavor, internalImage, workload, workloadNew, meta);
 
             service.taskById.put(uid, task);
             service.tasks.add(task);
 
-            if (start) {
-                task.start();
-            }
+            task.start();
+
 
             return task;
         }
 
         @Nullable
-        @Override
-        public Task findTask(@NotNull UUID id) {
+        public ServiceTask findTask(@NotNull UUID id) {
             checkOpen();
             return service.taskById.get(id);
         }
 
         @NotNull
-        @Override
-        public List<Task> queryTasks() {
+        public List<ServiceTask> queryTasks() {
             checkOpen();
 
             return new ArrayList<>(service.tasks);
         }
 
-        @Override
         public void close() {
             isClosed = true;
         }
@@ -606,9 +592,8 @@ public final class ComputeService implements AutoCloseable {
         }
 
         @Nullable
-        @Override
-        public void rescheduleTask(@NotNull Task task, @NotNull SimWorkload workload) {
-            ServiceTask internalTask = (ServiceTask) findTask(task.getUid());
+        public void rescheduleTask(@NotNull ServiceTask task, @NotNull SimWorkload workload) {
+            ServiceTask internalTask = findTask(task.getUid());
             Host from = service.lookupHost(internalTask);
 
             from.delete(internalTask);

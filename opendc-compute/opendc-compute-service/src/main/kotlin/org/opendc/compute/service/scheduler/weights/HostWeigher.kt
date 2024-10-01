@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.scheduler.weights
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 import org.opendc.compute.service.scheduler.FilterScheduler
 
 /**
@@ -36,11 +36,11 @@ public interface HostWeigher {
     public val multiplier: Double
 
     /**
-     * Obtain the weight of the specified [host] when scheduling the specified [task].
+     * Obtain the weight of the specified [host] when scheduling the specified [ServiceTask].
      */
     public fun getWeight(
         host: HostView,
-        task: Task,
+        task: ServiceTask,
     ): Double
 
     /**
@@ -48,7 +48,7 @@ public interface HostWeigher {
      */
     public fun getWeights(
         hosts: List<HostView>,
-        task: Task,
+        task: ServiceTask,
     ): Result {
         val weights = DoubleArray(hosts.size)
         var min = Double.MAX_VALUE

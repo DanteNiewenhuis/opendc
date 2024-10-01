@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.scheduler.filters
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 
 /**
  * A [HostFilter] that filters hosts based on the number of instances on the host.
@@ -33,7 +33,7 @@ import org.opendc.compute.service.HostView
 public class InstanceCountFilter(private val limit: Int) : HostFilter {
     override fun test(
         host: HostView,
-        task: Task,
+        task: ServiceTask,
     ): Boolean {
         return host.instanceCount < limit
     }

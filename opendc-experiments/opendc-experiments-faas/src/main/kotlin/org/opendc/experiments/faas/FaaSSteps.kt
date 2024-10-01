@@ -30,7 +30,7 @@ import org.opendc.faas.service.FaaSService
 import org.opendc.faas.service.autoscaler.FunctionTerminationPolicy
 import org.opendc.faas.service.router.RoutingPolicy
 import org.opendc.faas.simulator.delay.ColdStartModel
-import org.opendc.simulator.compute.model.MachineModel
+import org.opendc.simulator.compute.old.model.MachineModel
 
 /**
  * Return a [ProvisioningStep] that sets up a [FaaSService].

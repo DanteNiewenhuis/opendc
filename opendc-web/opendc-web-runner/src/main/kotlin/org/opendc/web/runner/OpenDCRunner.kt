@@ -36,10 +36,10 @@ import org.opendc.compute.workload.ComputeWorkloadLoader
 import org.opendc.compute.workload.sampleByLoad
 import org.opendc.compute.workload.trace
 import org.opendc.experiments.base.runner.replay
-import org.opendc.simulator.compute.model.CpuModel
-import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.cpu.CpuPowerModels
+import org.opendc.simulator.compute.old.model.CpuModel
+import org.opendc.simulator.compute.old.model.MachineModel
+import org.opendc.simulator.compute.old.model.MemoryUnit
+import org.opendc.simulator.compute.old.cpu.CpuPowerModels
 import org.opendc.simulator.kotlin.runSimulation
 import org.opendc.web.proto.runner.Job
 import org.opendc.web.proto.runner.Scenario

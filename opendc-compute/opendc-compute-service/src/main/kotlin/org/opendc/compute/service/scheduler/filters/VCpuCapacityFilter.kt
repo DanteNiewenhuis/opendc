@@ -22,17 +22,17 @@
 
 package org.opendc.compute.service.scheduler.filters
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 
 /**
- * A [HostFilter] that filters hosts based on the vCPU speed requirements of a [Task] and the available
+ * A [HostFilter] that filters hosts based on the vCPU speed requirements of a [ServiceTask] and the available
  * capacity on the host.
  */
 public class VCpuCapacityFilter : HostFilter {
     override fun test(
         host: HostView,
-        task: Task,
+        task: ServiceTask,
     ): Boolean {
         val requiredCapacity = task.flavor.meta["cpu-capacity"] as? Double
         val hostModel = host.host.model

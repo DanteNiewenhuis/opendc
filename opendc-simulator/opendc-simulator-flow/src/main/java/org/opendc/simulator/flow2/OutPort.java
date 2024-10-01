@@ -38,7 +38,7 @@ public final class OutPort {
 
     private boolean mask;
 
-    InPort input;
+    public InPort input;
     private OutHandler handler = OutHandlers.noop();
     private final String name;
     private final FlowStage stage;
@@ -176,7 +176,7 @@ public final class OutPort {
     /**
      * This method is invoked when the OutPort is connected to an InPort.
      */
-    void connect() {
+    public void connect() {
         input.push(demand);
     }
 
@@ -206,7 +206,7 @@ public final class OutPort {
     /**
      * This method is invoked by the connected {@link InPort} when downstream cancels the connection.
      */
-    void cancel(Throwable cause) {
+    public void cancel(Throwable cause) {
         try {
             handler.onDownstreamFinish(this, cause);
             this.capacity = 0.f;

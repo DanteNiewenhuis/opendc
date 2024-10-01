@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.assertThrows
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
 import org.opendc.compute.service.driver.HostModel
 import org.opendc.compute.service.driver.HostState

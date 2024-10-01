@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.scheduler.filters
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 import java.util.UUID
 
 /**
@@ -32,7 +32,7 @@ import java.util.UUID
 public class SameHostFilter : HostFilter {
     override fun test(
         host: HostView,
-        task: Task,
+        task: ServiceTask,
     ): Boolean {
         @Suppress("UNCHECKED_CAST")
         val affinityUUIDs = task.meta["scheduler_hint:same_host"] as? Set<UUID> ?: return true

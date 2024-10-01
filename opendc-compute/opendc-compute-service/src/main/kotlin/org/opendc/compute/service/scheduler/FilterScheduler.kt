@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.scheduler
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 import org.opendc.compute.service.scheduler.filters.HostFilter
 import org.opendc.compute.service.scheduler.weights.HostWeigher
 import java.util.SplittableRandom
@@ -32,7 +32,7 @@ import kotlin.math.min
 
 /**
  * A [ComputeScheduler] implementation that uses filtering and weighing passes to select
- * the host to schedule a [Task] on.
+ * the host to schedule a [ServiceTask] on.
  *
  * This implementation is based on the filter scheduler from OpenStack Nova.
  * See: https://docs.openstack.org/nova/latest/user/filter-scheduler.html
@@ -65,7 +65,7 @@ public class FilterScheduler(
         hosts.remove(host)
     }
 
-    override fun select(task: Task): HostView? {
+    override fun select(task: ServiceTask): HostView? {
         val hosts = hosts
         val filteredHosts = hosts.filter { host -> filters.all { filter -> filter.test(host, task) } }
 

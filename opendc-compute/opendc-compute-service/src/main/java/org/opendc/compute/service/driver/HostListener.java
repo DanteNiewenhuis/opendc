@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.driver;
 
-import org.opendc.compute.api.Task;
 import org.opendc.compute.api.TaskState;
+import org.opendc.compute.service.ServiceTask;
 
 /**
  * Listener interface for events originating from a {@link Host}.
@@ -32,7 +32,7 @@ public interface HostListener {
     /**
      * This method is invoked when the state of <code>task</code> on <code>host</code> changes.
      */
-    default void onStateChanged(Host host, Task task, TaskState newState) {}
+    default void onStateChanged(Host host, ServiceTask task, TaskState newState) {}
 
     /**
      * This method is invoked when the state of a {@link Host} has changed.

@@ -29,10 +29,10 @@ import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import org.opendc.common.Dispatcher
 import org.opendc.common.asCoroutineDispatcher
-import org.opendc.compute.api.Task
 import org.opendc.compute.api.TaskState
 import org.opendc.compute.carbon.CarbonTrace
 import org.opendc.compute.service.ComputeService
+import org.opendc.compute.service.ServiceTask
 import org.opendc.compute.service.driver.Host
 import org.opendc.compute.telemetry.table.HostInfo
 import org.opendc.compute.telemetry.table.HostTableReader
@@ -76,7 +76,7 @@ public class ComputeMetricReader(
     /**
      * Mapping from [Task] instances to [TaskTableReaderImpl]
      */
-    private val taskTableReaders = mutableMapOf<Task, TaskTableReaderImpl>()
+    private val taskTableReaders = mutableMapOf<ServiceTask, TaskTableReaderImpl>()
 
     /**
      * The background job that is responsible for collecting the metrics every cycle.
@@ -424,7 +424,7 @@ public class ComputeMetricReader(
      */
     private class TaskTableReaderImpl(
         private val service: ComputeService,
-        private val task: Task,
+        private val task: ServiceTask,
         private val startTime: Duration = Duration.ofMillis(0),
     ) : TaskTableReader {
         override fun copy(): TaskTableReader {

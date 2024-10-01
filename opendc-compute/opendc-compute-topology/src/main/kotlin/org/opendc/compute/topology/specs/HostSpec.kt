@@ -22,8 +22,8 @@
 
 package org.opendc.compute.topology.specs
 
-import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.cpu.CpuPowerModel
+import org.opendc.simulator.compute.old.model.MachineModel
+import org.opendc.simulator.compute.old.cpu.CpuPowerModel
 import org.opendc.simulator.flow2.mux.FlowMultiplexerFactory
 import java.util.UUID
 

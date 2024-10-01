@@ -23,8 +23,8 @@
 package org.opendc.compute.service.scheduler
 
 import mu.KotlinLogging
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 
 /**
  * Policy replaying VM-cluster assignment.
@@ -48,7 +48,7 @@ public class ReplayScheduler(private val vmPlacements: Map<String, String>) : Co
         hosts.remove(host)
     }
 
-    override fun select(task: Task): HostView? {
+    override fun select(task: ServiceTask): HostView? {
         val clusterName =
             vmPlacements[task.name]
                 ?: throw IllegalStateException("Could not find placement data in VM placement file for VM ${task.name}")

@@ -42,7 +42,7 @@ import org.opendc.compute.telemetry.table.ServiceTableReader
 import org.opendc.compute.topology.clusterTopology
 import org.opendc.compute.topology.specs.HostSpec
 import org.opendc.compute.workload.ComputeWorkloadLoader
-import org.opendc.compute.workload.VirtualMachine
+import org.opendc.compute.workload.Task
 import org.opendc.compute.workload.sampleByLoad
 import org.opendc.compute.workload.trace
 import org.opendc.experiments.base.runner.replay
@@ -248,7 +248,7 @@ class ScenarioIntegrationTest {
     private fun createTestWorkload(
         fraction: Double,
         seed: Long,
-    ): List<VirtualMachine> {
+    ): List<Task> {
         val source = trace("bitbrains-small").sampleByLoad(fraction)
         return source.resolve(workloadLoader, Random(seed))
     }

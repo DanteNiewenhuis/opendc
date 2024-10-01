@@ -161,7 +161,7 @@ public final class FlowEngine implements Runnable {
                     break;
                 }
 
-                ctx.onUpdate(now);
+                ctx.update(now);
             }
 
             // Execute all immediate updates
@@ -171,7 +171,7 @@ public final class FlowEngine implements Runnable {
                     break;
                 }
 
-                ctx.onUpdate(now);
+                ctx.update(now);
             }
         } finally {
             active = false;

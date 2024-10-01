@@ -36,7 +36,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.opendc.compute.api.Flavor
 import org.opendc.compute.api.Image
-import org.opendc.compute.api.Task
 import org.opendc.compute.api.TaskState
 import org.opendc.compute.api.TaskWatcher
 import org.opendc.compute.service.driver.Host

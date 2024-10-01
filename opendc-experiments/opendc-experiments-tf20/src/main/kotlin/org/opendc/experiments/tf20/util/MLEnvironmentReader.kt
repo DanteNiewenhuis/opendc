@@ -25,10 +25,10 @@ package org.opendc.experiments.tf20.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.opendc.simulator.compute.model.CpuModel
-import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.cpu.CpuPowerModels
+import org.opendc.simulator.compute.old.model.CpuModel
+import org.opendc.simulator.compute.old.model.MachineModel
+import org.opendc.simulator.compute.old.model.MemoryUnit
+import org.opendc.simulator.compute.old.cpu.CpuPowerModels
 import java.io.InputStream
 import java.util.UUID
 

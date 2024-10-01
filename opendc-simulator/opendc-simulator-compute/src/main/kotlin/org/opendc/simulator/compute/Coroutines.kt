@@ -23,9 +23,11 @@
 package org.opendc.simulator.compute
 
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.opendc.simulator.compute.workload.SimWorkload
+import org.opendc.simulator.compute.old.workload.SimWorkload
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+
+import org.opendc.simulator.compute.old.SimMachine
 
 /**
  * Run the specified [SimWorkload] on this machine and suspend execution util [workload] has finished.

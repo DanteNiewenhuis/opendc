@@ -29,12 +29,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.yield
-import org.opendc.compute.api.Task
 import org.opendc.compute.api.TaskState
-import org.opendc.compute.api.TaskWatcher
 import org.opendc.compute.failure.models.FailureModel
 import org.opendc.compute.service.ComputeService
-import org.opendc.compute.workload.VirtualMachine
+import org.opendc.compute.service.ServiceTask
+import org.opendc.compute.service.TaskWatcher
+import org.opendc.compute.workload.Task
 import org.opendc.experiments.base.scenario.specs.CheckpointModelSpec
 import org.opendc.experiments.base.scenario.specs.FailureModelSpec
 import org.opendc.experiments.base.scenario.specs.createFailureModel
@@ -63,7 +63,7 @@ public class RunningTaskWatcher : TaskWatcher {
     }
 
     override fun onStateChanged(
-        task: Task,
+        task: ServiceTask,
         newState: TaskState,
     ) {
         if (unlockStates.contains(newState)) {
@@ -73,7 +73,7 @@ public class RunningTaskWatcher : TaskWatcher {
 }
 
 /**
- * Helper method to replay the specified list of [VirtualMachine] and suspend execution util all VMs have finished.
+ * Helper method to replay the specified list of [Task] and suspend execution util all VMs have finished.
  *
  * @param clock The simulation clock.
  * @param trace The trace to simulate.
@@ -83,7 +83,7 @@ public class RunningTaskWatcher : TaskWatcher {
  */
 public suspend fun ComputeService.replay(
     clock: InstantSource,
-    trace: List<VirtualMachine>,
+    trace: List<Task>,
     failureModelSpec: FailureModelSpec? = null,
     checkpointModelSpec: CheckpointModelSpec? = null,
     seed: Long = 0,
@@ -107,9 +107,9 @@ public suspend fun ComputeService.replay(
 
             var simulationOffset = Long.MIN_VALUE
 
-            for (entry in trace.sortedBy { it.startTime }) {
+            for (entry in trace.sortedBy { it.submissionTime }) {
                 val now = clock.millis()
-                val start = entry.startTime.toEpochMilli()
+                val start = entry.submissionTime.toEpochMilli()
 
                 // Set the simulationOffset based on the starting time of the first task
                 if (simulationOffset == Long.MIN_VALUE) {
@@ -126,6 +126,8 @@ public suspend fun ComputeService.replay(
                 val checkpointIntervalScaling = checkpointModelSpec?.checkpointIntervalScaling ?: 1.0
 
                 val workload = entry.trace.createWorkload(start, checkpointInterval, checkpointDuration, checkpointIntervalScaling)
+                val workloadNew = entry.trace.createWorkloadNew(checkpointInterval, checkpointDuration, checkpointIntervalScaling)
+
                 val meta = mutableMapOf<String, Any>("workload" to workload)
 
                 launch {
@@ -137,9 +139,11 @@ public suspend fun ComputeService.replay(
                                 entry.name,
                                 entry.cpuCount,
                                 entry.memCapacity,
-                                meta = if (entry.cpuCapacity > 0.0) mapOf("cpu-capacity" to entry.cpuCapacity) else emptyMap(),
+                                if (entry.cpuCapacity > 0.0) mapOf("cpu-capacity" to entry.cpuCapacity) else emptyMap(),
                             ),
-                            meta = meta,
+                            workload,
+                            workloadNew,
+                            meta,
                         )
 
                     val taskWatcher = RunningTaskWatcher()

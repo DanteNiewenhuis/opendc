@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.scheduler.filters
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 import org.opendc.compute.service.scheduler.FilterScheduler
 
 /**
@@ -36,6 +36,6 @@ public fun interface HostFilter {
      */
     public fun test(
         host: HostView,
-        task: Task,
+        task: ServiceTask,
     ): Boolean
 }

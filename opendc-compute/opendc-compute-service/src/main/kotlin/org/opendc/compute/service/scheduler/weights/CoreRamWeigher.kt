@@ -22,8 +22,8 @@
 
 package org.opendc.compute.service.scheduler.weights
 
-import org.opendc.compute.api.Task
 import org.opendc.compute.service.HostView
+import org.opendc.compute.service.ServiceTask
 
 /**
  * A [HostWeigher] that weighs the hosts based on the available memory per core on the host.
@@ -35,7 +35,7 @@ import org.opendc.compute.service.HostView
 public class CoreRamWeigher(override val multiplier: Double = 1.0) : HostWeigher {
     override fun getWeight(
         host: HostView,
-        task: Task,
+        task: ServiceTask,
     ): Double {
         return host.availableMemory.toDouble()
     }

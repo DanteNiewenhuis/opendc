@@ -31,18 +31,18 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.api.Flavor
 import org.opendc.compute.api.Image
-import org.opendc.compute.api.Task
 import org.opendc.compute.api.TaskState
 import org.opendc.compute.api.TaskWatcher
+import org.opendc.compute.service.TaskWatcher
 import org.opendc.compute.service.driver.Host
 import org.opendc.compute.service.driver.HostListener
-import org.opendc.simulator.compute.SimBareMetalMachine
-import org.opendc.simulator.compute.kernel.SimHypervisor
-import org.opendc.simulator.compute.model.CpuModel
-import org.opendc.simulator.compute.model.MachineModel
-import org.opendc.simulator.compute.model.MemoryUnit
-import org.opendc.simulator.compute.workload.SimTrace
-import org.opendc.simulator.compute.workload.SimTraceFragment
+import org.opendc.simulator.compute.old.SimBareMetalMachine
+import org.opendc.simulator.compute.old.kernel.SimHypervisor
+import org.opendc.simulator.compute.old.model.CpuModel
+import org.opendc.simulator.compute.old.model.MachineModel
+import org.opendc.simulator.compute.old.model.MemoryUnit
+import org.opendc.simulator.compute.old.workload.SimTrace
+import org.opendc.simulator.compute.old.workload.SimTraceFragment
 import org.opendc.simulator.flow2.FlowEngine
 import org.opendc.simulator.flow2.mux.FlowMultiplexerFactory
 import org.opendc.simulator.kotlin.runSimulation
@@ -336,7 +336,6 @@ internal class SimHostTest {
     ) : Flavor {
         override val uid: UUID = UUID.randomUUID()
         override val name: String = "test"
-        override val labels: Map<String, String> = emptyMap()
         override val meta: Map<String, Any> = emptyMap()
 
         override fun delete() {
@@ -351,7 +350,6 @@ internal class SimHostTest {
     private class MockImage(
         override val uid: UUID,
         override val name: String,
-        override val labels: Map<String, String>,
         override val meta: Map<String, Any>,
     ) : Image {
         override fun delete() {
@@ -370,8 +368,6 @@ internal class SimHostTest {
         override val image: Image,
         override val numFailures: Int = 10,
     ) : Task {
-        override val labels: Map<String, String> = emptyMap()
-
         override val meta: Map<String, Any> = emptyMap()
 
         override val state: TaskState = TaskState.TERMINATED

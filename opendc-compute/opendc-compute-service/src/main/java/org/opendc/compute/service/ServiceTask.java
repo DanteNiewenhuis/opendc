@@ -32,17 +32,18 @@ import java.util.Objects;
 import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.opendc.compute.api.Task;
 import org.opendc.compute.api.TaskState;
-import org.opendc.compute.api.TaskWatcher;
 import org.opendc.compute.service.driver.Host;
+import org.opendc.simulator.compute.old.workload.SimWorkload;
+import org.opendc.simulator.compute.v2.workload.SimWorkloadNew;
+import org.opendc.simulator.compute.v2.workload.Workload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link Task} provided by {@link ComputeService}.
+ * Implementation of {@link ServiceTask} provided by {@link ComputeService}.
  */
-public final class ServiceTask implements Task {
+public final class ServiceTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTask.class);
 
     private final ComputeService service;
@@ -51,7 +52,9 @@ public final class ServiceTask implements Task {
     private final String name;
     private final ServiceFlavor flavor;
     private final ServiceImage image;
-    private final Map<String, String> labels;
+    public SimWorkload workload;
+    public Workload workloadNew;
+
     private Map<String, ?> meta;
 
     private final List<TaskWatcher> watchers = new ArrayList<>();
@@ -68,49 +71,40 @@ public final class ServiceTask implements Task {
             String name,
             ServiceFlavor flavor,
             ServiceImage image,
-            Map<String, String> labels,
+            SimWorkload workload,
+            Workload workloadNew,
             Map<String, ?> meta) {
         this.service = service;
         this.uid = uid;
         this.name = name;
         this.flavor = flavor;
         this.image = image;
-        this.labels = labels;
+        this.workload = workload;
+        this.workloadNew = workloadNew;
         this.meta = meta;
     }
 
     @NotNull
-    @Override
     public UUID getUid() {
         return uid;
     }
 
     @NotNull
-    @Override
     public String getName() {
         return name;
     }
 
     @NotNull
-    @Override
     public ServiceFlavor getFlavor() {
         return flavor;
     }
 
     @NotNull
-    @Override
     public ServiceImage getImage() {
         return image;
     }
 
     @NotNull
-    @Override
-    public Map<String, String> getLabels() {
-        return Collections.unmodifiableMap(labels);
-    }
-
-    @NotNull
-    @Override
     public Map<String, Object> getMeta() {
         return Collections.unmodifiableMap(meta);
     }
@@ -119,17 +113,16 @@ public final class ServiceTask implements Task {
         Map<String, Object> new_meta = new HashMap<String, Object>();
         new_meta.put("workload", _workload);
 
+        this.workload = (SimWorkload) _workload;
         meta = new_meta;
     }
 
     @NotNull
-    @Override
     public TaskState getState() {
         return state;
     }
 
     @Nullable
-    @Override
     public Instant getLaunchedAt() {
         return launchedAt;
     }
@@ -141,7 +134,7 @@ public final class ServiceTask implements Task {
         return host;
     }
 
-    @Override
+
     public void start() {
         switch (state) {
             case PROVISIONING:
@@ -161,7 +154,7 @@ public final class ServiceTask implements Task {
         }
     }
 
-    @Override
+
     public void stop() {
         switch (state) {
             case PROVISIONING:
@@ -179,22 +172,22 @@ public final class ServiceTask implements Task {
         }
     }
 
-    @Override
+
     public void watch(@NotNull TaskWatcher watcher) {
         watchers.add(watcher);
     }
 
-    @Override
+
     public void unwatch(@NotNull TaskWatcher watcher) {
         watchers.remove(watcher);
     }
 
-    @Override
+
     public void reload() {
         // No-op: this object is the source-of-truth
     }
 
-    @Override
+
     public void delete() {
         switch (state) {
             case PROVISIONING:
@@ -216,7 +209,7 @@ public final class ServiceTask implements Task {
         }
     }
 
-    @Override
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -224,12 +217,12 @@ public final class ServiceTask implements Task {
         return service.equals(task.service) && uid.equals(task.uid);
     }
 
-    @Override
+
     public int hashCode() {
         return Objects.hash(service, uid);
     }
 
-    @Override
+
     public String toString() {
         return "Task[uid=" + uid + ",name=" + name + ",state=" + state + "]";
     }
@@ -260,7 +253,7 @@ public final class ServiceTask implements Task {
         }
     }
 
-    @Override
+
     public int getNumFailures() {
         return this.numFailures;
     }

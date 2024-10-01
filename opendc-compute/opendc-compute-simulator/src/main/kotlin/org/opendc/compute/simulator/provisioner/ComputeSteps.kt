@@ -76,7 +76,6 @@ public fun registerComputeMonitor(
 public fun setupHosts(
     serviceDomain: String,
     specs: List<HostSpec>,
-    optimize: Boolean = false,
 ): ProvisioningStep {
-    return HostsProvisioningStep(serviceDomain, specs, optimize)
+    return HostsProvisioningStep(serviceDomain, specs)
 }

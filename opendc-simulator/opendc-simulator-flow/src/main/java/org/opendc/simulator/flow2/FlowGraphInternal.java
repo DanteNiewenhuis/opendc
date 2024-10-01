@@ -25,7 +25,7 @@ package org.opendc.simulator.flow2;
 /**
  * Interface implemented by {@link FlowGraph} implementations.
  */
-interface FlowGraphInternal extends FlowGraph {
+public interface FlowGraphInternal extends FlowGraph {
     /**
      * Internal method to remove the specified {@link FlowStage} from the graph.
      */

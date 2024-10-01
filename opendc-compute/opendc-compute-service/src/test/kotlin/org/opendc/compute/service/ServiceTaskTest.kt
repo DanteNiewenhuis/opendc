@@ -31,7 +31,6 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.opendc.compute.api.Task
 import org.opendc.compute.api.TaskState
 import org.opendc.compute.service.driver.Host
 import org.opendc.simulator.kotlin.runSimulation
