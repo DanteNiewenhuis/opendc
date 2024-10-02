@@ -53,6 +53,8 @@ final class SimChainWorkloadNew extends SimWorkloadNew implements FlowSupplier {
     private FlowEdge workloadEdge;
     private FlowEdge machineEdge;
 
+    private float capacity = 0;
+
     private long checkpointInterval = 0;
     private long checkpointDuration = 0;
     private double checkpointIntervalScaling = 1.0;
@@ -196,6 +198,7 @@ final class SimChainWorkloadNew extends SimWorkloadNew implements FlowSupplier {
     @Override
     public void addSupplierEdge(FlowEdge supplierEdge) {
         this.machineEdge = supplierEdge;
+        this.capacity = supplierEdge.getCapacity();
     }
 
     @Override
@@ -230,6 +233,11 @@ final class SimChainWorkloadNew extends SimWorkloadNew implements FlowSupplier {
     @Override
     public void removeConsumerEdge(FlowEdge consumerEdge) {
         this.close(); // TODO: implement multiple workloads
+    }
+
+    @Override
+    public float getCapacity() {
+        return this.capacity;
     }
 
     @Override

@@ -22,8 +22,8 @@ public final class SimplePsuNew extends FlowNode implements FlowSupplier {
     private final CpuPowerModel model;
     private final InstantSource clock;
 
-    private double targetFreq;
-    private double totalUsage;
+    private float targetFreq;
+    private float totalUsage;
     private long lastUpdate;
 
     private float powerDemand = 0.0f;
@@ -31,6 +31,8 @@ public final class SimplePsuNew extends FlowNode implements FlowSupplier {
     private float totalEnergyUsage = 0.0f;
 
     private FlowEdge cpuEdge;
+
+    private float capacity = Long.MAX_VALUE;
 
     public SimplePsuNew(FlowGraphNew graph, CpuPowerModel model) {
         super(graph);
@@ -62,14 +64,14 @@ public final class SimplePsuNew extends FlowNode implements FlowSupplier {
     /**
      * Return the instantaneous power usage of the machine (in W) measured at the InPort of the power supply.
      */
-    public double getPowerDraw() {
+    public float getPowerDraw() {
         return this.powerSupplied;
     }
 
     /**
      * Return the cumulated energy usage of the machine (in J) measured at the InPort of the powers supply.
      */
-    public double getEnergyUsage() {
+    public float getEnergyUsage() {
         updateEnergyUsage(clock.millis());
         return totalEnergyUsage;
     }
@@ -125,6 +127,11 @@ public final class SimplePsuNew extends FlowNode implements FlowSupplier {
     @Override
     public void removeConsumerEdge(FlowEdge consumerEdge) {
         this.cpuEdge = null;
+    }
+
+    @Override
+    public float getCapacity() {
+        return this.capacity;
     }
 
 

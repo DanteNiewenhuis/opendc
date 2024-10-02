@@ -37,11 +37,13 @@ import org.opendc.compute.simulator.internal.Guest
 import org.opendc.compute.simulator.internal.GuestListener
 import org.opendc.simulator.compute.old.SimBareMetalMachine
 import org.opendc.simulator.compute.old.SimMachineContext
+import org.opendc.simulator.compute.old.cpu.CpuPowerModel
 import org.opendc.simulator.compute.old.kernel.SimHypervisor
 import org.opendc.simulator.compute.old.model.MachineModel
 import org.opendc.simulator.compute.old.model.MemoryUnit
 import org.opendc.simulator.compute.old.workload.SimWorkload
 import org.opendc.simulator.compute.v2.machine.SimMachineNew
+import org.opendc.simulator.flow3.engine.FlowGraphNew
 import java.time.Duration
 import java.time.Instant
 import java.time.InstantSource
@@ -63,9 +65,9 @@ public class SimHost(
     private val name: String,
     private val meta: Map<String, Any>,
     private val clock: InstantSource,
-    private val machine: SimBareMetalMachine,
-    private val hypervisor: SimHypervisor,
-    private val machineNew: SimMachineNew,
+    private val graph: FlowGraphNew,
+    private val machineModel: MachineModel,
+    private val powerModel: CpuPowerModel,
 ) : Host, AutoCloseable {
     /**
      * The event listeners registered with this host.
@@ -88,10 +90,13 @@ public class SimHost(
 
     private val model: HostModel =
         HostModel(
-            machine.machineModel.cpu.totalCapacity,
-            machine.machineModel.cpu.coreCount,
-            machine.machineModel.memory.size,
+            machineModel.cpu.totalCapacity,
+            machineModel.cpu.coreCount,
+            machineModel.memory.size,
         )
+
+
+    private var simMachine: SimMachineNew? = null;
 
     /**
      * The [GuestListener] that listens for guest events.
@@ -111,7 +116,7 @@ public class SimHost(
     private var totalUptime = 0L
     private var totalDowntime = 0L
     private var bootTime: Instant? = null
-    private val cpuLimit = machine.machineModel.cpu.totalCapacity
+    private val cpuLimit = machineModel.cpu.totalCapacity
 
     init {
         launch()
@@ -144,7 +149,7 @@ public class SimHost(
     override fun canFit(task: ServiceTask): Boolean {
         val sufficientMemory = model.memoryCapacity >= task.flavor.memorySize
         val enoughCpus = model.coreCount >= task.flavor.coreCount
-        val canFit = hypervisor.canFit(task.flavor.toMachineModel())
+        val canFit = simMachine!!.canFit(task.flavor.toMachineModel())
 
         return sufficientMemory && enoughCpus && canFit
     }
@@ -158,17 +163,14 @@ public class SimHost(
         taskToGuestMap.computeIfAbsent(task) { key ->
             require(canFit(key)) { "Task does not fit" }
 
-            val machine = hypervisor.newMachine(key.flavor.toMachineModel())
-            val virtualMachine = machineNew.newMachine(key.flavor.toMachineModel())
+            val machine = simMachine!!.newMachine(key.flavor.toMachineModel())
             val newGuest =
                 Guest(
                     clock,
                     this,
-                    hypervisor,
                     guestListener,
                     task,
-                    machine,
-                    virtualMachine
+                    machine
                 )
 
             guests.add(newGuest)
@@ -209,7 +211,7 @@ public class SimHost(
 
     override fun close() {
         reset(HostState.DOWN)
-        machine.cancel()
+        simMachine!!.cancel()
     }
 
     override fun getSystemStats(): HostSystemStats {
@@ -239,8 +241,8 @@ public class SimHost(
             Duration.ofMillis(totalUptime),
             Duration.ofMillis(totalDowntime),
             bootTime,
-            machine.psu.powerDraw,
-            machine.psu.energyUsage,
+            simMachine!!.psu.powerDraw,
+            simMachine!!.psu.energyUsage,
             terminated,
             running,
             error,
@@ -254,18 +256,19 @@ public class SimHost(
     }
 
     override fun getCpuStats(): HostCpuStats {
-        val counters = hypervisor.counters
-        counters.sync()
+        simMachine!!.updateCounters(this.clock.millis());
+
+        val counters = simMachine!!.performanceCounters
 
         return HostCpuStats(
             counters.cpuActiveTime,
             counters.cpuIdleTime,
             counters.cpuStealTime,
             counters.cpuLostTime,
-            hypervisor.cpuCapacity,
-            hypervisor.cpuDemand,
-            hypervisor.cpuUsage,
-            hypervisor.cpuUsage / cpuLimit,
+            counters.cpuCapacity,
+            counters.cpuDemand,
+            counters.cpuSupply,
+            counters.cpuSupply / cpuLimit,
         )
     }
 
@@ -307,34 +310,13 @@ public class SimHost(
     private fun launch() {
         check(ctx == null) { "Concurrent hypervisor running" }
 
-        val hypervisor = hypervisor
-        val hypervisorWorkload =
-            object : SimWorkload by hypervisor {
-                override fun onStart(ctx: SimMachineContext) {
-                    try {
-                        bootTime = clock.instant()
-                        hostState = HostState.UP
-                        hypervisor.onStart(ctx)
+        bootTime = this.clock.instant()
+        hostState = HostState.UP;
 
-                        // Recover the guests that were running on the hypervisor.
-                        for (guest in guests) {
-                            guest.recover()
-                        }
-                    } catch (cause: Throwable) {
-                        hostState = HostState.ERROR
-                        throw cause
-                    }
-                }
-            }
-
-        val workload = hypervisorWorkload
-
-        // Launch hypervisor onto machine
-        ctx =
-            machine.startWorkload(workload, emptyMap()) { cause ->
-                hostState = if (cause != null) HostState.ERROR else HostState.DOWN
-                ctx = null
-            }
+        this.simMachine = SimMachineNew(this.graph, this.machineModel, this.powerModel) { cause ->
+            hostState = if (cause != null) HostState.ERROR else HostState.DOWN
+            ctx = null
+        }
     }
 
     /**
@@ -352,7 +334,7 @@ public class SimHost(
      * Convert flavor to machine model.
      */
     private fun Flavor.toMachineModel(): MachineModel {
-        return MachineModel(machine.machineModel.cpu, MemoryUnit("Generic", "Generic", 3200.0, memorySize))
+        return MachineModel(simMachine!!.machineModel.cpu, MemoryUnit("Generic", "Generic", 3200.0, memorySize))
     }
 
     /**

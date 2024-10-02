@@ -9,4 +9,6 @@ public interface FlowSupplier {
     void addConsumerEdge(FlowEdge consumerEdge);
 
     void removeConsumerEdge(FlowEdge consumerEdge);
+
+    float getCapacity();
 }

@@ -223,6 +223,7 @@ public class ComputeMetricReader(
         private val startTime: Duration = Duration.ofMillis(0),
         private val carbonTrace: CarbonTrace = CarbonTrace(null),
     ) : HostTableReader {
+
         override fun copy(): HostTableReader {
             val newHostTable = HostTableReaderImpl(_host)
             newHostTable.setValues(this)
@@ -285,21 +286,21 @@ public class ComputeMetricReader(
             get() = _guestsInvalid
         private var _guestsInvalid = 0
 
-        override val cpuLimit: Double
+        override val cpuLimit: Float
             get() = _cpuLimit
-        private var _cpuLimit = 0.0
+        private var _cpuLimit = 0.0f
 
-        override val cpuUsage: Double
+        override val cpuUsage: Float
             get() = _cpuUsage
-        private var _cpuUsage = 0.0
+        private var _cpuUsage = 0.0f
 
-        override val cpuDemand: Double
+        override val cpuDemand: Float
             get() = _cpuDemand
-        private var _cpuDemand = 0.0
+        private var _cpuDemand = 0.0f
 
-        override val cpuUtilization: Double
+        override val cpuUtilization: Float
             get() = _cpuUtilization
-        private var _cpuUtilization = 0.0
+        private var _cpuUtilization = 0.0f
 
         override val cpuActiveTime: Long
             get() = _cpuActiveTime - previousCpuActiveTime
@@ -321,22 +322,22 @@ public class ComputeMetricReader(
         private var _cpuLostTime = 0L
         private var previousCpuLostTime = 0L
 
-        override val powerDraw: Double
+        override val powerDraw: Float
             get() = _powerDraw
-        private var _powerDraw = 0.0
+        private var _powerDraw = 0.0f
 
-        override val energyUsage: Double
+        override val energyUsage: Float
             get() = _energyUsage - previousPowerTotal
-        private var _energyUsage = 0.0
-        private var previousPowerTotal = 0.0
+        private var _energyUsage = 0.0f
+        private var previousPowerTotal = 0.0f
 
-        override val carbonIntensity: Double
+        override val carbonIntensity: Float
             get() = _carbonIntensity
-        private var _carbonIntensity = 0.0
+        private var _carbonIntensity = 0.0f
 
-        override val carbonEmission: Double
+        override val carbonEmission: Float
             get() = _carbonEmission
-        private var _carbonEmission = 0.0
+        private var _carbonEmission = 0.0f
 
         override val uptime: Long
             get() = _uptime - previousUptime
@@ -382,7 +383,7 @@ public class ComputeMetricReader(
             _energyUsage = hostSysStats.energyUsage
             _carbonIntensity = carbonTrace.getCarbonIntensity(timestampAbsolute)
 
-            _carbonEmission = carbonIntensity * (energyUsage / 3600000.0) // convert energy usage from J to kWh
+            _carbonEmission = carbonIntensity * (energyUsage / 3600000.0f) // convert energy usage from J to kWh
             _uptime = hostSysStats.uptime.toMillis()
             _downtime = hostSysStats.downtime.toMillis()
             _bootTime = hostSysStats.bootTime
@@ -407,15 +408,15 @@ public class ComputeMetricReader(
             _guestsError = 0
             _guestsInvalid = 0
 
-            _cpuLimit = 0.0
-            _cpuUsage = 0.0
-            _cpuDemand = 0.0
-            _cpuUtilization = 0.0
+            _cpuLimit = 0.0f
+            _cpuUsage = 0.0f
+            _cpuDemand = 0.0f
+            _cpuUtilization = 0.0f
 
-            _powerDraw = 0.0
-            _energyUsage = 0.0
-            _carbonIntensity = 0.0
-            _carbonEmission = 0.0
+            _powerDraw = 0.0f
+            _energyUsage = 0.0f
+            _carbonIntensity = 0.0f
+            _carbonEmission = 0.0f
         }
     }
 
@@ -501,9 +502,9 @@ public class ComputeMetricReader(
             get() = _bootTime
         private var _bootTime: Instant? = null
 
-        override val cpuLimit: Double
+        override val cpuLimit: Float
             get() = _cpuLimit
-        private var _cpuLimit = 0.0
+        private var _cpuLimit = 0.0f
 
         override val cpuActiveTime: Long
             get() = _cpuActiveTime - previousCpuActiveTime
@@ -557,7 +558,7 @@ public class ComputeMetricReader(
             _timestamp = now
             _timestampAbsolute = now + startTime
 
-            _cpuLimit = cpuStats?.capacity ?: 0.0
+            _cpuLimit = cpuStats?.capacity ?: 0.0f
             _cpuActiveTime = cpuStats?.activeTime ?: 0
             _cpuIdleTime = cpuStats?.idleTime ?: 0
             _cpuStealTime = cpuStats?.stealTime ?: 0
@@ -588,7 +589,7 @@ public class ComputeMetricReader(
             previousCpuLostTime = _cpuLostTime
 
             _host = null
-            _cpuLimit = 0.0
+            _cpuLimit = 0.0f
         }
     }
 }

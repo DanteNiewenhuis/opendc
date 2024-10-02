@@ -83,7 +83,7 @@ public interface TaskTableReader : Exportable {
     /**
      * The capacity of the CPUs of Host on which the task is running (in MHz).
      */
-    public val cpuLimit: Double
+    public val cpuLimit: Float
 
     /**
      * The duration (in seconds) that a CPU was active in the task.

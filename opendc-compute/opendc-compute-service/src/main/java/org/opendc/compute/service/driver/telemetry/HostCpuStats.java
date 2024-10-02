@@ -40,7 +40,7 @@ public record HostCpuStats(
         long idleTime,
         long stealTime,
         long lostTime,
-        double capacity,
-        double demand,
-        double usage,
-        double utilization) {}
+        float capacity,
+        float demand,
+        float usage,
+        float utilization) {}

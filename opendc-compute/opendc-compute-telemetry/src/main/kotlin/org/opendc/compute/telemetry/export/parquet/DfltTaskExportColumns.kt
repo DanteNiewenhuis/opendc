@@ -25,7 +25,7 @@ package org.opendc.compute.telemetry.export.parquet
 import org.apache.parquet.io.api.Binary
 import org.apache.parquet.schema.LogicalTypeAnnotation
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY
-import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.DOUBLE
+import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.FLOAT
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT32
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64
 import org.apache.parquet.schema.Types
@@ -94,7 +94,7 @@ public object DfltTaskExportColumns {
 
     public val CPU_LIMIT: ExportColumn<TaskTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("cpu_limit"),
+            field = Types.required(FLOAT).named("cpu_limit"),
         ) { it.cpuLimit }
 
     public val CPU_TIME_ACTIVE: ExportColumn<TaskTableReader> =

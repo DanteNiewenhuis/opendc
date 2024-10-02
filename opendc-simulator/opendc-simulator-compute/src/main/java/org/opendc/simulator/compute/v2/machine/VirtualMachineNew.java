@@ -11,6 +11,7 @@ import org.opendc.simulator.flow3.engine.FlowNode;
 import org.opendc.simulator.flow3.engine.FlowSupplier;
 
 import java.time.InstantSource;
+import java.util.function.Consumer;
 
 /*
    A virtual Machine created to run a single workload
@@ -35,6 +36,7 @@ public class VirtualMachineNew extends FlowNode implements FlowConsumer, FlowSup
 
     private PerformanceCounters performanceCounters = new PerformanceCounters();
 
+    private Consumer<Exception> completion;
 
     public VirtualMachineNew(
         SimMachineNew machine,
@@ -53,8 +55,13 @@ public class VirtualMachineNew extends FlowNode implements FlowConsumer, FlowSup
         this.d = 1 / machine.getCpu().getFrequency();
     }
 
-    public void startWorkload(Workload workload) {
+    public void startWorkload(Workload workload, Consumer<Exception> completion) {
+        this.completion = completion;
         this.activeWorkload = workload.onStart(this, this.clock.millis());
+    }
+
+    public PerformanceCounters getPerformanceCounters() {
+        return performanceCounters;
     }
 
     public float getDemand() {
@@ -107,6 +114,13 @@ public class VirtualMachineNew extends FlowNode implements FlowConsumer, FlowSup
         return Long.MAX_VALUE;
     }
 
+    @Override
+    public void close() {
+        super.close();
+
+        completion.accept(null);
+    }
+
     /**
      * Add an edge to the workload
      * TODO: maybe add a check if there is already an edge
@@ -130,7 +144,7 @@ public class VirtualMachineNew extends FlowNode implements FlowConsumer, FlowSup
      **/
     @Override
     public void pushDemand(FlowEdge supplierEdge, float newDemand) {
-        supplierEdge.pushDemand(newDemand);
+        this.cpuEdge.pushDemand(newDemand);
     }
 
     /**
@@ -138,11 +152,7 @@ public class VirtualMachineNew extends FlowNode implements FlowConsumer, FlowSup
      **/
     @Override
     public void pushSupply(FlowEdge consumerEdge, float newSupply) {
-        if (this.cpuSupply == newSupply) {
-            return;
-        }
-
-        cpuEdge.pushDemand(newSupply);
+        this.workloadEdge.pushDemand(newSupply);
     }
 
     /**
@@ -164,21 +174,25 @@ public class VirtualMachineNew extends FlowNode implements FlowConsumer, FlowSup
      * Handle a new supply pushed by the cpuMux by sending it through to the workload
      **/
     @Override
-    public void handleSupply(FlowEdge supplierEdge, float newSupply) {
-        if (this.cpuSupply == this.cpuSupply) {
+    public void handleSupply(FlowEdge supplierEdge, float newCpuSupply) {
+        if (newCpuSupply == this.cpuSupply) {
             return;
         }
 
         updateCounters(this.clock.millis());
-        this.cpuSupply = newSupply;
+        this.cpuSupply = newCpuSupply;
 
-        pushSupply(this.workloadEdge, newSupply);
+        pushSupply(this.workloadEdge, newCpuSupply);
     }
 
     @Override
     public void removeConsumerEdge(FlowEdge consumerEdge) {
-//        this.updateCounters(this.clock.millis());
         this.close();
+    }
+
+    @Override
+    public float getCapacity() {
+        return this.cpuCapacity;
     }
 
     @Override

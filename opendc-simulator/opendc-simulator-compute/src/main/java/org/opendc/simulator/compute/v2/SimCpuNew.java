@@ -169,6 +169,11 @@ public final class SimCpuNew extends FlowNode implements SimProcessingUnitNew, F
         this.muxEdge = null;
     }
 
+    @Override
+    public float getCapacity() {
+        return maxCapacity;
+    }
+
     /**
      * Remove the connection to the psu
      */

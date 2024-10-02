@@ -29,7 +29,6 @@ import org.opendc.compute.service.driver.telemetry.GuestCpuStats
 import org.opendc.compute.service.driver.telemetry.GuestSystemStats
 import org.opendc.compute.simulator.SimHost
 import org.opendc.simulator.compute.old.SimMachineContext
-import org.opendc.simulator.compute.old.kernel.SimHypervisor
 import org.opendc.simulator.compute.v2.machine.VirtualMachineNew
 import org.opendc.simulator.compute.v2.workload.ChainWorkload
 import java.time.Duration
@@ -43,11 +42,9 @@ import java.util.LinkedList
 internal class Guest(
     private val clock: InstantSource,
     val host: SimHost,
-    private val hypervisor: SimHypervisor,
     private val listener: GuestListener,
     val task: ServiceTask,
-    val machine: SimHypervisor.SimVirtualMachine,
-    val virtualMachine: VirtualMachineNew,
+    val machine: VirtualMachineNew,
 ) {
     /**
      * The state of the [Guest].
@@ -69,7 +66,7 @@ internal class Guest(
     private var localDowntime = 0L
     private var localLastReport = clock.millis()
     private var localBootTime: Instant? = null
-    private val localCpuLimit = machine.machineModel.cpu.totalCapacity
+    private val localCpuLimit = machine.cpu.cpuModel.totalCapacity
 
     /**
      * Start the guest.
@@ -100,16 +97,12 @@ internal class Guest(
         val workload = task.workload;
         workload.setOffset(clock.millis())
 
-        val meta = mapOf("driver" to host, "task" to task) + task.meta
-        machineContext =
-            machine.startWorkload(workload, meta) { cause ->
-                onStop(if (cause != null) TaskState.ERROR else TaskState.TERMINATED)
-                machineContext = null
-            }
-
         val newChainWorkload = ChainWorkload(LinkedList(listOf(task.workloadNew)))
 
-        virtualMachine.startWorkload(newChainWorkload);
+        machine.startWorkload(newChainWorkload) { cause ->
+            onStop(if (cause != null) TaskState.ERROR else TaskState.TERMINATED)
+            machineContext = null
+        };
     }
 
     /**
@@ -169,7 +162,6 @@ internal class Guest(
         stop()
 
         state = TaskState.DELETED
-        hypervisor.removeMachine(machine)
     }
 
     /**
@@ -213,17 +205,17 @@ internal class Guest(
      * Obtain the CPU statistics of this guest.
      */
     fun getCpuStats(): GuestCpuStats {
-        val counters = machine.vmCounters
-        counters.sync()
+        machine.updateCounters(this.clock.millis())
+        val counters = machine.performanceCounters
 
         return GuestCpuStats(
             counters.cpuActiveTime / 1000L,
             counters.cpuIdleTime / 1000L,
             counters.cpuStealTime / 1000L,
             counters.cpuLostTime / 1000L,
-            machine.cpuCapacity,
-            machine.cpuUsage,
-            machine.cpuUsage / localCpuLimit,
+            counters.cpuCapacity,
+            counters.cpuSupply,
+            counters.cpuSupply / localCpuLimit,
         )
     }
 

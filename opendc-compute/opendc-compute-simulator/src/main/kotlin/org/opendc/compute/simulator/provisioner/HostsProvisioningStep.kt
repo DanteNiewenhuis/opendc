@@ -25,12 +25,8 @@ package org.opendc.compute.simulator.provisioner
 import org.opendc.compute.service.ComputeService
 import org.opendc.compute.simulator.SimHost
 import org.opendc.compute.topology.specs.HostSpec
-import org.opendc.simulator.compute.old.SimBareMetalMachine
-import org.opendc.simulator.compute.old.kernel.SimHypervisor
-import org.opendc.simulator.compute.v2.machine.SimMachineNew
 import org.opendc.simulator.flow2.FlowEngine
 import org.opendc.simulator.flow3.engine.FlowEngineNew
-import java.util.SplittableRandom
 
 /**
  * A [ProvisioningStep] that provisions a list of hosts for a [ComputeService].
@@ -56,20 +52,15 @@ public class HostsProvisioningStep internal constructor(
         val graphNew = engineNew.newGraph()
 
         for (spec in specs) {
-            val machineNew = SimMachineNew(graphNew, spec.model, spec.psuFactory)
-
-            val machine = SimBareMetalMachine.create(graph, spec.model, spec.psuFactory)
-            val hypervisor = SimHypervisor.create(spec.multiplexerFactory, SplittableRandom(ctx.seeder.nextLong()))
-
             val host =
                 SimHost(
                     spec.uid,
                     spec.name,
                     spec.meta,
                     ctx.dispatcher.timeSource,
-                    machine,
-                    hypervisor,
-                    machineNew = machineNew
+                    graphNew,
+                    spec.model,
+                    spec.psuFactory
                 )
 
             require(hosts.add(host)) { "Host with uid ${spec.uid} already exists" }

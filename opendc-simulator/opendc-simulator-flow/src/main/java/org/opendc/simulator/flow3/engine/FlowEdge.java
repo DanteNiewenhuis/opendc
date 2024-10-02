@@ -13,6 +13,8 @@ public class FlowEdge {
     private float demand = 0.0f;
     private float supply = 0.0f;
 
+    private float capacity;
+
     public FlowEdge(FlowConsumer consumer, FlowSupplier supplier) {
         if (!(consumer instanceof FlowNode)){
             throw new IllegalArgumentException("Flow consumer is not a FlowNode");
@@ -23,6 +25,8 @@ public class FlowEdge {
 
         this.consumer = consumer;
         this.supplier = supplier;
+
+        this.capacity = supplier.getCapacity();
 
         this.consumer.addSupplierEdge(this);
         this.supplier.addConsumerEdge(this);
@@ -40,13 +44,15 @@ public class FlowEdge {
         }
     }
 
-    public FlowEdge() {};
-
     public FlowConsumer getConsumer() {
         return consumer;
     }
     public FlowSupplier getSupplier() {
         return supplier;
+    }
+
+    public float getCapacity() {
+        return capacity;
     }
 
     public float getDemand() {

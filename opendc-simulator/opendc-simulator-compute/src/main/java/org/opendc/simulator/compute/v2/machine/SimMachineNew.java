@@ -13,13 +13,14 @@ import org.opendc.simulator.flow3.engine.FlowGraphNew;
 
 import java.time.InstantSource;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 /**
  * A machine that is able to execute {@link SimWorkload} objects.
  */
 public class SimMachineNew {
     private final MachineModel machineModel;
-    private SimMachineContextNew activeContext;
+
     private final ArrayList<VirtualMachineNew> virtualMachines = new ArrayList<>();
 
     private final FlowGraphNew graph;
@@ -31,7 +32,17 @@ public class SimMachineNew {
     private final SimplePsuNew psu;
     private final MemoryNew memory;
 
-    public SimMachineNew(FlowGraphNew graph, MachineModel machineModel, CpuPowerModel cpuPowerModel) {
+    private float cpuDemand;
+    private float cpuSupply;
+    private float cpuCapacity;
+
+    private PerformanceCounters performanceCounters = new PerformanceCounters();
+    private long lastCounterUpdate;
+    private final double cpuFrequencyInv;
+
+    private Consumer<Exception> completion;
+
+    public SimMachineNew(FlowGraphNew graph, MachineModel machineModel, CpuPowerModel cpuPowerModel, Consumer<Exception> completion) {
         this.graph = graph;
         this.machineModel = machineModel;
         this.clock = graph.getEngine().getClock();
@@ -48,7 +59,12 @@ public class SimMachineNew {
         this.cpuMux = new Multiplexer(this.graph);
         graph.addEdge(this.cpuMux, this.cpu);
 
-        this.activeContext = new SimMachineContextNew(this);
+        this.cpuFrequencyInv = 1 / machineModel.getCpu().getTotalCapacity();
+        this.completion = completion;
+    }
+
+    public PerformanceCounters getPerformanceCounters() {
+        return performanceCounters;
     }
 
     /**
@@ -115,12 +131,53 @@ public class SimMachineNew {
     }
 
     /**
+     * Update the performance counters of the hypervisor.
+     * TODO: move this to the CPU
+     * @param now The timestamp at which to update the counter.
+     */
+    public void updateCounters(long now) {
+        long lastUpdate = this.lastCounterUpdate;
+        this.lastCounterUpdate = now;
+        long delta = now - lastUpdate;
+
+        if (delta > 0) {
+            float demand = this.cpuDemand;
+            float rate = this.cpuSupply;
+            float capacity = this.cpuCapacity;
+
+            final double factor = this.cpuFrequencyInv * delta;
+
+            this.performanceCounters.addCpuActiveTime(Math.round(rate * factor));
+            this.performanceCounters.setCpuIdleTime(Math.round((capacity - rate) * factor));
+            this.performanceCounters.addCpuStealTime(Math.round((demand - rate) * factor));
+        }
+
+        this.performanceCounters.setCpuDemand(this.cpuDemand);
+        this.performanceCounters.setCpuSupply(this.cpuSupply);
+        this.performanceCounters.setCpuCapacity(this.cpuCapacity);
+    }
+
+    public long onUpdate(long now) {
+        updateCounters(now);
+
+        this.cpuDemand = cpuMux.getTotalDemand();
+        this.cpuSupply = cpuMux.getTotalSupply();
+        this.cpuCapacity = cpuMux.getCapacity();
+
+        return Long.MAX_VALUE;
+    }
+
+    /**
      * Cancel the active workloads on this machine (if any).
      */
     public void cancel() {
         for (VirtualMachineNew machine : virtualMachines) {
             removeMachine(machine);
         }
+    }
+
+    public void close() {
+
     }
 
     /**

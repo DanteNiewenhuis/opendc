@@ -37,6 +37,10 @@ public class SimMachineContextNew extends FlowNode {
         this.cpuFrequencyInv = 1 / machine.getCpu().getFrequency();
     }
 
+    public PerformanceCounters getPerformanceCounters() {
+        return performanceCounters;
+    }
+
     public long onUpdate(long now) {
         updateCounters(now);
 
@@ -52,7 +56,7 @@ public class SimMachineContextNew extends FlowNode {
      *
      * @param now The timestamp at which to update the counter.
      */
-    void updateCounters(long now) {
+    public void updateCounters(long now) {
         long lastUpdate = this.lastCounterUpdate;
         this.lastCounterUpdate = now;
         long delta = now - lastUpdate;
@@ -72,18 +76,5 @@ public class SimMachineContextNew extends FlowNode {
         this.performanceCounters.setCpuDemand(this.cpuDemand);
         this.performanceCounters.setCpuSupply(this.cpuSupply);
         this.performanceCounters.setCpuCapacity(this.cpuCapacity);
-    }
-
-    void stop() {
-        updateCounters(clock.millis());
-
-        this.stage.close();
-        this.stage = null;
-
-        this.machine = null;
-        this.cpuMux = null;
-        this.performanceCounters = null;
-        this.graph = null;
-        this.clock = null;
     }
 }

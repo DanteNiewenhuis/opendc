@@ -25,7 +25,7 @@ package org.opendc.compute.telemetry.export.parquet
 import org.apache.parquet.io.api.Binary
 import org.apache.parquet.schema.LogicalTypeAnnotation
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY
-import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.DOUBLE
+import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.FLOAT
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT32
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64
 import org.apache.parquet.schema.Types
@@ -106,22 +106,22 @@ public object DfltHostExportColumns {
 
     public val CPU_LIMIT: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("cpu_limit"),
+            field = Types.required(FLOAT).named("cpu_limit"),
         ) { it.cpuLimit }
 
     public val CPU_USAGE: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("cpu_usage"),
+            field = Types.required(FLOAT).named("cpu_usage"),
         ) { it.cpuUsage }
 
     public val CPU_DEMAND: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("cpu_demand"),
+            field = Types.required(FLOAT).named("cpu_demand"),
         ) { it.cpuDemand }
 
     public val CPU_UTILIZATION: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("cpu_utilization"),
+            field = Types.required(FLOAT).named("cpu_utilization"),
         ) { it.cpuUtilization }
 
     public val CPU_TIME_ACTIVE: ExportColumn<HostTableReader> =
@@ -146,22 +146,22 @@ public object DfltHostExportColumns {
 
     public val POWER_DRAW: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("power_draw"),
+            field = Types.required(FLOAT).named("power_draw"),
         ) { it.powerDraw }
 
     public val ENERGY_USAGE: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("energy_usage"),
+            field = Types.required(FLOAT).named("energy_usage"),
         ) { it.energyUsage }
 
     public val CARBON_INTENSITY: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("carbon_intensity"),
+            field = Types.required(FLOAT).named("carbon_intensity"),
         ) { it.carbonIntensity }
 
     public val CARBON_EMISSION: ExportColumn<HostTableReader> =
         ExportColumn(
-            field = Types.required(DOUBLE).named("carbon_emission"),
+            field = Types.required(FLOAT).named("carbon_emission"),
         ) { it.carbonEmission }
 
     public val UP_TIME: ExportColumn<HostTableReader> =

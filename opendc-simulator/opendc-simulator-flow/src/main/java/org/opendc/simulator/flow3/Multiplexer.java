@@ -42,11 +42,20 @@ public class Multiplexer extends FlowNode implements FlowSupplier, FlowConsumer 
     public long onUpdate(long now) {
 
         float totalSupply = this.totalDemand;
+        ArrayList<Float> supplies = this.supplies;
 
         if (totalDemand > capacity) {
             totalSupply = redistributeSupply(consumerEdges, supplies, capacity);
         }
+        else {
+            supplies = this.demands;
+        }
 
+        for (int i = 0; i < consumerEdges.size(); i++) {
+            this.pushSupply(consumerEdges.get(i), supplies.get(i));
+        }
+
+        // Only update supplier if supply has changed
         if (this.totalSupply != totalSupply) {
             this.totalSupply = totalSupply;
 
@@ -107,6 +116,7 @@ public class Multiplexer extends FlowNode implements FlowSupplier, FlowConsumer 
     @Override
     public void addSupplierEdge(FlowEdge supplierEdge) {
         this.supplierEdge = supplierEdge;
+        this.capacity = supplierEdge.getCapacity();
     }
 
     @Override
@@ -117,14 +127,20 @@ public class Multiplexer extends FlowNode implements FlowSupplier, FlowConsumer 
             return;
         }
 
+        this.totalDemand -= consumerEdge.getDemand();
+        this.totalSupply -= consumerEdge.getSupply();
+
         this.consumerEdges.remove(idx);
         this.demands.remove(idx);
         this.supplies.remove(idx);
+
+        this.invalidate();
     }
 
     @Override
     public void removeSupplierEdge(FlowEdge supplierEdge) {
         this.supplierEdge = null;
+        this.capacity = 0;
     }
 
     @Override
@@ -138,12 +154,9 @@ public class Multiplexer extends FlowNode implements FlowSupplier, FlowConsumer 
 
         float prevDemand = demands.get(idx);
         demands.set(idx, newDemand);
-        float totalDemand = this.totalDemand - prevDemand + newDemand;
 
-        if (totalDemand != this.totalDemand) {
-            this.totalDemand = totalDemand;
-            this.pushDemand(this.supplierEdge, totalDemand);
-        }
+        this.totalDemand += prevDemand + newDemand;
+        invalidate();
     }
 
     @Override
@@ -167,6 +180,10 @@ public class Multiplexer extends FlowNode implements FlowSupplier, FlowConsumer 
 
         if (idx == -1) {
             System.out.println("Error (Multiplexer): pushing supply to an unknown consumer");
+        }
+
+        if (newSupply == supplies.get(idx)) {
+            return;
         }
 
         supplies.set(idx, newSupply);
