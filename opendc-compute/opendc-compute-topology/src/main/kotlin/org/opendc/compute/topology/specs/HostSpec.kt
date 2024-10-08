@@ -22,9 +22,8 @@
 
 package org.opendc.compute.topology.specs
 
-import org.opendc.simulator.compute.old.model.MachineModel
-import org.opendc.simulator.compute.old.cpu.CpuPowerModel
-import org.opendc.simulator.flow2.mux.FlowMultiplexerFactory
+import org.opendc.simulator.compute.cpu.CpuPowerModel
+import org.opendc.simulator.compute.models.MachineModel
 import java.util.UUID
 
 /**
@@ -43,5 +42,4 @@ public data class HostSpec(
     val meta: Map<String, Any>,
     val model: MachineModel,
     val psuFactory: CpuPowerModel,
-    val multiplexerFactory: FlowMultiplexerFactory = FlowMultiplexerFactory.maxMinMultiplexer(),
 )

@@ -31,9 +31,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.yield
 import org.opendc.compute.api.TaskState
 import org.opendc.compute.failure.models.FailureModel
-import org.opendc.compute.service.ComputeService
-import org.opendc.compute.service.ServiceTask
-import org.opendc.compute.service.TaskWatcher
+import org.opendc.compute.simulator.TaskWatcher
+import org.opendc.compute.simulator.service.ComputeService
+import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.compute.workload.Task
 import org.opendc.experiments.base.scenario.specs.CheckpointModelSpec
 import org.opendc.experiments.base.scenario.specs.FailureModelSpec
@@ -125,9 +125,8 @@ public suspend fun ComputeService.replay(
                 val checkpointDuration = checkpointModelSpec?.checkpointDuration ?: 0L
                 val checkpointIntervalScaling = checkpointModelSpec?.checkpointIntervalScaling ?: 1.0
 
-                val workload = entry.trace.createWorkload(start, checkpointInterval, checkpointDuration, checkpointIntervalScaling)
-                val workloadNew = entry.trace.createWorkloadNew(checkpointInterval, checkpointDuration, checkpointIntervalScaling)
 
+                val workload = entry.trace; // TODO: add checkpoint params back
                 val meta = mutableMapOf<String, Any>("workload" to workload)
 
                 launch {
@@ -142,7 +141,6 @@ public suspend fun ComputeService.replay(
                                 if (entry.cpuCapacity > 0.0) mapOf("cpu-capacity" to entry.cpuCapacity) else emptyMap(),
                             ),
                             workload,
-                            workloadNew,
                             meta,
                         )
 

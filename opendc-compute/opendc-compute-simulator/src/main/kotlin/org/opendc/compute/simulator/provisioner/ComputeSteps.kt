@@ -25,9 +25,8 @@
 package org.opendc.compute.simulator.provisioner
 
 import org.opendc.compute.carbon.CarbonTrace
-import org.opendc.compute.service.ComputeService
-import org.opendc.compute.service.scheduler.ComputeScheduler
-import org.opendc.compute.telemetry.ComputeMonitor
+import org.opendc.compute.simulator.scheduler.ComputeScheduler
+import org.opendc.compute.simulator.telemetry.ComputeMonitor
 import org.opendc.compute.topology.specs.HostSpec
 import java.time.Duration
 

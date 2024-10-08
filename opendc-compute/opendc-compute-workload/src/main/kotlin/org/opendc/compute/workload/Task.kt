@@ -22,8 +22,7 @@
 
 package org.opendc.compute.workload
 
-import org.opendc.simulator.compute.old.kernel.interference.VmInterferenceProfile
-import org.opendc.simulator.compute.old.workload.SimTrace
+import org.opendc.simulator.compute.workload.TraceWorkload
 import java.time.Instant
 import java.util.UUID
 
@@ -48,6 +47,5 @@ public data class Task(
     val totalLoad: Double,
     val submissionTime: Instant,
     val duration: Long,
-    val trace: SimTrace,
-    val interferenceProfile: VmInterferenceProfile?,
+    val trace: TraceWorkload,
 )

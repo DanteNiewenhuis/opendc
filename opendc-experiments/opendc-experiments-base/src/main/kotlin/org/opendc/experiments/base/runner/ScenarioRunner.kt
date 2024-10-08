@@ -26,13 +26,13 @@ import me.tongfei.progressbar.ProgressBarBuilder
 import me.tongfei.progressbar.ProgressBarStyle
 import org.opendc.compute.carbon.CarbonTrace
 import org.opendc.compute.carbon.getCarbonTrace
-import org.opendc.compute.service.ComputeService
-import org.opendc.compute.service.scheduler.createComputeScheduler
 import org.opendc.compute.simulator.provisioner.Provisioner
 import org.opendc.compute.simulator.provisioner.registerComputeMonitor
 import org.opendc.compute.simulator.provisioner.setupComputeService
 import org.opendc.compute.simulator.provisioner.setupHosts
-import org.opendc.compute.telemetry.export.parquet.ParquetComputeMonitor
+import org.opendc.compute.simulator.scheduler.createComputeScheduler
+import org.opendc.compute.simulator.service.ComputeService
+import org.opendc.compute.simulator.telemetry.parquet.ParquetComputeMonitor
 import org.opendc.compute.topology.clusterTopology
 import org.opendc.compute.workload.ComputeWorkloadLoader
 import org.opendc.experiments.base.scenario.Scenario

@@ -22,30 +22,23 @@
 
 package org.opendc.simulator.compute
 
-import kotlinx.coroutines.suspendCancellableCoroutine
-import org.opendc.simulator.compute.old.workload.SimWorkload
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-
-import org.opendc.simulator.compute.old.SimMachine
-
 /**
- * Run the specified [SimWorkload] on this machine and suspend execution util [workload] has finished.
+ * Run the specified [SimWorkloadNew] on this machine and suspend execution util [workload] has finished.
  *
  * @param workload The workload to start on the machine.
  * @param meta The metadata to pass to the workload.
  * @return A [SimMachineContext] that represents the execution context for the workload.
  * @throws IllegalStateException if a workload is already active on the machine or if the machine is closed.
  */
-public suspend fun SimMachine.runWorkload(
-    workload: SimWorkload,
-    meta: Map<String, Any> = emptyMap(),
-) {
-    return suspendCancellableCoroutine { cont ->
-        cont.invokeOnCancellation { this@runWorkload.cancel() }
-
-        startWorkload(workload, meta) { cause ->
-            if (cause != null) cont.resumeWithException(cause) else cont.resume(Unit)
-        }
-    }
-}
+//public suspend fun SimMachineNew.runWorkload(
+//    workload: SimWorkloadNew,
+//    meta: Map<String, Any> = emptyMap(),
+//) {
+//    return suspendCancellableCoroutine { cont ->
+//        cont.invokeOnCancellation { this@runWorkload.cancel() }
+//
+//        startWorkload(workload, meta) { cause ->
+//            if (cause != null) cont.resumeWithException(cause) else cont.resume(Unit)
+//        }
+//    }
+//}

@@ -28,10 +28,10 @@ import org.opendc.compute.topology.specs.ClusterSpec
 import org.opendc.compute.topology.specs.HostJSONSpec
 import org.opendc.compute.topology.specs.HostSpec
 import org.opendc.compute.topology.specs.TopologySpec
-import org.opendc.simulator.compute.old.model.CpuModel
-import org.opendc.simulator.compute.old.model.MachineModel
-import org.opendc.simulator.compute.old.model.MemoryUnit
-import org.opendc.simulator.compute.old.cpu.getPowerModel
+import org.opendc.simulator.compute.models.CpuModel
+import org.opendc.simulator.compute.models.MachineModel
+import org.opendc.simulator.compute.models.MemoryUnit
+import org.opendc.simulator.compute.cpu.getPowerModel
 import java.io.File
 import java.io.InputStream
 import java.util.SplittableRandom

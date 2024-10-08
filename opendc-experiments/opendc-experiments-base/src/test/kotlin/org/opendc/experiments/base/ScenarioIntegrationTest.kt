@@ -36,9 +36,9 @@ import org.opendc.compute.simulator.provisioner.Provisioner
 import org.opendc.compute.simulator.provisioner.registerComputeMonitor
 import org.opendc.compute.simulator.provisioner.setupComputeService
 import org.opendc.compute.simulator.provisioner.setupHosts
-import org.opendc.compute.telemetry.ComputeMonitor
-import org.opendc.compute.telemetry.table.HostTableReader
-import org.opendc.compute.telemetry.table.ServiceTableReader
+import org.opendc.compute.simulator.service.telemetry.ComputeMonitor
+import service.telemetry.table.HostTableReader
+import service.telemetry.table.ServiceTableReader
 import org.opendc.compute.topology.clusterTopology
 import org.opendc.compute.topology.specs.HostSpec
 import org.opendc.compute.workload.ComputeWorkloadLoader
@@ -261,7 +261,7 @@ class ScenarioIntegrationTest {
         return stream.use { clusterTopology(stream) }
     }
 
-    class TestComputeMonitor : ComputeMonitor {
+    class TestComputeMonitor : org.opendc.compute.simulator.service.telemetry.ComputeMonitor {
         var attemptsSuccess = 0
         var attemptsFailure = 0
         var attemptsError = 0

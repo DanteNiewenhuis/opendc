@@ -38,7 +38,7 @@ import org.opendc.simulator.compute.old.model.MachineModel
 import org.opendc.simulator.compute.old.model.MemoryUnit
 import org.opendc.simulator.compute.old.runWorkload
 import org.opendc.simulator.compute.old.workload.SimTrace
-import org.opendc.simulator.compute.old.workload.SimTraceFragment
+import org.opendc.simulator.compute.old.workload.TraceFragment
 import org.opendc.simulator.flow2.FlowEngine
 import org.opendc.simulator.flow2.mux.FlowMultiplexerFactory
 import org.opendc.simulator.kotlin.runSimulation
@@ -76,10 +76,30 @@ internal class SimFairShareHypervisorTest {
             val duration = 5 * 60L
             val workloadA =
                 SimTrace.ofFragments(
-                    SimTraceFragment(0, duration * 1000, 28.0, 1),
-                    SimTraceFragment(duration * 1000, duration * 1000, 3500.0, 1),
-                    SimTraceFragment(duration * 2000, duration * 1000, 0.0, 1),
-                    SimTraceFragment(duration * 3000, duration * 1000, 183.0, 1),
+                    TraceFragment(
+                        0,
+                        duration * 1000,
+                        28.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 1000,
+                        duration * 1000,
+                        3500.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 2000,
+                        duration * 1000,
+                        0.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 3000,
+                        duration * 1000,
+                        183.0,
+                        1
+                    ),
                 ).createWorkload(0)
 
             val engine = FlowEngine.create(dispatcher)
@@ -119,17 +139,57 @@ internal class SimFairShareHypervisorTest {
             val duration = 5 * 60L
             val workloadA =
                 SimTrace.ofFragments(
-                    SimTraceFragment(0, duration * 1000, 28.0, 1),
-                    SimTraceFragment(duration * 1000, duration * 1000, 3500.0, 1),
-                    SimTraceFragment(duration * 2000, duration * 1000, 0.0, 1),
-                    SimTraceFragment(duration * 3000, duration * 1000, 183.0, 1),
+                    TraceFragment(
+                        0,
+                        duration * 1000,
+                        28.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 1000,
+                        duration * 1000,
+                        3500.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 2000,
+                        duration * 1000,
+                        0.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 3000,
+                        duration * 1000,
+                        183.0,
+                        1
+                    ),
                 ).createWorkload(0)
             val workloadB =
                 SimTrace.ofFragments(
-                    SimTraceFragment(0, duration * 1000, 28.0, 1),
-                    SimTraceFragment(duration * 1000, duration * 1000, 3100.0, 1),
-                    SimTraceFragment(duration * 2000, duration * 1000, 0.0, 1),
-                    SimTraceFragment(duration * 3000, duration * 1000, 73.0, 1),
+                    TraceFragment(
+                        0,
+                        duration * 1000,
+                        28.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 1000,
+                        duration * 1000,
+                        3100.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 2000,
+                        duration * 1000,
+                        0.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 3000,
+                        duration * 1000,
+                        73.0,
+                        1
+                    ),
                 ).createWorkload(0)
 
             val engine = FlowEngine.create(dispatcher)
@@ -236,17 +296,57 @@ internal class SimFairShareHypervisorTest {
             val duration = 5 * 60L
             val workloadA =
                 SimTrace.ofFragments(
-                    SimTraceFragment(0, duration * 1000, 0.0, 1),
-                    SimTraceFragment(duration * 1000, duration * 1000, 28.0, 1),
-                    SimTraceFragment(duration * 2000, duration * 1000, 3500.0, 1),
-                    SimTraceFragment(duration * 3000, duration * 1000, 183.0, 1),
+                    TraceFragment(
+                        0,
+                        duration * 1000,
+                        0.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 1000,
+                        duration * 1000,
+                        28.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 2000,
+                        duration * 1000,
+                        3500.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 3000,
+                        duration * 1000,
+                        183.0,
+                        1
+                    ),
                 ).createWorkload(0)
             val workloadB =
                 SimTrace.ofFragments(
-                    SimTraceFragment(0, duration * 1000, 0.0, 1),
-                    SimTraceFragment(duration * 1000, duration * 1000, 28.0, 1),
-                    SimTraceFragment(duration * 2000, duration * 1000, 3100.0, 1),
-                    SimTraceFragment(duration * 3000, duration * 1000, 73.0, 1),
+                    TraceFragment(
+                        0,
+                        duration * 1000,
+                        0.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 1000,
+                        duration * 1000,
+                        28.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 2000,
+                        duration * 1000,
+                        3100.0,
+                        1
+                    ),
+                    TraceFragment(
+                        duration * 3000,
+                        duration * 1000,
+                        73.0,
+                        1
+                    ),
                 ).createWorkload(0)
 
             launch {

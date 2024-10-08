@@ -23,13 +23,8 @@
 package org.opendc.compute.workload
 
 import mu.KotlinLogging
-import org.opendc.simulator.compute.old.kernel.interference.VmInterferenceModel
-import org.opendc.simulator.compute.old.workload.SimTrace
+import org.opendc.simulator.compute.workload.TraceWorkload
 import org.opendc.trace.Trace
-import org.opendc.trace.conv.INTERFERENCE_GROUP_MEMBERS
-import org.opendc.trace.conv.INTERFERENCE_GROUP_SCORE
-import org.opendc.trace.conv.INTERFERENCE_GROUP_TARGET
-import org.opendc.trace.conv.TABLE_INTERFERENCE_GROUPS
 import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TABLE_RESOURCE_STATES
 import org.opendc.trace.conv.resourceCpuCapacity
@@ -99,7 +94,6 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
     private fun parseMeta(
         trace: Trace,
         fragments: Map<String, Builder>,
-        interferenceModel: VmInterferenceModel,
     ): List<Task> {
         val reader = checkNotNull(trace.getTable(TABLE_RESOURCES)).newReader()
 
@@ -141,7 +135,6 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
                         submissionTime,
                         duration,
                         builder.build(),
-                        interferenceModel.getProfile(id),
                     ),
                 )
             }
@@ -153,34 +146,6 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         } catch (e: Exception) {
             e.printStackTrace()
             throw e
-        } finally {
-            reader.close()
-        }
-    }
-
-    /**
-     * Read the interference model associated with the specified [trace].
-     */
-    private fun parseInterferenceModel(trace: Trace): VmInterferenceModel {
-        val reader = checkNotNull(trace.getTable(TABLE_INTERFERENCE_GROUPS)).newReader()
-
-        return try {
-            val membersCol = reader.resolve(INTERFERENCE_GROUP_MEMBERS)
-            val targetCol = reader.resolve(INTERFERENCE_GROUP_TARGET)
-            val scoreCol = reader.resolve(INTERFERENCE_GROUP_SCORE)
-
-            val modelBuilder = VmInterferenceModel.builder()
-
-            while (reader.nextRow()) {
-                val members = reader.getSet(membersCol, String::class.java)!!
-                val target = reader.getDouble(targetCol)
-                val score = reader.getDouble(scoreCol)
-
-                modelBuilder
-                    .addGroup(members, target, score)
-            }
-
-            modelBuilder.build()
         } finally {
             reader.close()
         }
@@ -203,8 +168,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
 
                     val trace = Trace.open(path, format)
                     val fragments = parseFragments(trace)
-                    val interferenceModel = parseInterferenceModel(trace)
-                    val vms = parseMeta(trace, fragments, interferenceModel)
+                    val vms = parseMeta(trace, fragments)
 
                     SoftReference(vms)
                 } else {
@@ -234,7 +198,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         /**
          * The internal builder for the trace.
          */
-        private val builder = SimTrace.builder()
+        private val builder = TraceWorkload.builder()
 
         /**
          * Add a fragment to the trace.
@@ -256,6 +220,6 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         /**
          * Build the trace.
          */
-        fun build(): SimTrace = builder.build()
+        fun build(): TraceWorkload = builder.build()
     }
 }

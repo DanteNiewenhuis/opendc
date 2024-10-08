@@ -22,11 +22,10 @@
 
 package org.opendc.compute.simulator.provisioner
 
-import org.opendc.compute.service.ComputeService
-import org.opendc.compute.simulator.SimHost
+import org.opendc.compute.simulator.host.SimHost
+import org.opendc.compute.simulator.service.ComputeService
 import org.opendc.compute.topology.specs.HostSpec
-import org.opendc.simulator.flow2.FlowEngine
-import org.opendc.simulator.flow3.engine.FlowEngineNew
+import org.opendc.simulator.engine.FlowEngineNew
 
 /**
  * A [ProvisioningStep] that provisions a list of hosts for a [ComputeService].
@@ -44,8 +43,6 @@ public class HostsProvisioningStep internal constructor(
             requireNotNull(
                 ctx.registry.resolve(serviceDomain, ComputeService::class.java),
             ) { "Compute service $serviceDomain does not exist" }
-        val engine = FlowEngine.create(ctx.dispatcher)
-        val graph = engine.newGraph()
         val hosts = mutableSetOf<SimHost>()
 
         val engineNew = FlowEngineNew.create(ctx.dispatcher)

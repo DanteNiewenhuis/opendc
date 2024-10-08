@@ -22,17 +22,17 @@
 
 package org.opendc.web.runner.internal
 
-import org.opendc.compute.telemetry.ComputeMonitor
-import org.opendc.compute.telemetry.table.HostTableReader
-import org.opendc.compute.telemetry.table.ServiceData
-import org.opendc.compute.telemetry.table.ServiceTableReader
-import org.opendc.compute.telemetry.table.toServiceData
+import org.opendc.compute.simulator.service.telemetry.ComputeMonitor
+import service.telemetry.table.HostTableReader
+import service.telemetry.table.ServiceData
+import service.telemetry.table.ServiceTableReader
+import service.telemetry.table.toServiceData
 import kotlin.math.roundToLong
 
 /**
  * A [ComputeMonitor] that tracks the aggregate metrics for each repeat.
  */
-internal class WebComputeMonitor : ComputeMonitor {
+internal class WebComputeMonitor : org.opendc.compute.simulator.service.telemetry.ComputeMonitor {
     override fun record(reader: HostTableReader) {
         val slices = reader.downtime / sliceLength
 
