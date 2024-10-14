@@ -1,17 +1,19 @@
 package org.opendc.simulator.compute.power;
 
-
 import org.opendc.simulator.compute.cpu.SimCpu;
-import org.opendc.simulator.engine.FlowConsumer;
 import org.opendc.simulator.engine.FlowEdge;
 import org.opendc.simulator.engine.FlowGraphNew;
 import org.opendc.simulator.engine.FlowNode;
 import org.opendc.simulator.engine.FlowSupplier;
 
+import java.time.InstantSource;
+
 /**
  * A {@link SimPsu} implementation that estimates the power consumption based on CPU usage.
  */
-public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer {
+public final class SimPowerSource extends FlowNode implements FlowSupplier {
+    private final InstantSource clock;
+
     private long lastUpdate;
 
     private float powerDemand = 0.0f;
@@ -19,7 +21,6 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
     private float totalEnergyUsage = 0.0f;
 
     private FlowEdge cpuEdge;
-    private FlowEdge powerEdge;
 
     private float capacity = Long.MAX_VALUE;
 
@@ -69,10 +70,12 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
     // Constructors
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public SimPsu(FlowGraphNew graph) {
+    public SimPowerSource(FlowGraphNew graph) {
         super(graph);
 
-        lastUpdate = this.clock.millis();
+        this.clock = graph.getEngine().getClock();
+
+        lastUpdate = graph.getEngine().getClock().millis();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +107,7 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
 
         long duration = now - lastUpdate;
         if (duration > 0) {
-            // Compute the energy usage of the psu
+            // Compute the energy usage of the machine
             this.totalEnergyUsage += (float) (this.powerSupplied * duration * 0.001);
         }
     }
@@ -113,26 +116,6 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
     // FlowGraph Related functionality
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    @Override
-    public void pushDemand(FlowEdge supplierEdge, float newDemand) {
-        if (newDemand == this.powerDemand) {
-            return;
-        }
-
-        this.powerDemand = newDemand;
-        powerEdge.pushSupply(newDemand);
-    }
-
-    @Override
-    public void pushSupply(FlowEdge consumerEdge, float newSupply) {
-        if (newSupply == this.powerSupplied) {
-            return;
-        }
-
-        this.powerSupplied = newSupply;
-        cpuEdge.pushSupply(newSupply);
-    }
 
     @Override
     public void handleDemand(FlowEdge consumerEdge, float newPowerDemand) {
@@ -145,13 +128,13 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
     }
 
     @Override
-    public void handleSupply(FlowEdge supplierEdge, float newPowerSupply) {
-        if (newPowerSupply == this.powerSupplied) {
+    public void pushSupply(FlowEdge consumerEdge, float newSupply) {
+        if (newSupply == this.powerSupplied) {
             return;
         }
 
-        this.powerSupplied = newPowerSupply;
-        this.invalidate();
+        this.powerSupplied = newSupply;
+        consumerEdge.pushSupply(newSupply);
     }
 
     @Override
@@ -160,13 +143,8 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
     }
 
     @Override
-    public void addSupplierEdge(FlowEdge supplierEdge) {this.powerEdge = supplierEdge;}
-
-    @Override
     public void removeConsumerEdge(FlowEdge consumerEdge) {
         this.cpuEdge = null;
     }
-
-    @Override
-    public void removeSupplierEdge(FlowEdge supplierEdge) {this.powerEdge = null;}
 }
+

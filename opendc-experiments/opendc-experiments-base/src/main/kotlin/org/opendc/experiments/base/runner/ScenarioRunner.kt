@@ -92,7 +92,14 @@ public fun runScenario(
                 setupHosts(serviceDomain, topology),
             )
 
-            val workloadLoader = ComputeWorkloadLoader(File(scenario.workloadSpec.pathToFile))
+            val checkpointInterval = scenario.checkpointModelSpec?.checkpointInterval ?: 0L
+            val checkpointDuration = scenario.checkpointModelSpec?.checkpointDuration ?: 0L
+            val checkpointIntervalScaling = scenario.checkpointModelSpec?.checkpointIntervalScaling ?: 1.0
+
+            val workloadLoader = ComputeWorkloadLoader(File(scenario.workloadSpec.pathToFile),
+                                                       checkpointInterval,
+                                                       checkpointDuration,
+                                                       checkpointIntervalScaling)
             val tasks = getWorkloadType(scenario.workloadSpec.type).resolve(workloadLoader, Random(seed))
 
             val carbonTrace = getCarbonTrace(scenario.carbonTracePath)
@@ -104,7 +111,6 @@ public fun runScenario(
                 timeSource,
                 tasks,
                 failureModelSpec = scenario.failureModelSpec,
-                checkpointModelSpec = scenario.checkpointModelSpec,
                 seed = seed,
             )
         }

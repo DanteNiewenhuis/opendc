@@ -69,6 +69,16 @@ public interface ServiceTableReader : Exportable {
     public val tasksActive: Int
 
     /**
+     * The number of tasks that completed the tasks successfully
+     */
+    public val tasksCompleted: Int
+
+    /**
+     * The number of tasks that failed more times than allowed and are thus terminated
+     */
+    public val tasksTerminated: Int
+
+    /**
      * The scheduling attempts that were successful.
      */
     public val attemptsSuccess: Int
@@ -76,10 +86,5 @@ public interface ServiceTableReader : Exportable {
     /**
      * The scheduling attempts that were unsuccessful due to client error.
      */
-    public val attemptsFailure: Int
-
-    /**
-     * The scheduling attempts that were unsuccessful due to scheduler error.
-     */
-    public val attemptsError: Int
+    public val attemptsTerminated: Int
 }

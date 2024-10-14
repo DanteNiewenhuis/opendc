@@ -53,7 +53,7 @@ public class Guest(
      * [TaskState.PROVISIONING] is an invalid value for a guest, since it applies before the host is selected for
      * a task.
      */
-    public var state: TaskState = TaskState.TERMINATED
+    public var state: TaskState = TaskState.CREATED
         private set
 
 
@@ -73,14 +73,14 @@ public class Guest(
      */
     public fun start() {
         when (state) {
-            TaskState.TERMINATED, TaskState.ERROR -> {
+            TaskState.CREATED, TaskState.FAILED -> {
                 LOGGER.info { "User requested to start task ${task.uid}" }
                 doStart()
             }
             TaskState.RUNNING -> return
-            TaskState.DELETED -> {
-                LOGGER.warn { "User tried to start deleted task" }
-                throw IllegalArgumentException("Task is deleted")
+            TaskState.COMPLETED, TaskState.TERMINATED -> {
+                LOGGER.warn { "User tried to start a finished task" }
+                throw IllegalArgumentException("Task is already finished")
             }
             else -> assert(false) { "Invalid state transition" }
         }
@@ -106,7 +106,7 @@ public class Guest(
             task.workload.checkpointIntervalScaling)
 
         virtualMachine = simMachine.startWorkload(newChainWorkload) { cause ->
-            onStop(if (cause != null) TaskState.ERROR else TaskState.TERMINATED)
+            onStop(if (cause != null) TaskState.FAILED else TaskState.COMPLETED)
         };
     }
 
@@ -124,9 +124,9 @@ public class Guest(
      */
     public fun stop() {
         when (state) {
-            TaskState.RUNNING -> doStop(TaskState.TERMINATED)
-            TaskState.ERROR -> state = TaskState.TERMINATED
-            TaskState.TERMINATED, TaskState.DELETED -> return
+            TaskState.RUNNING -> doStop(TaskState.COMPLETED)
+            TaskState.FAILED -> state = TaskState.TERMINATED
+            TaskState.COMPLETED, TaskState.TERMINATED -> return
             else -> assert(false) { "Invalid state transition" }
         }
     }
@@ -137,11 +137,13 @@ public class Guest(
     private fun doStop(target: TaskState) {
         assert(virtualMachine != null) { "Invalid job state" }
         val virtualMachine = this.virtualMachine ?: return
-        if (target == TaskState.ERROR) {
+        if (target == TaskState.FAILED) {
             virtualMachine.shutdown(Exception("Task has failed"));
         } else {
             virtualMachine.shutdown();
         }
+
+        this.virtualMachine = null;
 
         this.state = target
     }
@@ -165,7 +167,7 @@ public class Guest(
     public fun delete() {
         stop()
 
-        state = TaskState.DELETED
+        state = TaskState.FAILED
     }
 
     /**
@@ -178,14 +180,14 @@ public class Guest(
             return
         }
 
-        doStop(TaskState.ERROR)
+        doStop(TaskState.FAILED)
     }
 
     /**
      * Recover the guest if it is in an error state.
      */
     public fun recover() {
-        if (state != TaskState.ERROR) {
+        if (state != TaskState.FAILED) {
             return
         }
 
@@ -233,7 +235,7 @@ public class Guest(
 
         if (state == TaskState.RUNNING) {
             uptime += duration
-        } else if (state == TaskState.ERROR) {
+        } else if (state == TaskState.FAILED) {
             downtime += duration
         }
     }

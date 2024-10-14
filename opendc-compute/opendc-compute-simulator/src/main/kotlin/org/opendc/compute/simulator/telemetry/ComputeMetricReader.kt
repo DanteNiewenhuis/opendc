@@ -72,6 +72,8 @@ public class ComputeMetricReader(
             startTime
         )
 
+    private var loggCounter = 0;
+
     /**
      * Mapping from [Host] instances to [HostTableReaderImpl]
      */
@@ -104,6 +106,7 @@ public class ComputeMetricReader(
         }
 
     private fun loggState() {
+        loggCounter++;
         try {
             val now = this.clock.instant()
 
@@ -135,6 +138,18 @@ public class ComputeMetricReader(
 
             this.serviceTableReader.record(now)
             monitor.record(this.serviceTableReader.copy())
+
+            if (loggCounter >= 100) {
+                var loggString = "\n\t\t\t\t\tMetrics after ${now.toEpochMilli() / 1000 / 60 / 60} hours:\n"
+                loggString += "\t\t\t\t\t\tTasks Total: ${this.serviceTableReader.tasksTotal}\n"
+                loggString += "\t\t\t\t\t\tTasks Active: ${this.serviceTableReader.tasksActive}\n"
+                loggString += "\t\t\t\t\t\tTasks Pending: ${this.serviceTableReader.tasksPending}\n"
+                loggString += "\t\t\t\t\t\tTasks Completed: ${this.serviceTableReader.tasksCompleted}\n"
+                loggString += "\t\t\t\t\t\tTasks Terminated: ${this.serviceTableReader.tasksTerminated}\n"
+
+                this.logger.warn { loggString }
+                loggCounter = 0;
+            }
         } catch (cause: Throwable) {
             this.logger.warn(cause) { "Exporter threw an Exception" }
         }
@@ -170,9 +185,10 @@ public class ComputeMetricReader(
             _tasksTotal = table.tasksTotal
             _tasksPending = table.tasksPending
             _tasksActive = table.tasksActive
+            _tasksCompleted = table.tasksCompleted
+            _tasksTerminated = table.tasksTerminated
             _attemptsSuccess = table.attemptsSuccess
-            _attemptsFailure = table.attemptsFailure
-            _attemptsError = table.attemptsError
+            _attemptsFailure = table.attemptsTerminated
         }
 
         private var _timestamp: Instant = Instant.MIN
@@ -199,21 +215,25 @@ public class ComputeMetricReader(
             get() = _tasksPending
         private var _tasksPending = 0
 
+        override val tasksCompleted: Int
+            get() = _tasksCompleted
+        private var _tasksCompleted = 0
+
         override val tasksActive: Int
             get() = _tasksActive
         private var _tasksActive = 0
+
+        override val tasksTerminated: Int
+            get() = _tasksTerminated
+        private var _tasksTerminated = 0
 
         override val attemptsSuccess: Int
             get() = _attemptsSuccess
         private var _attemptsSuccess = 0
 
-        override val attemptsFailure: Int
+        override val attemptsTerminated: Int
             get() = _attemptsFailure
         private var _attemptsFailure = 0
-
-        override val attemptsError: Int
-            get() = _attemptsError
-        private var _attemptsError = 0
 
         /**
          * Record the next cycle.
@@ -227,10 +247,11 @@ public class ComputeMetricReader(
             _hostsDown = stats.hostsUnavailable
             _tasksTotal = stats.tasksTotal
             _tasksPending = stats.tasksPending
+            _tasksCompleted = stats.tasksCompleted
             _tasksActive = stats.tasksActive
+            _tasksTerminated = stats.tasksTerminated
             _attemptsSuccess = stats.attemptsSuccess.toInt()
             _attemptsFailure = stats.attemptsFailure.toInt()
-            _attemptsError = stats.attemptsError.toInt()
         }
     }
 

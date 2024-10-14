@@ -142,8 +142,12 @@ public class SimHost(
     public fun fail() {
         reset(HostState.ERROR)
 
-        for (guest in guests) {
+        // Fail the guest and delete them
+        // This weird loop is the only way I have been able to make it work.
+        while (guests.size > 0) {
+            val guest = guests[0];
             guest.fail()
+            this.delete(guest.task)
         }
     }
 
@@ -205,22 +209,22 @@ public class SimHost(
      * @param task
      */
     public fun spawn(task: ServiceTask) {
-        taskToGuestMap.computeIfAbsent(task) { key ->
-            require(canFit(key)) { "Task does not fit" }
+        assert (simMachine != null) { "Tried start task ${task} while no SimMachine is active" }
 
-            val newGuest =
-                Guest(
-                    clock,
-                    this,
-                    guestListener,
-                    task,
-                    simMachine!!
-                )
+        require(canFit(task)) { "Task does not fit" }
 
-            guests.add(newGuest)
-            newGuest.start()
-            newGuest
-        }
+        val newGuest = Guest(
+                clock,
+                this,
+                guestListener,
+                task,
+                simMachine!!
+            )
+
+        guests.add(newGuest)
+        newGuest.start()
+
+        taskToGuestMap.computeIfAbsent(task) { newGuest }
     }
 
     public fun contains(task: ServiceTask): Boolean {
@@ -243,6 +247,7 @@ public class SimHost(
 
         taskToGuestMap.remove(task)
         guests.remove(guest)
+        task.host = null;
     }
 
     public fun addListener(listener: HostListener) {
@@ -259,16 +264,16 @@ public class SimHost(
 
         var terminated = 0
         var running = 0
-        var error = 0
+        var failed = 0
         var invalid = 0
+        var completed = 0
 
         val guests = guests.listIterator()
         for (guest in guests) {
             when (guest.state) {
-                TaskState.TERMINATED -> terminated++
                 TaskState.RUNNING -> running++
-                TaskState.ERROR -> error++
-                TaskState.DELETED -> {
+                TaskState.COMPLETED, TaskState.FAILED, TaskState.TERMINATED ->  {
+                    failed++
                     // Remove guests that have been deleted
                     this.taskToGuestMap.remove(guest.task)
                     guests.remove()
@@ -285,7 +290,7 @@ public class SimHost(
             simMachine!!.psu.energyUsage,
             terminated,
             running,
-            error,
+            failed,
             invalid,
         )
     }

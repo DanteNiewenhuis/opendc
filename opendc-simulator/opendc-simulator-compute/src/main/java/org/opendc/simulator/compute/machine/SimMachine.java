@@ -27,6 +27,8 @@ public class SimMachine {
     private SimPsu psu;
     private Memory memory;
 
+    private Consumer<Exception> completion;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Basic Getters and Setters
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,12 +106,18 @@ public class SimMachine {
         // Create a Multiplexer and add the cpu as supplier
         this.cpuMux = new Multiplexer(this.graph);
         graph.addEdge(this.cpuMux, this.cpu);
+
+        this.completion = completion;
+    }
+
+    public void shutdown() {
+        shutdown(null);
     }
 
     /**
      * Close all related hardware
      */
-    public void shutdown() {
+    public void shutdown(Exception cause) {
         this.graph.removeNode(this.psu);
         this.psu = null;
 
@@ -120,6 +128,8 @@ public class SimMachine {
         this.cpuMux = null;
 
         this.memory = null;
+
+        this.completion.accept(cause);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

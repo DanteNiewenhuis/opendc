@@ -47,7 +47,10 @@ import kotlin.math.roundToLong
  *
  * @param baseDir The directory containing the traces.
  */
-public class ComputeWorkloadLoader(private val baseDir: File) {
+public class ComputeWorkloadLoader(private val baseDir: File,
+                                   private val checkpointInterval: Long,
+                                   private val checkpointDuration: Long,
+                                   private val checkpointIntervalScaling: Double) {
     /**
      * The logger for this instance.
      */
@@ -78,7 +81,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
                 val cores = reader.getInt(coresCol)
                 val cpuUsage = reader.getDouble(usageCol)
 
-                val builder = fragments.computeIfAbsent(id) { Builder() }
+                val builder = fragments.computeIfAbsent(id) { Builder(checkpointInterval, checkpointDuration, checkpointIntervalScaling) }
                 builder.add(durationMs, cpuUsage, cores)
             }
 
@@ -189,7 +192,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
     /**
      * A builder for a VM trace.
      */
-    private class Builder {
+    private class Builder(checkpointInterval: Long, checkpointDuration: Long, checkpointIntervalScaling: Double) {
         /**
          * The total load of the trace.
          */
@@ -198,7 +201,7 @@ public class ComputeWorkloadLoader(private val baseDir: File) {
         /**
          * The internal builder for the trace.
          */
-        private val builder = TraceWorkload.builder()
+        private val builder = TraceWorkload.builder(checkpointInterval, checkpointDuration, checkpointIntervalScaling)
 
         /**
          * Add a fragment to the trace.

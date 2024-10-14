@@ -22,13 +22,10 @@
 
 package org.opendc.simulator.compute.workload;
 
-import org.jetbrains.annotations.NotNull;
 import org.opendc.simulator.engine.FlowEdge;
-import org.opendc.simulator.engine.FlowGraphNew;
 import org.opendc.simulator.engine.FlowNode;
 import org.opendc.simulator.engine.FlowSupplier;
 
-import java.time.InstantSource;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -50,7 +47,7 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
     private long checkpointInterval = 0;
     private long checkpointDuration = 0;
     private double checkpointIntervalScaling = 1.0;
-    private CheckPointModel checkpointModel;
+    private CheckpointModel checkpointModel;
 
     private ChainWorkload snapshot;
 
@@ -131,7 +128,7 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
     @Override
     public void stopWorkload() {
         if (this.checkpointModel != null) {
-            this.checkpointModel.stop();
+            this.checkpointModel.close();
             this.checkpointModel = null;
         }
 
@@ -149,7 +146,7 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
 
     @Override
     public void createCheckpointModel() {
-        this.checkpointModel = new CheckPointModel(this);
+        this.checkpointModel = new CheckpointModel(this);
     }
 
     @Override
@@ -291,72 +288,5 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
             return;
         }
         throw (T) e;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // CheckPoint Model
-    // TODO: Move this to a separate file
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private class CheckPointModel extends FlowNode {
-        private SimChainWorkload simWorkload;
-        private long checkpointInterval;
-        private final long checkpointDuration;
-        private double checkpointIntervalScaling;
-        private FlowGraphNew graph;
-
-        private long startOfInterval;
-
-        CheckPointModel(
-            @NotNull SimChainWorkload simWorkload) {
-            super(simWorkload.getGraph());
-
-            this.checkpointInterval = simWorkload.getCheckpointInterval();
-            this.checkpointDuration = simWorkload.getCheckpointDuration();
-            this.checkpointIntervalScaling = simWorkload.getCheckpointIntervalScaling();
-            this.simWorkload = simWorkload;
-
-            this.graph = simWorkload.getGraph();
-
-            InstantSource clock = graph.getEngine().getClock();
-
-            this.startOfInterval = clock.millis();
-        }
-
-        @Override
-        public long onUpdate(long now) {
-            if (this.simWorkload == null) {
-                return Long.MAX_VALUE;
-            }
-
-            long passedTime = now - startOfInterval;
-            long remainingTime = this.checkpointInterval - passedTime;
-
-            // Interval not completed
-            if (remainingTime > 0) {
-                return now + remainingTime;
-            }
-
-            simWorkload.makeSnapshot(now);
-
-            // start new fragment
-            this.startOfInterval = now - passedTime;
-
-            // Scale the interval time between checkpoints based on the provided scaling
-            this.checkpointInterval = (long) (this.checkpointInterval * this.checkpointIntervalScaling);
-
-            return now + this.checkpointInterval + this.checkpointDuration;
-        }
-
-        public void start() {
-            this.invalidate();
-        }
-
-        public void stop() {
-            this.closeNode();
-
-            this.simWorkload = null;
-            this.graph = null;
-        }
     }
 }

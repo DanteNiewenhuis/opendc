@@ -161,8 +161,7 @@ public final class ComputeService implements AutoCloseable {
 
             task.setState(newState);
 
-            // TODO: move the removal of tasks when max Failures are reached to here
-            if (newState == TaskState.TERMINATED || newState == TaskState.DELETED || newState == TaskState.ERROR) {
+            if (newState == TaskState.COMPLETED || newState == TaskState.TERMINATED || newState == TaskState.FAILED) {
                 LOGGER.info("task {} {} {} finished", task.getUid(), task.getName(), task.getFlavor());
 
                 if (activeTasks.remove(task) != null) {
@@ -179,6 +178,17 @@ public final class ComputeService implements AutoCloseable {
                     LOGGER.error("Unknown host {}", host);
                 }
 
+                if (newState == TaskState.COMPLETED) {
+                    tasksCompleted++;
+                }
+                if (newState == TaskState.TERMINATED) {
+                    tasksTerminated++;
+                }
+
+                if (task.getState() == TaskState.COMPLETED || task.getState() == TaskState.TERMINATED) {
+                    task.delete();
+                }
+
                 // Try to reschedule if needed
                 requestSchedulingCycle();
             }
@@ -189,9 +199,11 @@ public final class ComputeService implements AutoCloseable {
     private long maxMemory = 0L;
     private long attemptsSuccess = 0L;
     private long attemptsFailure = 0L;
-    private long attemptsError = 0L;
+    private int tasksTotal = 0;
     private int tasksPending = 0;
     private int tasksActive = 0;
+    private int tasksTerminated = 0;
+    private int tasksCompleted = 0;
 
     /**
      * Construct a {@link ComputeService} instance.
@@ -286,10 +298,11 @@ public final class ComputeService implements AutoCloseable {
                 hostToView.size() - availableHosts.size(),
                 attemptsSuccess,
                 attemptsFailure,
-                attemptsError,
-                tasks.size(),
+                tasksTotal,
                 tasksPending,
-                tasksActive);
+                tasksActive,
+                tasksCompleted,
+                tasksTerminated);
     }
 
     @Override
@@ -362,12 +375,12 @@ public final class ComputeService implements AutoCloseable {
 
             final ServiceTask task = request.task;
 
-            // Remove task from scheduling if it has failed too many times
-            if (task.getNumFailures() > maxNumFailures) {
-                LOGGER.warn("Failed to spawn {}: Task has failed more than the allowed {} times", task, maxNumFailures);
+            if (task.getNumFailures() >= maxNumFailures) {
+                LOGGER.warn("task {} has been terminated because it failed {} times", task, task.getNumFailures());
 
                 taskQueue.poll();
                 tasksPending--;
+                tasksTerminated++;
                 task.setState(TaskState.TERMINATED);
                 continue;
             }
@@ -382,11 +395,10 @@ public final class ComputeService implements AutoCloseable {
                     // Remove the incoming image
                     taskQueue.poll();
                     tasksPending--;
-                    attemptsFailure++;
 
                     LOGGER.warn("Failed to spawn {}: does not fit", task);
 
-                    task.setState(TaskState.TERMINATED);
+                    task.setState(TaskState.FAILED);
                     continue;
                 } else {
                     break;
@@ -417,7 +429,7 @@ public final class ComputeService implements AutoCloseable {
                 activeTasks.put(task, host);
             } catch (Exception cause) {
                 LOGGER.error("Failed to deploy VM", cause);
-                attemptsError++;
+                attemptsFailure++;
             }
         }
     }
@@ -561,6 +573,8 @@ public final class ComputeService implements AutoCloseable {
             service.taskById.put(uid, task);
             service.tasks.add(task);
 
+            service.tasksTotal++;
+
             task.start();
 
 
@@ -592,9 +606,9 @@ public final class ComputeService implements AutoCloseable {
         @Nullable
         public void rescheduleTask(@NotNull ServiceTask task, @NotNull Workload workload) {
             ServiceTask internalTask = findTask(task.getUid());
-            SimHost from = service.lookupHost(internalTask);
+//            SimHost from = service.lookupHost(internalTask);
 
-            from.delete(internalTask);
+//            from.delete(internalTask);
 
             internalTask.host = null;
 

@@ -35,7 +35,6 @@ import org.opendc.compute.simulator.TaskWatcher
 import org.opendc.compute.simulator.service.ComputeService
 import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.compute.workload.Task
-import org.opendc.experiments.base.scenario.specs.CheckpointModelSpec
 import org.opendc.experiments.base.scenario.specs.FailureModelSpec
 import org.opendc.experiments.base.scenario.specs.createFailureModel
 import java.time.InstantSource
@@ -50,7 +49,7 @@ import kotlin.math.max
  */
 public class RunningTaskWatcher : TaskWatcher {
     // TODO: make this changeable
-    private val unlockStates: List<TaskState> = listOf(TaskState.DELETED, TaskState.TERMINATED)
+    private val unlockStates: List<TaskState> = listOf(TaskState.COMPLETED, TaskState.TERMINATED)
 
     private val mutex: Mutex = Mutex()
 
@@ -85,7 +84,6 @@ public suspend fun ComputeService.replay(
     clock: InstantSource,
     trace: List<Task>,
     failureModelSpec: FailureModelSpec? = null,
-    checkpointModelSpec: CheckpointModelSpec? = null,
     seed: Long = 0,
     submitImmediately: Boolean = false,
 ) {
@@ -121,12 +119,7 @@ public suspend fun ComputeService.replay(
                     delay(max(0, (start - now - simulationOffset)))
                 }
 
-                val checkpointInterval = checkpointModelSpec?.checkpointInterval ?: 0L
-                val checkpointDuration = checkpointModelSpec?.checkpointDuration ?: 0L
-                val checkpointIntervalScaling = checkpointModelSpec?.checkpointIntervalScaling ?: 1.0
-
-
-                val workload = entry.trace; // TODO: add checkpoint params back
+                val workload = entry.trace
                 val meta = mutableMapOf<String, Any>("workload" to workload)
 
                 launch {
@@ -152,7 +145,7 @@ public suspend fun ComputeService.replay(
                     taskWatcher.wait()
 
                     // Stop the task after reaching the end-time of the virtual machine
-                    task.delete()
+//                    task.delete()
                 }
             }
         }

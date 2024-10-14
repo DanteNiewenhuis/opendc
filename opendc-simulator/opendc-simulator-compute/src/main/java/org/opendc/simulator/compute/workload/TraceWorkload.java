@@ -35,17 +35,27 @@ public record TraceWorkload(ArrayList<TraceFragment> fragments,
     }
 
     public static Builder builder() {
-        return new Builder();
+        return builder(0L, 0L, 0L);
+    }
+
+    public static Builder builder(long checkpointInterval, long checkpointDuration, double checkpointIntervalScaling) {
+        return new Builder(checkpointInterval, checkpointDuration, checkpointIntervalScaling);
     }
 
     public static final class Builder {
         private final ArrayList<TraceFragment> fragments;
+        private final long checkpointInterval;
+        private final long checkpointDuration;
+        private final double checkpointIntervalScaling;
 
         /**
          * Construct a new {@link Builder} instance.
          */
-        private Builder() {
+        private Builder(long checkpointInterval, long checkpointDuration, double checkpointIntervalScaling) {
             this.fragments = new ArrayList<TraceFragment>();
+            this.checkpointInterval = checkpointInterval;
+            this.checkpointDuration = checkpointDuration;
+            this.checkpointIntervalScaling = checkpointIntervalScaling;
         }
 
         /**
@@ -63,7 +73,7 @@ public record TraceWorkload(ArrayList<TraceFragment> fragments,
          * Build the {@link TraceWorkload} instance.
          */
         public TraceWorkload build() {
-            return new TraceWorkload(fragments, 0, 0,0);
+            return new TraceWorkload(this.fragments, this.checkpointInterval, this.checkpointDuration,this.checkpointIntervalScaling);
         }
     }
 }

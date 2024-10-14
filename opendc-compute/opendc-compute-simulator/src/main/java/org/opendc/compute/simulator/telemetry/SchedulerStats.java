@@ -28,8 +28,7 @@ package org.opendc.compute.simulator.telemetry;
  * @param hostsAvailable The number of hosts currently available for scheduling.
  * @param hostsUnavailable The number of hosts unavailable for scheduling.
  * @param attemptsSuccess Scheduling attempts that resulted into an allocation onto a host.
- * @param attemptsFailure The number of failed scheduling attempt due to insufficient capacity at the moment.
- * @param attemptsError The number of scheduling attempts that failed due to system error.
+ * @param attemptsFailure The number of failed scheduling attempt due to any reason
  * @param tasksTotal The number of tasks registered with the service.
  * @param tasksPending The number of tasks that are pending to be scheduled.
  * @param tasksActive The number of tasks that are currently managed by the service and running.
@@ -39,7 +38,8 @@ public record SchedulerStats(
         int hostsUnavailable,
         long attemptsSuccess,
         long attemptsFailure,
-        long attemptsError,
         int tasksTotal,
         int tasksPending,
-        int tasksActive) {}
+        int tasksActive,
+        int tasksCompleted,
+        int tasksTerminated) {}

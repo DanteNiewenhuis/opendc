@@ -56,7 +56,7 @@ public final class ServiceTask {
     private Map<String, ?> meta;
 
     private final List<TaskWatcher> watchers = new ArrayList<>();
-    private TaskState state = TaskState.TERMINATED;
+    private TaskState state = TaskState.CREATED;
     Instant launchedAt = null;
     SimHost host = null;
     private ComputeService.SchedulingRequest request = null;
@@ -78,6 +78,7 @@ public final class ServiceTask {
         this.image = image;
         this.workload = workload;
         this.meta = meta;
+
     }
 
     @NotNull
@@ -126,6 +127,13 @@ public final class ServiceTask {
         return host;
     }
 
+    public void setHost(SimHost host) {this.host = host;}
+
+
+    public int getNumFailures() {
+        return this.numFailures;
+    }
+
 
     public void start() {
         switch (state) {
@@ -134,32 +142,16 @@ public final class ServiceTask {
             case RUNNING:
                 LOGGER.debug("User tried to start task but task is already running");
                 break;
-            case DELETED:
+            case COMPLETED:
+            case TERMINATED:
                 LOGGER.warn("User tried to start deleted task");
                 throw new IllegalStateException("Task is deleted");
-            default:
+            case CREATED:
+            case FAILED:
                 LOGGER.info("User requested to start task {}", uid);
                 setState(TaskState.PROVISIONING);
                 assert request == null : "Scheduling request already active";
                 request = service.schedule(this);
-                break;
-        }
-    }
-
-
-    public void stop() {
-        switch (state) {
-            case PROVISIONING:
-                cancelProvisioningRequest();
-                setState(TaskState.TERMINATED);
-                break;
-            case RUNNING:
-            case ERROR:
-                final SimHost host = this.host;
-                if (host == null) {
-                    throw new IllegalStateException("Task not running");
-                }
-                host.stop(this);
                 break;
         }
     }
@@ -175,30 +167,14 @@ public final class ServiceTask {
     }
 
 
-    public void reload() {
-        // No-op: this object is the source-of-truth
-    }
-
-
     public void delete() {
-        switch (state) {
-            case PROVISIONING:
-            case TERMINATED:
-                cancelProvisioningRequest();
-                service.delete(this);
-                setState(TaskState.DELETED);
-                break;
-            case RUNNING:
-            case ERROR:
-                final SimHost host = this.host;
-                if (host == null) {
-                    throw new IllegalStateException("Task not running");
-                }
-                host.delete(this);
-                service.delete(this);
-                setState(TaskState.DELETED);
-                break;
+        cancelProvisioningRequest();
+        final SimHost host = this.host;
+        if (host == null) {
+            throw new IllegalStateException("Task not running");
         }
+        host.delete(this);
+        service.delete(this);
     }
 
 
@@ -227,7 +203,7 @@ public final class ServiceTask {
         for (TaskWatcher watcher : watchers) {
             watcher.onStateChanged(this, newState);
         }
-        if (newState == TaskState.ERROR) {
+        if (newState == TaskState.FAILED) {
             this.numFailures++;
         }
 
@@ -243,10 +219,5 @@ public final class ServiceTask {
             this.request = null;
             request.isCancelled = true;
         }
-    }
-
-
-    public int getNumFailures() {
-        return this.numFailures;
     }
 }

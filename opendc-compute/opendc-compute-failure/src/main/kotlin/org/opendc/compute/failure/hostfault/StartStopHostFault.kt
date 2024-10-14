@@ -42,10 +42,11 @@ public class StartStopHostFault(
             val guests = host.getGuests()
 
             val snapshots = guests.map { it.virtualMachine!!.getActiveWorkload().getSnapshot() }
+            val tasks = guests.map{ it.task }
             host.fail()
 
-            for ((task, snapshot) in guests.zip(snapshots)) {
-                client.rescheduleTask(task.task, snapshot)
+            for ((task, snapshot) in tasks.zip(snapshots)) {
+                client.rescheduleTask(task, snapshot)
             }
         }
 
