@@ -4,11 +4,23 @@ import org.opendc.simulator.engine.FlowSupplier;
 
 import java.util.ArrayList;
 
-public record TraceWorkload(ArrayList<TraceFragment> fragments,
-                            long checkpointInterval,
-                            long checkpointDuration,
-                            double checkpointIntervalScaling)
+public class TraceWorkload
     implements Workload {
+    private ArrayList<TraceFragment> fragments;
+    private final long checkpointInterval;
+    private final long checkpointDuration;
+    private final double checkpointIntervalScaling;
+
+    public TraceWorkload(ArrayList<TraceFragment> fragments,
+                         long checkpointInterval,
+                         long checkpointDuration,
+                         double checkpointIntervalScaling) {
+        this.fragments = fragments;
+        this.checkpointInterval = checkpointInterval;
+        this.checkpointDuration = checkpointDuration;
+        this.checkpointIntervalScaling = checkpointIntervalScaling;
+
+    }
 
     public ArrayList<TraceFragment> getFragments() {
         return fragments;
@@ -27,6 +39,17 @@ public record TraceWorkload(ArrayList<TraceFragment> fragments,
     @Override
     public double getCheckpointIntervalScaling() {
         return checkpointIntervalScaling;
+    }
+
+    public void removeFragments(int numberOfFragments) {
+        if (numberOfFragments <= 0) {
+            return;
+        }
+        this.fragments.subList(0, numberOfFragments).clear();
+    }
+
+    public void addFirst(TraceFragment fragment) {
+        this.fragments.add(0, fragment);
     }
 
     @Override
@@ -52,7 +75,7 @@ public record TraceWorkload(ArrayList<TraceFragment> fragments,
          * Construct a new {@link Builder} instance.
          */
         private Builder(long checkpointInterval, long checkpointDuration, double checkpointIntervalScaling) {
-            this.fragments = new ArrayList<TraceFragment>();
+            this.fragments = new ArrayList<>();
             this.checkpointInterval = checkpointInterval;
             this.checkpointDuration = checkpointDuration;
             this.checkpointIntervalScaling = checkpointIntervalScaling;

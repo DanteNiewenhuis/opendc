@@ -33,7 +33,8 @@ import java.util.LinkedList;
  * A {@link SimChainWorkload} that composes multiple {@link SimWorkload}s.
  */
 final class SimChainWorkload extends SimWorkload implements FlowSupplier {
-    private final LinkedList<Workload> workloadQueue;
+    private final LinkedList<Workload> workloads;
+    private int workloadIndex;
 
     private SimWorkload activeWorkload;
     private float demand = 0.0f;
@@ -94,7 +95,7 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
         this.parentGraph.addEdge(this, supplier);
 
         this.clock = this.parentGraph.getEngine().getClock();
-        this.workloadQueue = new LinkedList<Workload>(workload.getWorkloadQueue());
+        this.workloads = new LinkedList<>(workload.getWorkloads());
         this.checkpointInterval = workload.getCheckpointInterval();
         this.checkpointDuration = workload.getCheckpointDuration();
         this.checkpointIntervalScaling = workload.getCheckpointIntervalScaling();
@@ -103,12 +104,19 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
             this.createCheckpointModel();
         }
 
+        this.workloadIndex = -1;
+
         this.onStart();
+    }
+
+    public Workload getNextWorkload() {
+        this.workloadIndex++;
+        return workloads.pop();
     }
 
     // TODO: Combine with Constructor
     public void onStart() {
-        if (this.workloadQueue.isEmpty()) {
+        if (this.workloads.isEmpty()) {
             return;
         }
 
@@ -117,7 +125,7 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
             this.checkpointModel.start();
         }
 
-        this.activeWorkload = workloadQueue.pop().startWorkload(this, this.clock.millis());
+        this.activeWorkload = this.getNextWorkload().startWorkload(this, this.clock.millis());
     }
 
     @Override
@@ -151,19 +159,11 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
 
     @Override
     public void makeSnapshot(long now) {
-        final ArrayList<Workload> newWorkloadQueue = new ArrayList<>(this.workloadQueue);
+
+        this.snapshot.removeWorkloads(this.workloadIndex);
+        this.workloadIndex = 0;
 
         activeWorkload.makeSnapshot(now);
-
-        if (this.activeWorkload == null) {
-            this.stopWorkload();
-            return;
-        }
-        final Workload activeWorkloadSnapshot = activeWorkload.getSnapshot();
-
-        newWorkloadQueue.add(0, activeWorkloadSnapshot);
-
-        this.snapshot = new ChainWorkload(newWorkloadQueue, this.checkpointInterval, this.checkpointDuration, this.checkpointIntervalScaling);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -261,10 +261,8 @@ final class SimChainWorkload extends SimWorkload implements FlowSupplier {
         this.workloadEdge = null;
 
         // Start next workload
-        if (!this.workloadQueue.isEmpty()) {
-            final Workload nextWorkload = this.workloadQueue.pop();
-
-            this.activeWorkload = nextWorkload.startWorkload(this, this.clock.millis());
+        if (!this.workloads.isEmpty()) {
+            this.activeWorkload = getNextWorkload().startWorkload(this, this.clock.millis());
             return;
         }
 

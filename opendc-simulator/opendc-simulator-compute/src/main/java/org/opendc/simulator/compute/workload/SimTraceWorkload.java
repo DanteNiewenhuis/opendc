@@ -6,11 +6,11 @@ import org.opendc.simulator.engine.FlowGraphNew;
 import org.opendc.simulator.engine.FlowNode;
 import org.opendc.simulator.engine.FlowSupplier;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     private LinkedList<TraceFragment> remainingFragments;
+    private int fragmentIndex;
 
     private TraceFragment currentFragment;
     private long startOfFragment;
@@ -42,6 +42,13 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     @Override
     double getCheckpointIntervalScaling() {return 0;}
 
+    public TraceFragment getNextFragment() {
+        this.currentFragment = this.remainingFragments.pop();
+        this.fragmentIndex++;
+
+        return this.currentFragment;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Constructors
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,12 +57,13 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         super(((FlowNode)supplier).getGraph());
 
         this.snapshot = workload;
-        this.remainingFragments = new LinkedList<TraceFragment>(workload.getFragments());
+        this.remainingFragments = new LinkedList<>(workload.getFragments());
+        this.fragmentIndex = 0;
 
         final FlowGraphNew graph = ((FlowNode)supplier).getGraph();
         graph.addEdge(this, supplier);
 
-        this.currentFragment = this.remainingFragments.pop();
+        this.currentFragment = this.getNextFragment();
         pushDemand(machineEdge, (float) this.currentFragment.cpuUsage());
         this.startOfFragment = now;
     }
@@ -63,6 +71,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Fragment related functionality
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     @Override
     public long onUpdate(long now) {
@@ -85,7 +94,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
             passedTime = passedTime - duration;
 
             // get next Fragment
-            currentFragment = this.remainingFragments.pop();
+            currentFragment = this.getNextFragment();
             duration = currentFragment.duration();
         }
 
@@ -124,34 +133,35 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
      * @param now
      */
     public void makeSnapshot(long now){
-        final LinkedList<TraceFragment> newFragments = this.remainingFragments;
 
-        TraceFragment currentFragment = this.currentFragment;
+        // Check if fragments is empty
+
+
+        // Get remaining time of current fragment
         long passedTime = getPassedTime(now);
         long remainingTime = currentFragment.duration() - passedTime;
 
-        // Alter the current fragment to have the duration as the remaining time
-        if (remainingTime > 0) {
-            TraceFragment newFragment =
-                new TraceFragment(remainingTime, currentFragment.cpuUsage(), currentFragment.coreCount());
+        // Create a new fragment based on the current fragment and remaining duration
+        TraceFragment newFragment =
+            new TraceFragment(remainingTime, currentFragment.cpuUsage(), currentFragment.coreCount());
 
-            newFragments.addFirst(newFragment);
-        }
+        // Alter the snapshot by removing finished fragments
+        this.snapshot.removeFragments(this.fragmentIndex);
+        this.snapshot.addFirst(newFragment);
 
-        if (newFragments.isEmpty()) {
-            this.stopWorkload();
-            return;
-        }
+        this.remainingFragments.addFirst(newFragment);
 
-        // A Workload with the new fragments is the new snapshot
-        this.snapshot = new TraceWorkload(new ArrayList<>(newFragments), this.checkpointInterval, this.checkpointDuration, this.checkpointIntervalScaling);
-
-        // Add a processing Fragment to the start
+        // Create and add a fragment for processing the snapshot process
         long checkpointDuration = 1000L; // TODO: connect to front-end
         TraceFragment snapshotFragment = new TraceFragment(checkpointDuration, 123456, 1);
-        newFragments.addFirst(snapshotFragment);
+        this.remainingFragments.addFirst(snapshotFragment);
 
-        this.updateFragments(newFragments, now);
+        this.fragmentIndex = -1;
+        this.currentFragment = getNextFragment();
+        pushDemand(this.machineEdge, (float) this.currentFragment.cpuUsage());
+        this.startOfFragment = now;
+
+        this.invalidate();
     }
 
     /**
