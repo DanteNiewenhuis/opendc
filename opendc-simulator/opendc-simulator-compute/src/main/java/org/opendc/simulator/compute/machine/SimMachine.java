@@ -2,6 +2,7 @@ package org.opendc.simulator.compute.machine;
 
 import org.opendc.simulator.compute.cpu.CpuPowerModel;
 import org.opendc.simulator.compute.cpu.SimCpu;
+import org.opendc.simulator.compute.power.SimPowerSource;
 import org.opendc.simulator.compute.power.SimPsu;
 import org.opendc.simulator.compute.models.MachineModel;
 import org.opendc.simulator.compute.memory.Memory;
@@ -90,13 +91,17 @@ public class SimMachine {
     // Constructors
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public SimMachine(FlowGraphNew graph, MachineModel machineModel, CpuPowerModel cpuPowerModel, Consumer<Exception> completion) {
+    public SimMachine(FlowGraphNew graph, MachineModel machineModel, CpuPowerModel cpuPowerModel,
+                      Multiplexer powerMux, Consumer<Exception> completion) {
         this.graph = graph;
         this.machineModel = machineModel;
         this.clock = graph.getEngine().getClock();
 
         // Create the psu and cpu and connect them
         this.psu = new SimPsu(graph);
+
+        graph.addEdge(this.psu, powerMux);
+
         this.cpu = new SimCpu(graph, this.machineModel.getCpu(), 0);
 
         graph.addEdge(this.cpu, this.psu);

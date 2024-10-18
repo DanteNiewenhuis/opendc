@@ -165,6 +165,7 @@ public class Multiplexer extends FlowNode implements FlowSupplier, FlowConsumer 
         }
 
         this.totalSupply = newSupply;
+        this.invalidate();
     }
 
     @Override
@@ -178,10 +179,6 @@ public class Multiplexer extends FlowNode implements FlowSupplier, FlowConsumer 
 
         if (idx == -1) {
             System.out.println("Error (Multiplexer): pushing supply to an unknown consumer");
-        }
-
-        if (newSupply == supplies.get(idx)) {
-            return;
         }
 
         supplies.set(idx, newSupply);

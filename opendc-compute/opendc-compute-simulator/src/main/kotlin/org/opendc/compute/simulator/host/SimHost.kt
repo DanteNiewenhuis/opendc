@@ -31,6 +31,7 @@ import org.opendc.compute.simulator.telemetry.GuestCpuStats
 import org.opendc.compute.simulator.telemetry.GuestSystemStats
 import org.opendc.compute.simulator.telemetry.HostCpuStats
 import org.opendc.compute.simulator.telemetry.HostSystemStats
+import org.opendc.simulator.Multiplexer
 import org.opendc.simulator.compute.cpu.CpuPowerModel
 import org.opendc.simulator.compute.machine.SimMachine
 import org.opendc.simulator.compute.models.MachineModel
@@ -61,6 +62,7 @@ public class SimHost(
     private val graph: FlowGraphNew,
     private val machineModel: MachineModel,
     private val powerModel: CpuPowerModel,
+    private val powerMux: Multiplexer
 ) : AutoCloseable {
     /**
      * The event listeners registered with this host.
@@ -129,7 +131,8 @@ public class SimHost(
         this.simMachine = SimMachine(
             this.graph,
             this.machineModel,
-            this.powerModel
+            this.powerModel,
+            this.powerMux
         ) { cause ->
             hostState = if (cause != null) HostState.ERROR else HostState.DOWN
         }

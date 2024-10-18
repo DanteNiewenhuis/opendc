@@ -24,7 +24,10 @@ package org.opendc.compute.simulator.provisioner
 
 import org.opendc.compute.simulator.host.SimHost
 import org.opendc.compute.simulator.service.ComputeService
+import org.opendc.compute.topology.specs.ClusterSpec
 import org.opendc.compute.topology.specs.HostSpec
+import org.opendc.simulator.Multiplexer
+import org.opendc.simulator.compute.power.SimPowerSource
 import org.opendc.simulator.engine.FlowEngineNew
 
 /**
@@ -36,37 +39,56 @@ import org.opendc.simulator.engine.FlowEngineNew
  */
 public class HostsProvisioningStep internal constructor(
     private val serviceDomain: String,
-    private val specs: List<HostSpec>,
+    private val clusterSpecs: List<ClusterSpec>,
 ) : ProvisioningStep {
     override fun apply(ctx: ProvisioningContext): AutoCloseable {
         val service =
             requireNotNull(
                 ctx.registry.resolve(serviceDomain, ComputeService::class.java),
             ) { "Compute service $serviceDomain does not exist" }
-        val hosts = mutableSetOf<SimHost>()
+        val simHosts = mutableSetOf<SimHost>()
+        val simPowerSources = mutableListOf<SimPowerSource>()
 
-        val engineNew = FlowEngineNew.create(ctx.dispatcher)
-        val graphNew = engineNew.newGraph()
+        val engine = FlowEngineNew.create(ctx.dispatcher)
+        val graph = engine.newGraph()
 
-        for (spec in specs) {
-            val host =
+        for (cluster in clusterSpecs){
+
+            // Create the Power Source to which hosts are connected
+            val simPowerSource = SimPowerSource(graph, cluster.powerSource.totalPower)
+            service.addPowerSource(simPowerSource)
+            simPowerSources.add(simPowerSource)
+
+            val powerMux = Multiplexer(graph)
+            graph.addEdge(powerMux, simPowerSource)
+
+            // Create hosts, they are connected to the powerMux when SimMachine is created
+            for (hostSpec in cluster.hostSpecs) {
+                val simHost =
                 SimHost(
-                    spec.uid,
-                    spec.name,
-                    spec.meta,
-                    ctx.dispatcher.timeSource,
-                    graphNew,
-                    spec.model,
-                    spec.psuFactory
-                )
+                        hostSpec.uid,
+                        hostSpec.name,
+                        hostSpec.meta,
+                        ctx.dispatcher.timeSource,
+                        graph,
+                        hostSpec.model,
+                        hostSpec.psuFactory,
+                        powerMux
+                    )
 
-            require(hosts.add(host)) { "Host with uid ${spec.uid} already exists" }
-            service.addHost(host)
+                require(simHosts.add(simHost)) { "Host with uid ${hostSpec.uid} already exists" }
+                service.addHost(simHost)
+            }
         }
 
         return AutoCloseable {
-            for (host in hosts) {
-                host.close()
+            for (simHost in simHosts) {
+                simHost.close()
+            }
+
+            for (simPowerSource in simPowerSources){
+                // TODO: add close function
+//                simPowerSource.close()
             }
         }
     }

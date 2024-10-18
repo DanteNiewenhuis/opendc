@@ -82,11 +82,8 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
     @Override
     public long onUpdate(long now) {
         updateCounters();
-        float powerSupply = this.powerDemand;
 
-        if (powerSupply != this.powerSupplied) {
-            this.pushSupply(this.cpuEdge, powerSupply);
-        }
+        // TODO: Maybe Implement this
 
         return Long.MAX_VALUE;
     }
@@ -113,7 +110,12 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
     // FlowGraph Related functionality
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+    /**
+     * Push new demand to the power multiplexer
+     *
+     * @param supplierEdge
+     * @param newDemand
+     */
     @Override
     public void pushDemand(FlowEdge supplierEdge, float newDemand) {
         if (newDemand == this.powerDemand) {
@@ -121,9 +123,16 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
         }
 
         this.powerDemand = newDemand;
-        powerEdge.pushSupply(newDemand);
+        powerEdge.pushDemand(newDemand);
     }
 
+    /**
+     * Push the new supply to the cpu
+     * Update the power counters given that a new fragment start
+     *
+     * @param consumerEdge
+     * @param newSupply
+     */
     @Override
     public void pushSupply(FlowEdge consumerEdge, float newSupply) {
         if (newSupply == this.powerSupplied) {
@@ -131,27 +140,39 @@ public final class SimPsu extends FlowNode implements FlowSupplier, FlowConsumer
         }
 
         this.powerSupplied = newSupply;
+
+        updateCounters();
         cpuEdge.pushSupply(newSupply);
     }
 
+    /**
+     * Handle updated demand from the cpu by pushing it through to the power Multiplexer
+     *
+     * @param consumerEdge
+     * @param newPowerDemand
+     */
     @Override
     public void handleDemand(FlowEdge consumerEdge, float newPowerDemand) {
         if (newPowerDemand == this.powerDemand) {
             return;
         }
 
-        this.powerDemand = newPowerDemand;
-        this.invalidate();
+        this.pushDemand(this.powerEdge, newPowerDemand);
     }
 
+    /**
+     * Handle updated supply coming from the power supply by sending it through to the cpu
+     *
+     * @param supplierEdge
+     * @param newPowerSupply
+     */
     @Override
     public void handleSupply(FlowEdge supplierEdge, float newPowerSupply) {
         if (newPowerSupply == this.powerSupplied) {
             return;
         }
 
-        this.powerSupplied = newPowerSupply;
-        this.invalidate();
+        this.pushSupply(this.cpuEdge, newPowerSupply);
     }
 
     @Override

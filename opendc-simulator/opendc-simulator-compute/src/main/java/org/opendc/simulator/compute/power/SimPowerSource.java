@@ -12,8 +12,6 @@ import java.time.InstantSource;
  * A {@link SimPsu} implementation that estimates the power consumption based on CPU usage.
  */
 public final class SimPowerSource extends FlowNode implements FlowSupplier {
-    private final InstantSource clock;
-
     private long lastUpdate;
 
     private float powerDemand = 0.0f;
@@ -70,12 +68,11 @@ public final class SimPowerSource extends FlowNode implements FlowSupplier {
     // Constructors
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public SimPowerSource(FlowGraphNew graph) {
+    public SimPowerSource(FlowGraphNew graph, long maxPower) {
         super(graph);
 
-        this.clock = graph.getEngine().getClock();
-
-        lastUpdate = graph.getEngine().getClock().millis();
+        this.capacity = maxPower;
+        lastUpdate = this.clock.millis();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

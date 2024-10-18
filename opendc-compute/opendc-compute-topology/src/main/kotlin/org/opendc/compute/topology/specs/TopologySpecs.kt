@@ -34,7 +34,7 @@ import org.opendc.common.units.Power
  */
 @Serializable
 public data class TopologySpec(
-    val clusters: List<ClusterSpec>,
+    val clusters: List<ClusterJSONSpec>,
     val schemaVersion: Int = 1,
 )
 
@@ -46,10 +46,11 @@ public data class TopologySpec(
  * @param location Location of the cluster. This can impact the carbon intensity
  */
 @Serializable
-public data class ClusterSpec(
+public data class ClusterJSONSpec(
     val name: String = "Cluster",
     val count: Int = 1,
     val hosts: List<HostJSONSpec>,
+    val powerSource: PowerSourceJSONSpec = PowerSourceJSONSpec.DFLT,
     val location: String = "NL",
 )
 
@@ -65,11 +66,35 @@ public data class ClusterSpec(
 @Serializable
 public data class HostJSONSpec(
     val name: String? = null,
-    val cpu: CPUSpec,
-    val memory: MemorySpec,
-    val powerModel: PowerModelSpec = PowerModelSpec.DFLT,
+    val cpu: CPUJSONSpec,
+    val memory: MemoryJSONSpec,
+    val powerModel: PowerModelJSONSpec = PowerModelJSONSpec.DFLT,
     val count: Int = 1,
 )
+
+/**
+ * Definition of a compute host modeled in the simulation.
+ *
+ * @param name The name of the host.
+ * @param cpu The CPU available in this cluster
+ * @param memory The amount of RAM memory available in Byte
+ * @param powerModel The power model used to determine the power draw of a host
+ * @param count The power model used to determine the power draw of a host
+ */
+@Serializable
+public data class PowerSourceJSONSpec(
+    val vendor: String = "unknown",
+    val modelName: String = "unknown",
+    val arch: String = "unknown",
+    val totalPower: Long
+) {
+    public companion object {
+        public val DFLT: PowerSourceJSONSpec =
+            PowerSourceJSONSpec(
+                totalPower = 10000
+            )
+    }
+}
 
 /**
  * Definition of a compute CPU modeled in the simulation.
@@ -81,7 +106,7 @@ public data class HostJSONSpec(
  * @param coreSpeed The speed of the cores
  */
 @Serializable
-public data class CPUSpec(
+public data class CPUJSONSpec(
     val vendor: String = "unknown",
     val modelName: String = "unknown",
     val arch: String = "unknown",
@@ -100,7 +125,7 @@ public data class CPUSpec(
  * @param memorySize The size of the memory Unit
  */
 @Serializable
-public data class MemorySpec(
+public data class MemoryJSONSpec(
     val vendor: String = "unknown",
     val modelName: String = "unknown",
     val arch: String = "unknown",
@@ -109,7 +134,7 @@ public data class MemorySpec(
 )
 
 @Serializable
-public data class PowerModelSpec(
+public data class PowerModelJSONSpec(
     val modelType: String,
     val power: Power = Power.ofWatts(400),
     val maxPower: Power,
@@ -120,8 +145,8 @@ public data class PowerModelSpec(
     }
 
     public companion object {
-        public val DFLT: PowerModelSpec =
-            PowerModelSpec(
+        public val DFLT: PowerModelJSONSpec =
+            PowerModelJSONSpec(
                 modelType = "linear",
                 power = Power.ofWatts(350),
                 maxPower = Power.ofWatts(400.0),

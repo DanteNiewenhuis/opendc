@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 AtLarge Research
+ * Copyright (c) 2021 AtLarge Research
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,14 @@
  * SOFTWARE.
  */
 
-package org.opendc.compute.simulator.telemetry
-
-import org.opendc.compute.simulator.telemetry.table.HostTableReader
-import org.opendc.compute.simulator.telemetry.table.PowerSourceTableReader
-import org.opendc.compute.simulator.telemetry.table.ServiceTableReader
-import org.opendc.compute.simulator.telemetry.table.TaskTableReader
+package org.opendc.compute.simulator.telemetry.table
 
 /**
- * A monitor that tracks the metrics and events of the OpenDC Compute service.
+ * Information about a host exposed to the telemetry service.
  */
-public interface ComputeMonitor {
-    /**
-     * Record an entry with the specified [reader].
-     */
-    public fun record(reader: TaskTableReader) {}
-
-    /**
-     * Record an entry with the specified [reader].
-     */
-    public fun record(reader: HostTableReader) {}
-
-    /**
-     * Record an entry with the specified [reader].
-     */
-    public fun record(reader: PowerSourceTableReader) {}
-
-    /**
-     * Record an entry with the specified [reader].
-     */
-    public fun record(reader: ServiceTableReader) {}
-}
+public data class PowerSourceInfo(
+    val id: String,
+    val name: String,
+    val arch: String,
+    val maxPower: Int,
+)

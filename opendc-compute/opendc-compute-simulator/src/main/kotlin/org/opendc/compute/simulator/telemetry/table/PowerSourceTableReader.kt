@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 AtLarge Research
+ * Copyright (c) 2021 AtLarge Research
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,51 @@
  * SOFTWARE.
  */
 
-package org.opendc.compute.simulator.telemetry
+package org.opendc.compute.simulator.telemetry.table
 
-import org.opendc.compute.simulator.telemetry.table.HostTableReader
-import org.opendc.compute.simulator.telemetry.table.PowerSourceTableReader
-import org.opendc.compute.simulator.telemetry.table.ServiceTableReader
-import org.opendc.compute.simulator.telemetry.table.TaskTableReader
+import org.opendc.trace.util.parquet.exporter.Exportable
+import java.time.Instant
 
 /**
- * A monitor that tracks the metrics and events of the OpenDC Compute service.
+ * An interface that is used to read a row of a service trace entry.
  */
-public interface ComputeMonitor {
-    /**
-     * Record an entry with the specified [reader].
-     */
-    public fun record(reader: TaskTableReader) {}
+public interface PowerSourceTableReader : Exportable {
+    public fun copy(): PowerSourceTableReader
+
+    public fun setValues(table: PowerSourceTableReader)
 
     /**
-     * Record an entry with the specified [reader].
+     * The timestamp of the current entry of the reader.
      */
-    public fun record(reader: HostTableReader) {}
+    public val timestamp: Instant
 
     /**
-     * Record an entry with the specified [reader].
+     * The timestamp of the current entry of the reader.
      */
-    public fun record(reader: PowerSourceTableReader) {}
+    public val timestampAbsolute: Instant
 
     /**
-     * Record an entry with the specified [reader].
+     * The number of hosts that are connected to the power source.
      */
-    public fun record(reader: ServiceTableReader) {}
+    public val hostsConnected: Int
+
+    /**
+     * The current power draw of the host in W.
+     */
+    public val powerDraw: Float
+
+    /**
+     * The total energy consumption of the host since last sample in J.
+     */
+    public val energyUsage: Float
+
+    /**
+     * The current carbon intensity of the host in gCO2 / kW.
+     */
+    public val carbonIntensity: Float
+
+    /**
+     * The current carbon emission since the last deadline in g.
+     */
+    public val carbonEmission: Float
 }

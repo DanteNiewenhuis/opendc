@@ -35,6 +35,7 @@ import org.opendc.compute.simulator.host.HostState;
 import org.opendc.compute.simulator.host.SimHost;
 import org.opendc.compute.simulator.scheduler.ComputeScheduler;
 import org.opendc.compute.simulator.telemetry.SchedulerStats;
+import org.opendc.simulator.compute.power.SimPowerSource;
 import org.opendc.simulator.compute.workload.Workload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +98,11 @@ public final class ComputeService implements AutoCloseable {
      * The available hypervisors.
      */
     private final Set<HostView> availableHosts = new HashSet<>();
+
+    /**
+     * The available hypervisors.
+     */
+    private final Set<SimPowerSource> powerSources = new HashSet<>();
 
     /**
      * The tasks that should be launched by the service.
@@ -276,6 +282,18 @@ public final class ComputeService implements AutoCloseable {
     }
 
     /**
+     * Add a {@link SimHost} to the scheduling pool of the compute service.
+     */
+    public void addPowerSource(SimPowerSource simPowerSource) {
+        // Check if host is already known
+        if (powerSources.contains(simPowerSource)) {
+            return;
+        }
+
+        powerSources.add(simPowerSource);
+    }
+
+    /**
      * Lookup the {@link SimHost} that currently hosts the specified {@link ServiceTask}.
      */
     public SimHost lookupHost(ServiceTask task) {
@@ -288,6 +306,11 @@ public final class ComputeService implements AutoCloseable {
     public Set<SimHost> getHosts() {
         return Collections.unmodifiableSet(hostToView.keySet());
     }
+
+    public Set<SimPowerSource> getPowerSources() {
+        return Collections.unmodifiableSet(this.powerSources);
+    }
+
 
     /**
      * Collect the statistics about the scheduler component of this service.
@@ -606,9 +629,6 @@ public final class ComputeService implements AutoCloseable {
         @Nullable
         public void rescheduleTask(@NotNull ServiceTask task, @NotNull Workload workload) {
             ServiceTask internalTask = findTask(task.getUid());
-//            SimHost from = service.lookupHost(internalTask);
-
-//            from.delete(internalTask);
 
             internalTask.host = null;
 

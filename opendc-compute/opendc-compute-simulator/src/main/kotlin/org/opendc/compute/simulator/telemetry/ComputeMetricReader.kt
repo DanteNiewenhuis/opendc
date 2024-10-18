@@ -36,9 +36,11 @@ import org.opendc.compute.simulator.service.ComputeService
 import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.compute.simulator.telemetry.table.HostInfo
 import org.opendc.compute.simulator.telemetry.table.HostTableReader
+import org.opendc.compute.simulator.telemetry.table.PowerSourceTableReader
 import org.opendc.compute.simulator.telemetry.table.ServiceTableReader
 import org.opendc.compute.simulator.telemetry.table.TaskInfo
 import org.opendc.compute.simulator.telemetry.table.TaskTableReader
+import org.opendc.simulator.compute.power.SimPowerSource
 import java.time.Duration
 import java.time.Instant
 
@@ -80,6 +82,11 @@ public class ComputeMetricReader(
     private val hostTableReaders = mutableMapOf<SimHost, HostTableReaderImpl>()
 
     /**
+     * Mapping from [Host] instances to [HostTableReaderImpl]
+     */
+    private val powerSourceTableReaders = mutableMapOf<SimPowerSource, PowerSourceTableReaderImpl>()
+
+    /**
      * Mapping from [Task] instances to [TaskTableReaderImpl]
      */
     private val taskTableReaders = mutableMapOf<ServiceTask, TaskTableReaderImpl>()
@@ -109,6 +116,20 @@ public class ComputeMetricReader(
         loggCounter++;
         try {
             val now = this.clock.instant()
+
+            for (simPowerSource in this.service.powerSources) {
+                val reader = this.powerSourceTableReaders.computeIfAbsent(simPowerSource) {
+                    PowerSourceTableReaderImpl(
+                        it,
+                        startTime,
+                        carbonTrace
+                    )
+                }
+
+                reader.record(now)
+                this.monitor.record(reader.copy())
+                reader.reset()
+            }
 
             for (host in this.service.hosts) {
                 val reader = this.hostTableReaders.computeIfAbsent(host) {
@@ -635,6 +656,95 @@ public class ComputeMetricReader(
 
             _host = null
             _cpuLimit = 0.0f
+        }
+    }
+    /**
+     * An aggregator for task metrics before they are reported.
+     */
+    private class PowerSourceTableReaderImpl(
+        powerSource: SimPowerSource,
+        private val startTime: Duration = Duration.ofMillis(0),
+        private val carbonTrace: CarbonTrace = CarbonTrace(null),
+    ) : PowerSourceTableReader {
+        override fun copy(): PowerSourceTableReader {
+            val newPowerSourceTable =
+                PowerSourceTableReaderImpl(
+                    _powerSource
+                )
+            newPowerSourceTable.setValues(this)
+
+            return newPowerSourceTable
+        }
+
+        override fun setValues(table: PowerSourceTableReader) {
+            _timestamp = table.timestamp
+            _timestampAbsolute = table.timestampAbsolute
+
+            _hostsConnected = table.hostsConnected
+            _powerDraw = table.powerDraw
+            _energyUsage = table.energyUsage
+            _carbonIntensity = table.carbonIntensity
+            _carbonEmission = table.carbonEmission
+        }
+
+        private val _powerSource = powerSource
+
+        private var _timestamp = Instant.MIN
+        override val timestamp: Instant
+            get() = _timestamp
+
+        private var _timestampAbsolute = Instant.MIN
+        override val timestampAbsolute: Instant
+            get() = _timestampAbsolute
+
+        override val hostsConnected: Int
+            get() = _hostsConnected
+        private var _hostsConnected: Int = 0
+
+        override val powerDraw: Float
+            get() = _powerDraw
+        private var _powerDraw = 0.0f
+
+        override val energyUsage: Float
+            get() = _energyUsage - previousEnergyUsage
+        private var _energyUsage = 0.0f
+        private var previousEnergyUsage = 0.0f
+
+        override val carbonIntensity: Float
+            get() = _carbonIntensity
+        private var _carbonIntensity = 0.0f
+
+        override val carbonEmission: Float
+            get() = _carbonEmission
+        private var _carbonEmission = 0.0f
+
+        /**
+         * Record the next cycle.
+         */
+        fun record(now: Instant) {
+
+            _timestamp = now
+            _timestampAbsolute = now + startTime
+
+            _hostsConnected = 0
+            _powerDraw = _powerSource.powerDraw
+            _energyUsage = _powerSource.energyUsage
+            _carbonIntensity = carbonTrace.getCarbonIntensity(timestampAbsolute)
+            _carbonEmission = carbonIntensity * (energyUsage / 3600000.0f)
+        }
+
+        /**
+         * Finish the aggregation for this cycle.
+         */
+        fun reset() {
+
+            previousEnergyUsage = _energyUsage
+
+            _hostsConnected = 0
+            _powerDraw = 0.0f
+            _energyUsage = 0.0f
+            _carbonIntensity = 0.0f
+            _carbonEmission = 0.0f
         }
     }
 }
