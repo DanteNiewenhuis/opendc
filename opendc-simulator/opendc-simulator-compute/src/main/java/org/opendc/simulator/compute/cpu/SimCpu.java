@@ -107,7 +107,7 @@ public final class SimCpu extends FlowNode implements FlowSupplier, FlowConsumer
         this.maxCapacity = this.cpuModel.getTotalCapacity();
 
         // TODO: connect this to the front-end
-        this.cpuPowerModel = powerModel;
+        this.cpuPowerModel = powerModel;In de politieverklaring wordt vermeld dat de boetes "niet strafrechtelijk" waren. "Dat de boetes worden ingetrokken, betekent niet dat die ongegrond zijn."
 
         this.lastCounterUpdate = graph.getEngine().getClock().millis();
 

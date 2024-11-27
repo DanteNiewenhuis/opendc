@@ -40,7 +40,7 @@ const leads = [
     },
     {
         name: 'Fabian Mastenbroek',
-        title: 'Technology Lead (2020-2022)',
+        title: 'Formder Technology Lead (2020-2022)',
         avatar: 'https://www.atlarge-research.com/images/people/fmastenbroek_large.png',
         url: 'https://www.atlarge-research.com/fmastenbroek/',
     },

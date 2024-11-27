@@ -1,8 +1,8 @@
 ---
-description: Designing a simple experiment
+description: Running a simple experiment
 ---
 
-# First Experiment
+# Running OpenDC
 Now that you have downloaded OpenDC, we will start creating a simple experiment. 
 In this experiment we will compare the performance of a small, and a big data center on the same workload.
 
@@ -32,7 +32,7 @@ A **topology** is defined using a JSON file. A **topology** contains one or more
 _clusters_ are groups of _hosts_ on a specific location. Each cluster consists of one or more _hosts_. 
 A _host_ is a machine on which one or more tasks can be executed. _hosts_ are composed of a _cpu_ and a _memory_ unit. 
 
-### Simple Data Center
+### Small Data Center
 in this experiment, we are comparing two data centers. Below is an example of the small **topology** file:
 
 ```json
@@ -66,7 +66,7 @@ This **topology** consist of a single _cluster_, with a single _host_.
 To use this **topology** in experiment copy the content to a new JSON file, or download it [here](documents/topologies/small.json "download")
 :::
 
-### Simple Data Center
+### Big Data Center
 in this experiment, we are comparing two data centers. Below is an example of the bigger **topology** file:
 
 ```json

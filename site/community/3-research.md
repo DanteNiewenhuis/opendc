@@ -17,11 +17,15 @@ For a sneak peek of the kind of work we do, have a look at the material listed b
 
 ## Publications about OpenDC
 
-1. [OpenDC 2.0: Convenient Modeling and Simulation of Emerging Technologies in Cloud Datacenters](https://atlarge-research.com/pdfs/ccgrid21-opendc-paper.pdf)  
+
+1. [FootPrinter: Quantifying Data Center Carbon Footprint](https://atlarge-research.com/pdfs/2024-hotcloud-footprinter.pdf)  
+   **HotCloudPerf 2024**  
+   Dante Niewenhuis, Sacheendra Talluri, Alexandru Iosup, Tiziano De Matteis
+2. [OpenDC 2.0: Convenient Modeling and Simulation of Emerging Technologies in Cloud Datacenters](https://atlarge-research.com/pdfs/ccgrid21-opendc-paper.pdf)  
    **CCGrid 2021**  
    Fabian Mastenbroek, Georgios Andreadis, Soufiane Jounaid, Wenchen Lai, Jacob Burley, Jaro Bosch, Erwin van Eyk,
    Laurens Versluis, Vincent van Beek, Alexandru Iosup
-2. [The OpenDC vision: Towards collaborative datacenter simulation and exploration for everybody](https://atlarge-research.com/pdfs/opendc-vision17ispdc_cr.pdf)  
+3. [The OpenDC vision: Towards collaborative datacenter simulation and exploration for everybody](https://atlarge-research.com/pdfs/opendc-vision17ispdc_cr.pdf)  
    **ISPDC 2017 (invited paper)**  
    Alexandru Iosup, Georgios Andreadis, Vincent van Beek, Matthijs Bijman, Erwin van Eyk, Mihai Neacsu, Leon Overweel,
    Sacheendra Talluri, Laurens Versluis, Maaike Visser.
