@@ -94,7 +94,7 @@ class ExperimentTest {
         runSimulation {
             val seed = 1L
             val workload = createTestWorkload("single_task", 1.0, seed)
-            val topology = createTopology("single.json")
+            val topology = createTopology("single_2000.json")
             val monitor = monitor
 
             Provisioner(dispatcher, seed).use { provisioner ->
@@ -135,7 +135,7 @@ class ExperimentTest {
         runSimulation {
             val seed = 1L
             val workload = createTestWorkload("single_task", 1.0, seed)
-            val topology = createTopology("single.json")
+            val topology = createTopology("single_2000.json")
             val monitor = monitor
             val failureModelSpec =
                 TraceBasedFailureModelSpec(
@@ -183,7 +183,7 @@ class ExperimentTest {
         runSimulation {
             val seed = 1L
             val workload = createTestWorkload("single_task", 1.0, seed)
-            val topology = createTopology("single.json")
+            val topology = createTopology("single_2000.json")
             val monitor = monitor
             val failureModelSpec = TraceBasedFailureModelSpec("$basePath/failureTraces/11_failures.parquet")
 
@@ -227,7 +227,7 @@ class ExperimentTest {
             val seed = 1L
             workloadLoader = ComputeWorkloadLoader(File("$basePath/traces"), 1000000L, 1000L, 1.0)
             val workload = createTestWorkload("single_task", 1.0, seed)
-            val topology = createTopology("single.json")
+            val topology = createTopology("single_2000.json")
             val monitor = monitor
             val failureModelSpec = TraceBasedFailureModelSpec("$basePath/failureTraces/11_failures.parquet")
 
@@ -271,7 +271,7 @@ class ExperimentTest {
         runSimulation {
             val seed = 1L
             val workload = createTestWorkload("bitbrains-small", 0.25, seed)
-            val topology = createTopology("single.json")
+            val topology = createTopology("single_2000.json")
             val monitor = monitor
 
             Provisioner(dispatcher, seed).use { provisioner ->

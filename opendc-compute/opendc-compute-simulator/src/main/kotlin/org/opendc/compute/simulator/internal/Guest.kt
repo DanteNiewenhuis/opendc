@@ -31,8 +31,6 @@ import org.opendc.compute.simulator.telemetry.GuestSystemStats
 import org.opendc.simulator.compute.machine.SimMachine
 import org.opendc.simulator.compute.machine.VirtualMachine
 import org.opendc.simulator.compute.workload.ChainWorkload
-import org.opendc.simulator.compute.workload.TraceFragment
-import org.opendc.simulator.compute.workload.TraceWorkload
 import java.time.Duration
 import java.time.Instant
 import java.time.InstantSource
@@ -93,21 +91,21 @@ public class Guest(
 
         onStart()
 
-        val bootworkload =
-            TraceWorkload(
-                ArrayList(
-                    listOf(
-                        TraceFragment(
-                            1000000L,
-                            100000.0,
-                            1,
-                        ),
-                    ),
-                ),
-                0,
-                0,
-                0.0,
-            )
+//        val bootworkload =
+//            TraceWorkload(
+//                ArrayList(
+//                    listOf(
+//                        TraceFragment(
+//                            1000000L,
+//                            100000.0,
+//                            1,
+//                        ),
+//                    ),
+//                ),
+//                0,
+//                0,
+//                0.0,
+//            )
         val newChainWorkload =
             ChainWorkload(
                 ArrayList(listOf(task.workload)),

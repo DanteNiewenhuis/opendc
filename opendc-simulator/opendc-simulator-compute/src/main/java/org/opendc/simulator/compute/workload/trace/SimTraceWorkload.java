@@ -20,9 +20,14 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.compute.workload;
+package org.opendc.simulator.compute.workload.trace;
 
 import java.util.LinkedList;
+
+import org.opendc.simulator.compute.workload.SimWorkload;
+import org.opendc.simulator.compute.workload.trace.scaling.NoDelay;
+import org.opendc.simulator.compute.workload.trace.scaling.PerfectScaling;
+import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy;
 import org.opendc.simulator.engine.FlowConsumer;
 import org.opendc.simulator.engine.FlowEdge;
 import org.opendc.simulator.engine.FlowGraph;
@@ -38,11 +43,12 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
 
     private FlowEdge machineEdge;
     private double currentDemand;
-    private double currentSupply;
 
     private long checkpointDuration;
 
     private TraceWorkload snapshot;
+
+    private ScalingPolicy scalingPolicy = new NoDelay();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Basic Getters and Setters
@@ -57,25 +63,18 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     }
 
     @Override
-    long getCheckpointInterval() {
+    public long getCheckpointInterval() {
         return 0;
     }
 
     @Override
-    long getCheckpointDuration() {
+    public long getCheckpointDuration() {
         return 0;
     }
 
     @Override
-    double getCheckpointIntervalScaling() {
+    public double getCheckpointIntervalScaling() {
         return 0;
-    }
-
-    public TraceFragment getNextFragment() {
-        this.currentFragment = this.remainingFragments.pop();
-        this.fragmentIndex++;
-
-        return this.currentFragment;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -93,8 +92,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         final FlowGraph graph = ((FlowNode) supplier).getGraph();
         graph.addEdge(this, supplier);
 
-        this.currentFragment = this.getNextFragment();
-        pushDemand(machineEdge, this.currentFragment.cpuUsage());
+        this.startNextFragment();
         this.startOfFragment = now;
     }
 
@@ -105,37 +103,62 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     @Override
     public long onUpdate(long now) {
         long passedTime = getPassedTime(now);
-        long duration = this.currentFragment.duration();
 
-        // The current Fragment has not yet been finished, continue
-        if (passedTime < duration) {
-            return now + (duration - passedTime);
-        }
+        // The amount of work done since last update
+//        double finishedWork = this.cpuFreqSupplied * passedTime / 1000;
 
-        // Loop through fragments until the passed time is filled.
-        // We need a while loop to account for skipping of fragments.
-        while (passedTime >= duration) {
-            if (this.remainingFragments.isEmpty()) {
-                this.stopWorkload();
+        double finishedWork = this.scalingPolicy.getFinishedWork(this.cpuFreqDemand, this.cpuFreqSupplied, passedTime);
+
+        this.remainingWork -= finishedWork;
+        if (this.remainingWork <= 0) {
+            if (!this.startNextFragment()) {
                 return Long.MAX_VALUE;
             }
-
-            passedTime = passedTime - duration;
-
-            // get next Fragment
-            currentFragment = this.getNextFragment();
-            duration = currentFragment.duration();
         }
 
-        // start new fragment
-        this.startOfFragment = now - passedTime;
+        this.startOfFragment = now;
+        if (this.cpuFreqSupplied == 0) {
+            return Long.MAX_VALUE;
+        }
 
-        // Change the cpu Usage to the new Fragment
-        pushDemand(machineEdge, this.currentFragment.cpuUsage());
+        // The amount of time required to finish the fragment at this speed
+//        long remainingDuration = (long) (this.remainingWork / this.cpuFreqSupplied) * 1000;
 
-        // Return the time when the current fragment will complete
-        return this.startOfFragment + duration;
+        long remainingDuration = this.scalingPolicy.getRemainingDuration(this.cpuFreqDemand, this.cpuFreqSupplied, this.remainingWork);
+
+        return now + remainingDuration;
     }
+
+    public TraceFragment getNextFragment() {
+        if (this.remainingFragments.isEmpty()) {
+            return null;
+        }
+        this.currentFragment = this.remainingFragments.pop();
+        this.fragmentIndex++;
+
+        return this.currentFragment;
+    }
+
+    private double cpuFreqDemand; // The Cpu demanded by fragment
+    private double cpuFreqSupplied; // The Cpu speed supplied
+    private double remainingWork; // The duration of the fragment at the demanded speed
+
+    private boolean startNextFragment() {
+
+        // TODO: turn this into a loop, should not be needed, but might be safer
+        TraceFragment nextFragment = this.getNextFragment();
+        if (nextFragment == null) {
+            this.stopWorkload();
+            return false;
+        }
+        this.cpuFreqDemand = nextFragment.cpuUsage();
+        this.remainingWork = this.scalingPolicy.getRemainingWork(this.cpuFreqDemand, nextFragment.duration());
+        this.pushDemand(this.machineEdge, this.cpuFreqDemand);
+
+        return true;
+    }
+
+
 
     @Override
     public void stopWorkload() {
@@ -155,7 +178,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
      * TODO: Maybe add checkpoint models for SimTraceWorkload
      */
     @Override
-    void createCheckpointModel() {}
+    public void createCheckpointModel() {}
 
     /**
      * Create a new snapshot based on the current status of the workload.
@@ -204,11 +227,12 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
      */
     @Override
     public void handleSupply(FlowEdge supplierEdge, double newSupply) {
-        if (newSupply == this.currentSupply) {
+        if (newSupply == this.cpuFreqSupplied) {
             return;
         }
 
-        this.currentSupply = newSupply;
+        this.cpuFreqSupplied = newSupply;
+        this.invalidate();
     }
 
     /**
