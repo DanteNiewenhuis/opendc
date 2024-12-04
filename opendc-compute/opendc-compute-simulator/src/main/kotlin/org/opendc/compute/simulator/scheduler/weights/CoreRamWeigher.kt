@@ -37,6 +37,8 @@ public class CoreRamWeigher(override val multiplier: Double = 1.0) : HostWeigher
         host: HostView,
         task: ServiceTask,
     ): Double {
+        
+
         return host.availableMemory.toDouble()
     }
 

@@ -204,7 +204,6 @@ public final class SimCpu extends FlowNode implements FlowSupplier, FlowConsumer
     public void handleDemand(FlowEdge consumerEdge, double newCpuDemand) {
         updateCounters();
         this.currentCpuDemand = newCpuDemand;
-        this.currentCpuUtilization = this.currentCpuDemand / this.maxCapacity;
 
         this.currentCpuUtilization = Math.min(this.currentCpuDemand / this.maxCapacity, 1.0);
 
