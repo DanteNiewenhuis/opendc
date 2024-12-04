@@ -23,7 +23,7 @@
 package org.opendc.compute.workload
 
 import mu.KotlinLogging
-import org.opendc.simulator.compute.workload.TraceWorkload
+import org.opendc.simulator.compute.workload.trace.TraceWorkload
 import org.opendc.trace.Trace
 import org.opendc.trace.conv.TABLE_RESOURCES
 import org.opendc.trace.conv.TABLE_RESOURCE_STATES
