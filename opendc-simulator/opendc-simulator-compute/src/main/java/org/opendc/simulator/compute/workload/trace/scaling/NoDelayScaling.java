@@ -7,7 +7,7 @@ package org.opendc.simulator.compute.workload.trace.scaling;
  * This could be used in situations where the data is streamed.
  * This will also result in the same behaviour as older OpenDC.
  */
-public class NoDelay implements ScalingPolicy {
+public class NoDelayScaling implements ScalingPolicy {
     @Override
     public double getFinishedWork(double cpuFreqDemand, double cpuFreqSupplied, long passedTime) {
         return cpuFreqDemand * passedTime;

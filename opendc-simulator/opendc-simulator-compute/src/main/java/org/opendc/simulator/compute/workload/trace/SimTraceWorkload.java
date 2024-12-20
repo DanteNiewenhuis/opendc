@@ -30,7 +30,7 @@ import org.opendc.simulator.engine.graph.FlowNode;
 import org.opendc.simulator.engine.graph.FlowSupplier;
 
 import org.opendc.simulator.compute.workload.SimWorkload;
-import org.opendc.simulator.compute.workload.trace.scaling.NoDelay;
+import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling;
 import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy;
 
 public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
@@ -50,7 +50,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
 
     private TraceWorkload snapshot;
 
-    private ScalingPolicy scalingPolicy = new NoDelay();
+    private ScalingPolicy scalingPolicy = new NoDelayScaling();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Basic Getters and Setters
@@ -88,6 +88,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
 
         this.snapshot = workload;
         this.checkpointDuration = workload.getCheckpointDuration();
+        this.scalingPolicy = workload.getScalingPolicy();
         this.remainingFragments = new LinkedList<>(workload.getFragments());
         this.fragmentIndex = 0;
 

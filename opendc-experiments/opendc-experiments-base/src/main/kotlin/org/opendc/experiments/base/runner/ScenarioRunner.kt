@@ -35,6 +35,7 @@ import org.opendc.compute.topology.clusterTopology
 import org.opendc.compute.workload.ComputeWorkloadLoader
 import org.opendc.experiments.base.experiment.Scenario
 import org.opendc.experiments.base.experiment.specs.getWorkloadType
+import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import org.opendc.simulator.kotlin.runSimulation
 import java.io.File
 import java.time.Duration
@@ -81,12 +82,15 @@ public fun runScenario(
             val checkpointDuration = scenario.checkpointModelSpec?.checkpointDuration ?: 0L
             val checkpointIntervalScaling = scenario.checkpointModelSpec?.checkpointIntervalScaling ?: 1.0
 
+            val scalingPolicy = NoDelayScaling();
+
             val workloadLoader =
                 ComputeWorkloadLoader(
                     File(scenario.workloadSpec.pathToFile),
                     checkpointInterval,
                     checkpointDuration,
                     checkpointIntervalScaling,
+                    scalingPolicy
                 )
             val tasks = getWorkloadType(scenario.workloadSpec.type).resolve(workloadLoader, Random(seed))
 
