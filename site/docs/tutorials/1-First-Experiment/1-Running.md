@@ -2,7 +2,7 @@
 description: Designing a simple experiment
 ---
 
-# First Experiment
+# Running An Experiments
 Now that you have downloaded OpenDC, we will start creating a simple experiment. 
 In this experiment we will compare the performance of a small, and a big data center on the same workload.
 
@@ -62,7 +62,7 @@ in this experiment, we are comparing two data centers. Below is an example of th
 This **topology** consist of a single _cluster_, with a single _host_. 
 
 :::tip
-To use this **topology** in experiment copy the content to a new JSON file, or download it [here](documents/topologies/small.json "download")
+To use this **topology** in experiment copy the content to a new JSON file, or download it [here](../../getting-started/documents/topologies/small.json "download")
 :::
 
 ### Simple Data Center
@@ -132,11 +132,11 @@ in this experiment, we are comparing two data centers. Below is an example of th
 Compared to the small topology, the big topology consist of three clusters, all consisting of a single host.
 
 :::tip
-To use this **topology** in experiment copy the content to a new JSON file, or download it [here](documents/topologies/big.json "download")
+To use this **topology** in experiment copy the content to a new JSON file, or download it [here](../../getting-started/documents/topologies/big.json "download")
 :::
 
 :::info
-For more in depth information about Topologies, see [Topology](../documentation/Input/Topology)
+For more in depth information about Topologies, see [Topology](../../documentation/Input/Topology)
 :::
 
 ## Workloads
@@ -145,10 +145,10 @@ Next to the topology, we need a workload to simulate on the data center.
 In OpenDC, workloads are defined as a bag of tasks. Each task is accompanied by one or more fragments. 
 These fragments define the computational requirements of the task over time. 
 For this experiment, we will use the bitbrains-small workload. This is a small workload of 50 tasks, 
-spanning over a bit more than a month time. You can download the workload [here](documents/workloads/bitbrains-small.zip "download")
+spanning over a bit more than a month time. You can download the workload [here](../../getting-started/documents/workloads/bitbrains-small.zip "download")
 
 :::info
-For more in depth information about Workloads, see [Workload](../documentation/Input/Workload.md)
+For more in depth information about Workloads, see [Workload](../../documentation/Input/Workload.md)
 :::
 
 ## Executing an experiment
@@ -174,7 +174,7 @@ by OpenDC, and how. Below is an example of a simple **experiment** file:
 
 In this **experiment**, three things are defined. First, is the `name`. This defines how the experiment is called 
 in the output folder. Second, is the `topologies`. This defines where OpenDC can find the topology files.
-Finally, the `workloads`. This defines which workload OpenDC should run. You can download the experiment file [here](documents/experiments/simple_experiment.json "download")
+Finally, the `workloads`. This defines which workload OpenDC should run. You can download the experiment file [here](../../getting-started/documents/experiments/simple_experiment.json "download")
 
 As you can see, `topologies` defines two topologies. In this case OpenDC will run two simulations, one with the small
 topology, and one with the big topology. 
