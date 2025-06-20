@@ -132,6 +132,7 @@ public class SimHost(
 
         this.simMachine =
             SimMachine(
+                this.name,
                 this.engine,
                 this.machineModel,
                 this.powerDistributor,

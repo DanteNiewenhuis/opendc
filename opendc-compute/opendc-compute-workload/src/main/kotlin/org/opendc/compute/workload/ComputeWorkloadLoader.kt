@@ -156,9 +156,9 @@ public class ComputeWorkloadLoader(
                         totalLoad,
                         submissionTime,
                         duration,
-                        nature,
-                        deadline,
-                        builder.build(),
+                        nature = nature,
+                        deadline = deadline,
+                        trace = builder.build(),
                     ),
                 )
             }

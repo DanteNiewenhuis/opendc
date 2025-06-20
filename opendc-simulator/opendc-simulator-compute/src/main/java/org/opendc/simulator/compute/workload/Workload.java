@@ -36,5 +36,7 @@ public interface Workload {
 
     SimWorkload startWorkload(FlowSupplier supplier);
 
+    SimWorkload startWorkload(FlowSupplier supplier, String hostName);
+
     SimWorkload startWorkload(FlowSupplier supplier, SimMachine machine, Consumer<Exception> completion);
 }

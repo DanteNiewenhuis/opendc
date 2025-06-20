@@ -23,6 +23,7 @@
 package org.opendc.compute.simulator.service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -40,13 +41,19 @@ public final class ServiceFlavor implements Flavor {
     private final long memorySize;
     private final Map<String, ?> meta;
 
-    ServiceFlavor(ComputeService service, UUID uid, String name, int coreCount, long memorySize, Map<String, ?> meta) {
+    private final List<String> dependencies;
+    private final List<String> pendingDependencies;
+
+    ServiceFlavor(ComputeService service, UUID uid, String name, int coreCount, long memorySize, Map<String, ?> meta,
+                  List<String> dependencies) {
         this.service = service;
         this.uid = uid;
         this.name = name;
         this.coreCount = coreCount;
         this.memorySize = memorySize;
         this.meta = meta;
+        this.dependencies = dependencies;
+        this.pendingDependencies = dependencies;
     }
 
     @Override
@@ -103,5 +110,25 @@ public final class ServiceFlavor implements Flavor {
     @Override
     public String toString() {
         return "Flavor[uid=" + uid + ",name=" + name + "]";
+    }
+
+    @Override
+    public @NotNull List<@NotNull String> getDependencies() {
+        return this.dependencies;
+    }
+
+    @Override
+    public @NotNull List<@NotNull String> getPendingDependencies() {
+        return this.pendingDependencies;
+    }
+
+    public void updatePendingDependencies(List<String> completedTasks) {
+        for (String task : completedTasks) {
+            this.updatePendingDependencies(task);
+        }
+    }
+
+    public void updatePendingDependencies(String completedTask) {
+        this.pendingDependencies.remove(completedTask);
     }
 }

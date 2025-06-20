@@ -23,7 +23,9 @@
 package org.opendc.simulator.compute.workload.trace;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.opendc.simulator.compute.machine.SimMachine;
 import org.opendc.simulator.compute.workload.SimWorkload;
@@ -36,8 +38,10 @@ public class TraceWorkload implements Workload {
     private final long checkpointInterval;
     private final long checkpointDuration;
     private final double checkpointIntervalScaling;
-    private final double maxCpuDemand;
-    private final int maxCoreCount;
+    private double maxCpuDemand = 0.0;
+    private int maxCoreCount = 0;
+
+    private Map<String, Long> durations;
 
     public String getTaskName() {
         return taskName;
@@ -53,27 +57,30 @@ public class TraceWorkload implements Workload {
 
     public TraceWorkload(
             ArrayList<TraceFragment> fragments,
+            Map<String, Long> durations,
             long checkpointInterval,
             long checkpointDuration,
             double checkpointIntervalScaling,
             ScalingPolicy scalingPolicy,
             String taskName) {
         this.fragments = fragments;
+        this.durations = durations;
         this.checkpointInterval = checkpointInterval;
         this.checkpointDuration = checkpointDuration;
         this.checkpointIntervalScaling = checkpointIntervalScaling;
         this.scalingPolicy = scalingPolicy;
         this.taskName = taskName;
 
-        // TODO: remove if we decide not to use it.
-        this.maxCpuDemand = fragments.stream()
+        if (!fragments.isEmpty()) {
+            this.maxCpuDemand = fragments.stream()
                 .max(Comparator.comparing(TraceFragment::cpuUsage))
                 .get()
                 .cpuUsage();
-        this.maxCoreCount = fragments.stream()
+            this.maxCoreCount = fragments.stream()
                 .max(Comparator.comparing(TraceFragment::coreCount))
                 .get()
                 .coreCount();
+        }
     }
 
     public ArrayList<TraceFragment> getFragments() {
@@ -116,6 +123,21 @@ public class TraceWorkload implements Workload {
 
     @Override
     public SimWorkload startWorkload(FlowSupplier supplier) {
+        return new SimTraceWorkload(supplier, this);
+    }
+
+    @Override
+    public SimWorkload startWorkload(FlowSupplier supplier, String hostName) {
+
+        if (fragments.size() == 0) {
+            fragments.addFirst(new TraceFragment(
+                this.durations.get(hostName),
+                1,
+                1
+            ));
+        }
+
+
         return new SimTraceWorkload(supplier, this);
     }
 
@@ -175,6 +197,7 @@ public class TraceWorkload implements Workload {
         public TraceWorkload build() {
             return new TraceWorkload(
                     this.fragments,
+                    Collections.emptyMap(),
                     this.checkpointInterval,
                     this.checkpointDuration,
                     this.checkpointIntervalScaling,

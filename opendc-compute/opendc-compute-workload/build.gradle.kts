@@ -25,11 +25,14 @@ description = "OpenDC Compute Service implementation"
 // Build configuration
 plugins {
     `kotlin-library-conventions`
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 dependencies {
     api(projects.opendcCompute.opendcComputeApi)
     implementation(projects.opendcCommon)
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation(project(mapOf("path" to ":opendc-trace:opendc-trace-api")))
     implementation(project(mapOf("path" to ":opendc-simulator:opendc-simulator-compute")))
 

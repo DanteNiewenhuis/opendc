@@ -60,6 +60,8 @@ public final class VirtualMachine extends SimWorkload implements FlowSupplier {
     private final PerformanceCounters performanceCounters = new PerformanceCounters();
     private Consumer<Exception> completion;
 
+    private String hostName = "default";
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Basic Getters and Setters
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,8 +99,10 @@ public final class VirtualMachine extends SimWorkload implements FlowSupplier {
     // Constructors
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    VirtualMachine(FlowSupplier supplier, ChainWorkload workload) {
+    VirtualMachine(FlowSupplier supplier, ChainWorkload workload, String hostName) {
         super(((FlowNode) supplier).getEngine());
+
+        this.hostName = hostName;
 
         this.snapshot = workload;
 
@@ -121,7 +125,7 @@ public final class VirtualMachine extends SimWorkload implements FlowSupplier {
     }
 
     VirtualMachine(FlowSupplier supplier, ChainWorkload workload, SimMachine machine, Consumer<Exception> completion) {
-        this(supplier, workload);
+        this(supplier, workload, machine.getHostName());
 
         this.capacity = machine.getCpu().getFrequency();
         this.d = 1 / machine.getCpu().getFrequency();
@@ -144,7 +148,7 @@ public final class VirtualMachine extends SimWorkload implements FlowSupplier {
             this.checkpointModel.start();
         }
 
-        this.activeWorkload = this.getNextWorkload().startWorkload(this);
+        this.activeWorkload = this.getNextWorkload().startWorkload(this, hostName);
     }
 
     public void updateCounters(long now) {

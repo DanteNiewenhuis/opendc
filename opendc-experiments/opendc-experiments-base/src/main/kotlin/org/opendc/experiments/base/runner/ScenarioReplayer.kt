@@ -141,6 +141,7 @@ public suspend fun ComputeService.replay(
                                 entry.cpuCount,
                                 entry.memCapacity,
                                 if (entry.cpuCapacity > 0.0) mapOf("cpu-capacity" to entry.cpuCapacity) else emptyMap(),
+                                entry.dependencies,
                             ),
                             workload,
                             meta,

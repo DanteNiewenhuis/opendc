@@ -22,7 +22,9 @@
 
 package org.opendc.compute.workload
 
+import org.opendc.simulator.compute.workload.trace.TraceFragment
 import org.opendc.simulator.compute.workload.trace.TraceWorkload
+import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import java.util.UUID
 
 /**
@@ -46,7 +48,10 @@ public data class Task(
     val totalLoad: Double,
     var submissionTime: Long,
     val duration: Long,
+    val durations: Map<String, Long>? = null,
+    val dependencies: List<String> = emptyList(),
     val nature: String?,
     var deadline: Long,
-    val trace: TraceWorkload,
+    val trace: TraceWorkload = TraceWorkload(arrayListOf<TraceFragment>(), durations, 0,
+        0, 1.0, NoDelayScaling(), name)
 )
