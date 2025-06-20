@@ -64,8 +64,14 @@ public record ChainWorkload(
 
     @Override
     public SimWorkload startWorkload(FlowSupplier supplier) {
-        return new VirtualMachine(supplier, this);
+        return new VirtualMachine(supplier, this, "default-host");
     }
+
+    @Override
+    public SimWorkload startWorkload(FlowSupplier supplier, String hostName) {
+        return new VirtualMachine(supplier, this, "default-host");
+    }
+
 
     @Override
     public SimWorkload startWorkload(List<FlowSupplier> supplier, SimMachine machine, Consumer<Exception> completion) {

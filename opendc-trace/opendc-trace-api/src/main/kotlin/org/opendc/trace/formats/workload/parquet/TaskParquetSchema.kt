@@ -23,6 +23,10 @@
 package org.opendc.trace.formats.workload.parquet
 
 import java.time.Instant
+import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TraceWorkload
+import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
+import java.util.UUID
 
 /**
  * A description of a resource in a trace.
@@ -41,4 +45,14 @@ internal data class TaskParquetSchema(
     val children: Set<Int> = emptySet(),
     val deferrable: Boolean = false,
     val deadline: Long = -1,
+    val memCapacity: Long,
+    val totalLoad: Double,
+    var submissionTime: Long,
+    val duration: Long,
+    val durations: Map<String, Long>? = null,
+    val dependencies: List<String> = emptyList(),
+    val nature: String?,
+    var deadline: Long,
+    val trace: TraceWorkload = TraceWorkload(arrayListOf<TraceFragment>(), durations, 0,
+        0, 1.0, NoDelayScaling(), name)
 )

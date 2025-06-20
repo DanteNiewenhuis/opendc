@@ -340,17 +340,17 @@ public class ServiceTask {
                 LOGGER.info("User requested to start task {}", id);
                 setState(TaskState.PROVISIONING);
                 assert request == null : "Scheduling request already active";
-                request = service.schedule(this);
+                this.request = service.schedule(this);
                 break;
             case PAUSED:
                 LOGGER.info("User requested to start task after pause {}", id);
                 setState(TaskState.PROVISIONING);
-                request = service.schedule(this, false);
+                this.request = service.schedule(this, true);
                 break;
             case FAILED:
                 LOGGER.info("User requested to start task after failure {}", id);
                 setState(TaskState.PROVISIONING);
-                request = service.schedule(this, false);
+                this.request = service.schedule(this, true);
                 break;
         }
     }

@@ -25,6 +25,7 @@ package org.opendc.experiments.base.experiment.specs
 import kotlinx.serialization.Serializable
 import org.opendc.compute.workload.ComputeWorkloadLoader
 import org.opendc.compute.workload.WorkloadLoader
+import org.opendc.compute.workload.greenifier.GreenifierWorkloadLoader
 import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import org.opendc.simulator.compute.workload.trace.scaling.PerfectScaling
 import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy
@@ -62,6 +63,7 @@ public data class WorkloadSpec(
  */
 public enum class WorkloadTypes {
     ComputeWorkload,
+    GreenifierWorkload
 }
 
 /**
@@ -88,6 +90,9 @@ public fun getWorkloadLoader(
                 scalingPolicy,
                 deferAll,
             )
+        WorkloadTypes.GreenifierWorkload -> GreenifierWorkloadLoader(
+            pathToFile
+        )
     }
 }
 

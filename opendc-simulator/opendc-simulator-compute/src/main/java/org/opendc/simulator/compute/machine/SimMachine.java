@@ -56,6 +56,12 @@ public class SimMachine {
     private final MachineModel machineModel;
     private final FlowEngine engine;
 
+    public String getHostName() {
+        return hostName;
+    }
+
+    private final String hostName;
+
     private final InstantSource clock;
 
     private SimPsu psu;
@@ -194,12 +200,14 @@ public class SimMachine {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public SimMachine(
+        String hostName,
             FlowEngine engine,
             MachineModel machineModel,
             FlowDistributor powerDistributor,
             PowerModel cpuPowerModel,
             @Nullable PowerModel gpuPowerModel,
             Consumer<Exception> completion) {
+        this.hostName = hostName;
         this.engine = engine;
         this.machineModel = machineModel;
         this.clock = engine.getClock();
