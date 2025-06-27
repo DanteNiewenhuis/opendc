@@ -49,6 +49,7 @@ public data class Task(
     val totalLoad: Double,
     var submissionTime: Long,
     val duration: Long,
+    val dependencies: Set<String>? = emptySet(),
     val nature: String?,
     var deadline: Long,
     val trace: TraceWorkload,

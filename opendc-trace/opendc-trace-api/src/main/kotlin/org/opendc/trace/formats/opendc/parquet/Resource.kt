@@ -36,6 +36,7 @@ internal data class Resource(
     val memCapacity: Double,
     val gpuCount: Int,
     val gpuCapacity: Double,
+    val dependencies: Set<String> = emptySet(),
     val nature: String? = null,
     val deadline: Long = -1,
 )

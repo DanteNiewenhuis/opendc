@@ -41,4 +41,9 @@ public interface Flavor : Resource {
      * The amount of gpu cores available to the task.
      */
     public val gpuCoreCount: Int
+
+    /**
+     * Set of Tasks that need to be finished before this can startAdd commentMore actions
+     */
+    public val dependencies: Set<String>
 }

@@ -27,6 +27,7 @@ import org.opendc.trace.TableWriter
 import org.opendc.trace.conv.resourceCpuCapacity
 import org.opendc.trace.conv.resourceCpuCount
 import org.opendc.trace.conv.resourceDeadline
+import org.opendc.trace.conv.resourceDependencies
 import org.opendc.trace.conv.resourceDuration
 import org.opendc.trace.conv.resourceID
 import org.opendc.trace.conv.resourceMemCapacity
@@ -51,6 +52,7 @@ internal class OdcVmResourceTableWriter(private val writer: ParquetWriter<Resour
     private var localCpuCount: Int = 0
     private var localCpuCapacity: Double = Double.NaN
     private var localMemCapacity: Double = Double.NaN
+    private var localDependencies: Set<String> = emptySet()
     private var localNature: String? = null
     private var localDeadline: Long = -1
     private var localGpuCount: Int = 0
@@ -66,6 +68,7 @@ internal class OdcVmResourceTableWriter(private val writer: ParquetWriter<Resour
         localMemCapacity = Double.NaN
         localGpuCount = 0
         localGpuCapacity = Double.NaN
+        localDependencies = emptySet()
         localNature = null
         localDeadline = -1L
     }
@@ -83,6 +86,7 @@ internal class OdcVmResourceTableWriter(private val writer: ParquetWriter<Resour
                 localMemCapacity,
                 localGpuCount,
                 localGpuCapacity,
+                localDependencies,
                 localNature,
                 localDeadline,
             ),
@@ -97,6 +101,7 @@ internal class OdcVmResourceTableWriter(private val writer: ParquetWriter<Resour
             resourceCpuCount -> colCpuCount
             resourceCpuCapacity -> colCpuCapacity
             resourceMemCapacity -> colMemCapacity
+            resourceDependencies -> colDependencies
             resourceNature -> colNature
             resourceDeadline -> colDeadline
             else -> -1
@@ -230,4 +235,5 @@ internal class OdcVmResourceTableWriter(private val writer: ParquetWriter<Resour
     private val colDeadline = 7
     private val colGpuCount = 8
     private val colGpuCapacity = 9
+    private val colDependencies = 10
 }

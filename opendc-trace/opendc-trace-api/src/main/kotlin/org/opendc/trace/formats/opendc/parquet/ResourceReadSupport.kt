@@ -34,6 +34,7 @@ import org.opendc.trace.TableColumn
 import org.opendc.trace.conv.resourceCpuCapacity
 import org.opendc.trace.conv.resourceCpuCount
 import org.opendc.trace.conv.resourceDeadline
+import org.opendc.trace.conv.resourceDependencies
 import org.opendc.trace.conv.resourceDuration
 import org.opendc.trace.conv.resourceID
 import org.opendc.trace.conv.resourceMemCapacity
@@ -58,6 +59,7 @@ internal class ResourceReadSupport(private val projection: List<String>?) : Read
             "cpu_capacity" to resourceCpuCapacity,
             "requiredMemory" to resourceMemCapacity,
             "mem_capacity" to resourceMemCapacity,
+            "dependencies" to resourceDependencies,
             "nature" to resourceNature,
             "deadline" to resourceDeadline,
         )
@@ -153,6 +155,13 @@ internal class ResourceReadSupport(private val projection: List<String>?) : Read
                     Types
                         .required(PrimitiveType.PrimitiveTypeName.INT64)
                         .named("mem_capacity"),
+                    Types.requiredList()
+                        .element(
+                            Types.required(PrimitiveType.PrimitiveTypeName.BINARY)
+                                .`as`(LogicalTypeAnnotation.stringType())
+                                .named("element")
+                        )
+                        .named("dependencies"),
                     Types
                         .optional(PrimitiveType.PrimitiveTypeName.BINARY)
                         .`as`(LogicalTypeAnnotation.stringType())

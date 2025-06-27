@@ -193,18 +193,18 @@ public class ServiceTask {
             case CREATED:
                 LOGGER.info("User requested to start task {}", uid);
                 setState(TaskState.PROVISIONING);
-                assert request == null : "Scheduling request already active";
-                request = service.schedule(this);
+                assert this.request == null : "Scheduling request already active";
+                this.request = service.schedule(this);
                 break;
             case PAUSED:
                 LOGGER.info("User requested to start task after pause {}", uid);
                 setState(TaskState.PROVISIONING);
-                request = service.schedule(this, true);
+                this.request = service.schedule(this, true);
                 break;
             case FAILED:
                 LOGGER.info("User requested to start task after failure {}", uid);
                 setState(TaskState.PROVISIONING);
-                request = service.schedule(this, true);
+                this.request = service.schedule(this, true);
                 break;
         }
     }

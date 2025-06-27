@@ -32,6 +32,7 @@ import org.opendc.trace.conv.TABLE_RESOURCE_STATES
 import org.opendc.trace.conv.resourceCpuCapacity
 import org.opendc.trace.conv.resourceCpuCount
 import org.opendc.trace.conv.resourceDeadline
+import org.opendc.trace.conv.resourceDependencies
 import org.opendc.trace.conv.resourceDuration
 import org.opendc.trace.conv.resourceGpuCapacity
 import org.opendc.trace.conv.resourceGpuCount
@@ -137,6 +138,8 @@ public class ComputeWorkloadLoader(
         val gpuCapacityCol = reader.resolve(resourceGpuCapacity) // Assuming GPU capacity is also present
         val gpuCoreCountCol = reader.resolve(resourceGpuCount) // Assuming GPU cores are also present
         val gpuMemoryCol = reader.resolve(resourceGpuMemCapacity) // Assuming GPU memory is also present
+
+        val dependenciesCol = reader.resolve(resourceDependencies)
         val natureCol = reader.resolve(resourceNature)
         val deadlineCol = reader.resolve(resourceDeadline)
 
@@ -167,6 +170,8 @@ public class ComputeWorkloadLoader(
                 val gpuCoreCount = reader.getInt(gpuCoreCountCol) // Default to 0 if not present
                 val gpuMemory = 0L // currently not implemented
                 val uid = UUID.nameUUIDFromBytes("$id-${counter++}".toByteArray())
+
+                val dependencies = reader.getSet(dependenciesCol, String::class.java) // No dependencies in the trace
                 var nature = reader.getString(natureCol)
                 var deadline = reader.getLong(deadlineCol)
                 if (deferAll) {
@@ -190,6 +195,7 @@ public class ComputeWorkloadLoader(
                         totalLoad,
                         submissionTime,
                         duration,
+                        dependencies, // No dependencies in the trace
                         nature,
                         deadline,
                         builder.build(),

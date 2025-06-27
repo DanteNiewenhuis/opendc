@@ -120,6 +120,11 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
     private final Deque<SchedulingRequest> taskQueue = new ArrayDeque<>();
 
     /**
+     * Tasks that are blocked due to task dependencies.
+     */
+    private final List<SchedulingRequest> blockedTasks = new ArrayList<>();
+
+    /**
      * The active tasks in the system.
      */
     private final Map<ServiceTask, SimHost> activeTasks = new HashMap<>();
@@ -128,7 +133,7 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
      * The active tasks in the system.
      * TODO: this is not doing anything, maybe delete it?
      */
-    private final Map<ServiceTask, SimHost> completedTasks = new HashMap<>();
+    private final List<String> completedTasks = new ArrayList<>();
 
     /**
      * The registered flavors for this compute service.
@@ -209,9 +214,11 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
 
                 if (newState == TaskState.COMPLETED) {
                     tasksCompleted++;
+                    addCompletedTask(task.getName());
                 }
                 if (newState == TaskState.TERMINATED) {
                     tasksTerminated++;
+//                    addTerminatedTask(task.getName());
                 }
 
                 if (task.getState() == TaskState.COMPLETED || task.getState() == TaskState.TERMINATED) {
@@ -430,6 +437,16 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
         long now = clock.millis();
         SchedulingRequest request = new SchedulingRequest(task, now);
 
+        request.getTask().getFlavor().updatePendingDependencies(this.completedTasks);
+        Set<String> pendingDependencies = request.getTask().getFlavor().getDependencies();
+
+        if (!pendingDependencies.isEmpty()) {
+            // If the task has pending dependencies, we cannot schedule it yet
+            LOGGER.debug("Task {} has pending dependencies: {}", task.getUid(), pendingDependencies);
+            blockedTasks.add(request);
+            return null;
+        }
+
         if (atFront) {
             taskQueue.addFirst(request);
         } else {
@@ -439,6 +456,32 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
 
         requestSchedulingCycle();
         return request;
+    }
+
+    void addCompletedTask(String task) {
+
+        if (!this.completedTasks.contains(task)) {
+            this.completedTasks.add(task);
+        }
+
+        List<SchedulingRequest> requestsToRemove = new ArrayList<>();
+
+        for (SchedulingRequest request : blockedTasks) {
+
+            request.getTask().getFlavor().updatePendingDependencies(task);
+
+            Set<String> pendingDependencies = request.getTask().getFlavor().getDependencies();
+
+            if (pendingDependencies.isEmpty()) {
+                requestsToRemove.add(request);
+                taskQueue.add(request);
+                tasksPending++;
+            }
+        }
+
+        for (SchedulingRequest request : requestsToRemove) {
+            blockedTasks.remove(request);
+        }
     }
 
     void delete(ServiceFlavor flavor) {
@@ -452,7 +495,6 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
     }
 
     void delete(ServiceTask task) {
-        completedTasks.remove(task);
         taskById.remove(task.getUid());
     }
 
@@ -612,17 +654,13 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
 
         @NotNull
         public ServiceFlavor newFlavor(
-                @NotNull String name, int cpuCount, long memorySize, int gpuCoreCount, @NotNull Map<String, ?> meta) {
+                @NotNull String name, int cpuCount, long memorySize, int gpuCoreCount, @NotNull Set<String> dependencies, @NotNull Map<String, ?> meta) {
             checkOpen();
 
             final ComputeService service = this.service;
             UUID uid = new UUID(service.clock.millis(), service.random.nextLong());
-            ServiceFlavor flavor = new ServiceFlavor(service, uid, name, cpuCount, memorySize, gpuCoreCount, meta);
 
-            //            service.flavorById.put(uid, flavor);
-            //            service.flavors.add(flavor);
-
-            return flavor;
+            return new ServiceFlavor(service, uid, name, cpuCount, memorySize, gpuCoreCount, dependencies, meta);
         }
 
         @NotNull

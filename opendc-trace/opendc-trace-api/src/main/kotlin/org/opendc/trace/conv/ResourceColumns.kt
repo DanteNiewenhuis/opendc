@@ -91,6 +91,12 @@ public val resourceGpuCapacity: String = "gpu_capacity"
 public val resourceGpuMemCapacity: String = "gpu_mem_capacity"
 
 /**
+ * Total GPU memory capacity of the resource in MB.
+ */
+@JvmField
+public val resourceDependencies: String = "dependencies"
+
+/**
  * Nature of the task. Delayable, interruptible, etc.
  */
 @JvmField

@@ -45,6 +45,7 @@ internal class ResourceRecordMaterializer(schema: MessageType) : RecordMateriali
     private var localMemCapacity = 0.0
     private var localGpuCount = 0
     private var localGpuCapacity = 0.0
+    private var localDependencies = emptySet<String>()
     private var localNature: String? = null
     private var localDeadline = -1L
 
@@ -111,6 +112,35 @@ internal class ResourceRecordMaterializer(schema: MessageType) : RecordMateriali
                                     localGpuCapacity = value
                                 }
                             }
+                        "dependencies" -> object : GroupConverter() {
+                            private val dependencies = mutableListOf<String>()
+
+                            override fun start() {
+                                dependencies.clear()
+                            }
+
+                            override fun getConverter(fieldIndex: Int): Converter {
+                                // fieldIndex = 0 corresponds to "list"
+                                return object : GroupConverter() {
+                                    override fun start() {}
+                                    override fun end() {}
+
+                                    override fun getConverter(innerIndex: Int): Converter {
+                                        // innerIndex = 0 corresponds to "element"
+                                        return object : PrimitiveConverter() {
+                                            override fun addBinary(value: Binary) {
+                                                dependencies.add(value.toStringUsingUTF8())
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            override fun end() {
+                                localDependencies = dependencies.toSet()
+                            }
+                        }
+
                         "nature" ->
                             object : PrimitiveConverter() {
                                 override fun addBinary(value: Binary) {
@@ -136,6 +166,7 @@ internal class ResourceRecordMaterializer(schema: MessageType) : RecordMateriali
                 localMemCapacity = 0.0
                 localGpuCount = 0
                 localGpuCapacity = 0.0
+                localDependencies = emptySet()
                 localNature = null
                 localDeadline = -1
             }
@@ -155,6 +186,7 @@ internal class ResourceRecordMaterializer(schema: MessageType) : RecordMateriali
             localMemCapacity,
             localGpuCount,
             localGpuCapacity,
+            localDependencies,
             localNature,
             localDeadline,
         )

@@ -26,9 +26,11 @@ import org.opendc.trace.TableReader
 import org.opendc.trace.conv.resourceCpuCapacity
 import org.opendc.trace.conv.resourceCpuCount
 import org.opendc.trace.conv.resourceDeadline
+import org.opendc.trace.conv.resourceDependencies
 import org.opendc.trace.conv.resourceDuration
 import org.opendc.trace.conv.resourceGpuCapacity
 import org.opendc.trace.conv.resourceGpuCount
+import org.opendc.trace.conv.resourceGpuMemCapacity
 import org.opendc.trace.conv.resourceID
 import org.opendc.trace.conv.resourceMemCapacity
 import org.opendc.trace.conv.resourceNature
@@ -70,6 +72,8 @@ internal class OdcVmResourceTableReader(private val reader: LocalParquetReader<R
     private val colDeadline = 7
     private val colGpuCapacity = 8
     private val colGpuCount = 9
+    private val colGpuMemCapacity = 10
+    private val colDependencies = 11
 
     override fun resolve(name: String): Int {
         return when (name) {
@@ -83,6 +87,8 @@ internal class OdcVmResourceTableReader(private val reader: LocalParquetReader<R
             resourceDeadline -> colDeadline
             resourceGpuCount -> colGpuCount
             resourceGpuCapacity -> colGpuCapacity
+            resourceGpuMemCapacity -> colGpuMemCapacity
+            resourceDependencies -> colDependencies
             else -> -1
         }
     }
@@ -174,7 +180,12 @@ internal class OdcVmResourceTableReader(private val reader: LocalParquetReader<R
         index: Int,
         elementType: Class<T>,
     ): Set<T>? {
-        throw IllegalArgumentException("Invalid column")
+        val record = checkNotNull(record) { "Reader in invalid state" }
+
+        return when (index) {
+            colDependencies -> record.dependencies.toSet() as Set<T>?
+            else -> throw IllegalArgumentException("Invalid column")
+        }
     }
 
     override fun <K, V> getMap(
