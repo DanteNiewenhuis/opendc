@@ -51,7 +51,7 @@ public data class ExperimentSpec(
     val topologies: Set<ScenarioTopologySpec>,
     val workloads: Set<WorkloadSpec>,
     val allocationPolicies: Set<AllocationPolicySpec> = setOf(PrefabAllocationPolicySpec(ComputeSchedulerEnum.Mem)),
-    val failureModels: Set<FailureModelSpec?> = setOf(null),
+    val failureModels: Set<Set<FailureModelSpec>?> = setOf(null),
     val maxNumFailures: Set<Int> = setOf(10),
     val checkpointModels: Set<CheckpointModelSpec?> = setOf(null),
     val exportModels: Set<ExportModelSpec> = setOf(ExportModelSpec()),

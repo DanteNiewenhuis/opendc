@@ -53,7 +53,7 @@ public data class Scenario(
     val workloadSpec: WorkloadSpec,
     val allocationPolicySpec: AllocationPolicySpec,
     val exportModelSpec: ExportModelSpec = ExportModelSpec(),
-    val failureModelSpec: FailureModelSpec?,
+    val failureModelSpec: Set<FailureModelSpec>?,
     val checkpointModelSpec: CheckpointModelSpec?,
     val maxNumFailures: Int = 10,
 )

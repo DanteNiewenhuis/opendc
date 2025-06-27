@@ -74,7 +74,8 @@ public class TraceBasedFailureModel(
     pathToTrace: String,
     startPoint: Double,
     private val repeat: Boolean = true,
-) : FailureModel(context, clock, service, random) {
+    clusterName: String? = null,
+) : FailureModel(context, clock, service, random, clusterName) {
     private val failureList = loadTrace(pathToTrace, startPoint)
 
     override suspend fun runInjector() {

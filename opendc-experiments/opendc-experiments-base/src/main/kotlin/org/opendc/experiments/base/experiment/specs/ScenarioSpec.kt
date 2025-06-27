@@ -36,7 +36,7 @@ public data class ScenarioSpec(
     val workload: WorkloadSpec,
     val allocationPolicy: AllocationPolicySpec = PrefabAllocationPolicySpec(ComputeSchedulerEnum.Mem),
     val exportModel: ExportModelSpec = ExportModelSpec(),
-    val failureModel: FailureModelSpec? = null,
+    val failureModel: Set<FailureModelSpec>? = null,
     val checkpointModel: CheckpointModelSpec? = null,
     val maxNumFailures: Int = 10,
     val taskStopper: TaskStopperSpec? = null,

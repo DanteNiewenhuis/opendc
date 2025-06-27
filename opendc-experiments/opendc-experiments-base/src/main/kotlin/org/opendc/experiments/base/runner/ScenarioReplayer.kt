@@ -85,22 +85,28 @@ public class RunningTaskWatcher : TaskWatcher {
 public suspend fun ComputeService.replay(
     clock: InstantSource,
     trace: List<Task>,
-    failureModelSpec: FailureModelSpec? = null,
+    failureModelSpec: Set<FailureModelSpec>? = null,
     seed: Long = 0,
     submitImmediately: Boolean = false,
 ) {
     val client = newClient()
 
-    // Create a failure model based on the failureModelSpec, if not null, otherwise set failureModel to null
-    val failureModel: FailureModel? =
-        failureModelSpec?.let {
-            createFailureModel(coroutineContext, clock, this, Random(seed), it)
+    val failureModels = ArrayList<FailureModel?>()
+
+    if (failureModelSpec != null) {
+        for (spec in failureModelSpec) {
+            val f = createFailureModel(coroutineContext, clock, this, Random(seed), spec)
+            failureModels.add(f)
         }
+    }
 
     try {
         coroutineScope {
-            // Start the fault injector
-            failureModel?.start()
+
+            for (failureModel in failureModels) {
+                // Start the failure model if it is not null
+                failureModel?.start()
+            }
 
             var simulationOffset = Long.MIN_VALUE
 
@@ -167,7 +173,11 @@ public suspend fun ComputeService.replay(
         }
         yield()
     } finally {
-        failureModel?.close()
+        for (failureModel in failureModels) {
+            // Stop the failure model if it is not null
+            failureModel?.close()
+        }
+
         client.close()
     }
 }

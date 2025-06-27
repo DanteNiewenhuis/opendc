@@ -76,12 +76,14 @@ import kotlin.coroutines.CoroutineContext
 @Serializable
 public sealed interface FailureModelSpec {
     public var name: String
+    public val clusterName: String?
 }
 
 @Serializable
 @SerialName("no")
 public data class NoFailureModel(
     override var name: String = "no failure model",
+    override val clusterName: String? = null
 ) : FailureModelSpec
 
 /**
@@ -95,6 +97,7 @@ public data class TraceBasedFailureModelSpec(
     public val pathToFile: String,
     public val startPoint: Double = 0.0,
     public val repeat: Boolean = true,
+    override val clusterName: String? = null
 ) : FailureModelSpec {
     override var name: String = File(pathToFile).nameWithoutExtension
 
@@ -114,6 +117,7 @@ public data class TraceBasedFailureModelSpec(
 @SerialName("prefab")
 public data class PrefabFailureModelSpec(
     public val prefabName: FailurePrefab,
+    override val clusterName: String? = null
 ) : FailureModelSpec {
     override var name: String = prefabName.toString()
 }
@@ -133,6 +137,7 @@ public data class CustomFailureModelSpec(
     public val iatSampler: DistributionSpec,
     public val durationSampler: DistributionSpec,
     public val nohSampler: DistributionSpec,
+    override val clusterName: String? = null
 ) : FailureModelSpec {
     override var name: String = "custom"
 }
@@ -277,7 +282,9 @@ public fun createFailureModel(
     random: java.util.random.RandomGenerator,
     failureModel: TraceBasedFailureModelSpec,
 ): FailureModel {
-    return TraceBasedFailureModel(context, clock, service, random, failureModel.pathToFile, failureModel.startPoint, failureModel.repeat)
+    return TraceBasedFailureModel(context, clock, service, random, failureModel.pathToFile,
+        failureModel.startPoint, failureModel.repeat, failureModel.clusterName)
+
 }
 
 /**
@@ -303,7 +310,7 @@ public fun createFailureModel(
     val durationSampler = createSampler(rng, failureModel.durationSampler)
     val nohSampler = createSampler(rng, failureModel.nohSampler)
 
-    return SampleBasedFailureModel(context, clock, service, random, iatSampler, durationSampler, nohSampler)
+    return SampleBasedFailureModel(context, clock, service, random, iatSampler, durationSampler, nohSampler, failureModel.clusterName)
 }
 
 /**

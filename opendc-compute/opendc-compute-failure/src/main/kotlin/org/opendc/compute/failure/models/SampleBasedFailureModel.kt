@@ -51,7 +51,8 @@ public class SampleBasedFailureModel(
     private val iatSampler: RealDistribution,
     private val durationSampler: RealDistribution,
     private val nohSampler: RealDistribution,
-) : FailureModel(context, clock, service, random) {
+    clusterName: String? = null,
+) : FailureModel(context, clock, service, random, clusterName) {
     override suspend fun runInjector() {
         while (true) {
             val iatSample = max(0.0, iatSampler.sample())
