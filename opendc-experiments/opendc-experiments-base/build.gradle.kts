@@ -52,7 +52,7 @@ dependencies {
 val createScenarioApp by tasks.creating(CreateStartScripts::class) {
     dependsOn(tasks.jar)
 
-    applicationName = "OpenDCExperimentRunner"
+    applicationName = "Greenifier"
     mainClass.set("org.opendc.experiments.base.runner.ExperimentCli")
     classpath = tasks.jar.get().outputs.files + configurations["runtimeClasspath"]
     outputDir = layout.buildDirectory.dir("scripts").get().asFile
@@ -61,13 +61,13 @@ val createScenarioApp by tasks.creating(CreateStartScripts::class) {
 // Create custom Scenario distribution
 distributions {
     main {
-        distributionBaseName.set("OpenDCExperimentRunner")
+        distributionBaseName.set("Greenifier")
 
         contents {
             from("README.md")
             from("LICENSE.txt")
             from("../../LICENSE.txt") {
-                rename { "LICENSE-OpenDC.txt" }
+                rename { "LICENSE-Greenifier.txt" }
             }
 
             into("bin") {
