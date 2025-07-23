@@ -36,7 +36,6 @@ import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy;
 import org.opendc.simulator.engine.graph.FlowSupplier;
 
 public class TraceWorkload implements Workload {
-    private final ArrayList<TraceFragment> fragments;
     private final long checkpointInterval;
     private final long checkpointDuration;
     private final double checkpointIntervalScaling;
@@ -45,6 +44,13 @@ public class TraceWorkload implements Workload {
     private final int maxGpuMemoryDemand;
     private final int taskId;
     private final ResourceType[] resourceTypes;
+
+    private final ArrayList<TraceFragment> fragments;
+
+    private int fragmentIndex = -1;
+    private final long[] fragmentDurations;
+    private double[] fragmentCpuUsages = new double[0];
+    private double[] fragmentGpuUsages = new double[0];
 
     public ScalingPolicy getScalingPolicy() {
         return scalingPolicy;
@@ -61,6 +67,30 @@ public class TraceWorkload implements Workload {
             int taskId,
             ResourceType[] resourceTypes) {
         this.fragments = fragments;
+
+        this.fragmentDurations = new long[fragments.size()];
+
+        if (Arrays.asList(resourceTypes).contains(ResourceType.CPU)) {
+            this.fragmentCpuUsages = new double[fragments.size()];
+        }
+
+        if (Arrays.asList(resourceTypes).contains(ResourceType.GPU)) {
+            this.fragmentGpuUsages = new double[fragments.size()];
+        }
+
+        int i = 0;
+        for (TraceFragment fragment : fragments) {
+            this.fragmentDurations[i] = fragment.duration();
+            for (ResourceType resourceType : resourceTypes) {
+                if (resourceType == ResourceType.CPU) {
+                    this.fragmentCpuUsages[i] = fragment.cpuUsage();
+                } else if (resourceType == ResourceType.GPU) {
+                    this.fragmentGpuUsages[i] = fragment.gpuUsage();
+                }
+            }
+            i++;
+        }
+
         this.checkpointInterval = checkpointInterval;
         this.checkpointDuration = checkpointDuration;
         this.checkpointIntervalScaling = checkpointIntervalScaling;
@@ -84,6 +114,16 @@ public class TraceWorkload implements Workload {
     public ArrayList<TraceFragment> getFragments() {
         return fragments;
     }
+
+    public TraceFragment getNextFragment() {
+        return new TraceFragment(this.fragmentDurations[fragmentIndex], this.fragmentCpuUsages[fragmentIndex],
+            this.fragmentGpuUsages[fragmentIndex++]);
+    }
+
+    public boolean isCompleted() {
+        return fragmentIndex >= this.fragmentDurations.length;
+    }
+
 
     @Override
     public long checkpointInterval() {
@@ -134,14 +174,10 @@ public class TraceWorkload implements Workload {
     @Override
     public SimWorkload startWorkload(FlowSupplier supplier) {
         return new SimTraceWorkload(supplier, this);
-        //        ArrayList<FlowSupplier> flowSuppliers = new ArrayList<>();
-        //        flowSuppliers.add(supplier);
-        //        return new SimTraceWorkload(flowSuppliers, this);
     }
 
     @Override
     public SimWorkload startWorkload(List<FlowSupplier> supplier, SimMachine machine, Consumer<Exception> completion) {
-        //        return this.startWorkload(supplier);
         return new SimTraceWorkload(supplier, this);
     }
 

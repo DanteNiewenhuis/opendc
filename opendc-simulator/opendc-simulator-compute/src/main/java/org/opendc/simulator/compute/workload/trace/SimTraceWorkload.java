@@ -35,11 +35,9 @@ import org.opendc.simulator.engine.graph.FlowConsumer;
 import org.opendc.simulator.engine.graph.FlowEdge;
 import org.opendc.simulator.engine.graph.FlowNode;
 import org.opendc.simulator.engine.graph.FlowSupplier;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SimTraceWorkload.class);
+
     private LinkedList<TraceFragment> remainingFragments;
     private int fragmentIndex;
 
@@ -139,6 +137,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
 
         this.startOfFragment = this.clock.millis();
 
+        // Initialize supplied resources at 0.0
         for (FlowSupplier supplier : resourceSuppliers) {
             if (supplier.getSupplierResourceType() != ResourceType.AUXILIARY) {
                 new FlowEdge(this, supplier);
@@ -222,10 +221,10 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     }
 
     public TraceFragment getNextFragment() {
-        if (this.remainingFragments.isEmpty()) {
+        if (this.snapshot.isCompleted()) {
             return null;
         }
-        this.currentFragment = this.remainingFragments.pop();
+        this.currentFragment = this.snapshot.getNextFragment();
         this.fragmentIndex++;
 
         return this.currentFragment;
