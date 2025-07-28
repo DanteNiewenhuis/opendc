@@ -25,10 +25,15 @@ package org.opendc.simulator.compute.workload.trace;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.opendc.common.ResourceType;
+import org.opendc.common.util.ResizeableDoubleArray;
 import org.opendc.simulator.compute.machine.SimMachine;
 import org.opendc.simulator.compute.workload.SimWorkload;
 import org.opendc.simulator.compute.workload.Workload;
@@ -43,14 +48,14 @@ public class TraceWorkload implements Workload {
     private final double maxGpuDemand;
     private final int maxGpuMemoryDemand;
     private final int taskId;
-    private final ResourceType[] resourceTypes;
+    private final Set<ResourceType> resourceTypes;
 
     private final ArrayList<TraceFragment> fragments;
 
-    private int fragmentIndex = -1;
+    private int fragmentIndex = 0;
+
     private final long[] fragmentDurations;
-    private double[] fragmentCpuUsages = new double[0];
-    private double[] fragmentGpuUsages = new double[0];
+    private final Map<ResourceType, ResizeableDoubleArray> resourceUsages = new HashMap<>();
 
     public ScalingPolicy getScalingPolicy() {
         return scalingPolicy;
@@ -65,28 +70,21 @@ public class TraceWorkload implements Workload {
             double checkpointIntervalScaling,
             ScalingPolicy scalingPolicy,
             int taskId,
-            ResourceType[] resourceTypes) {
+            Set<ResourceType> resourceTypes) {
         this.fragments = fragments;
+        this.resourceTypes = resourceTypes;
 
         this.fragmentDurations = new long[fragments.size()];
 
-        if (Arrays.asList(resourceTypes).contains(ResourceType.CPU)) {
-            this.fragmentCpuUsages = new double[fragments.size()];
-        }
-
-        if (Arrays.asList(resourceTypes).contains(ResourceType.GPU)) {
-            this.fragmentGpuUsages = new double[fragments.size()];
+        for (ResourceType resourceType : this.resourceTypes) {
+            this.resourceUsages.put(resourceType, new ResizeableDoubleArray(fragments.size()));
         }
 
         int i = 0;
         for (TraceFragment fragment : fragments) {
-            this.fragmentDurations[i] = fragment.duration();
+            this.fragmentDurations[i] = fragment.getDuration();
             for (ResourceType resourceType : resourceTypes) {
-                if (resourceType == ResourceType.CPU) {
-                    this.fragmentCpuUsages[i] = fragment.cpuUsage();
-                } else if (resourceType == ResourceType.GPU) {
-                    this.fragmentGpuUsages[i] = fragment.gpuUsage();
-                }
+                this.resourceUsages.get(resourceType).add(fragment.getCpuUsage());
             }
             i++;
         }
@@ -99,16 +97,16 @@ public class TraceWorkload implements Workload {
 
         // TODO: remove if we decide not to use it.
         this.maxCpuDemand = fragments.stream()
-                .max(Comparator.comparing(TraceFragment::cpuUsage))
+                .max(Comparator.comparing(TraceFragment::getCpuUsage))
                 .get()
                 .getResourceUsage(ResourceType.CPU);
         this.maxGpuDemand = fragments.stream()
-                .max(Comparator.comparing(TraceFragment::gpuUsage))
+                .max(Comparator.comparing(TraceFragment::getGpuUsage))
                 .get()
                 .getResourceUsage(ResourceType.GPU);
         this.maxGpuMemoryDemand = 0; // TODO: add GPU memory demand to the trace fragments
 
-        this.resourceTypes = resourceTypes;
+
     }
 
     public ArrayList<TraceFragment> getFragments() {
@@ -116,14 +114,29 @@ public class TraceWorkload implements Workload {
     }
 
     public TraceFragment getNextFragment() {
-        return new TraceFragment(this.fragmentDurations[fragmentIndex], this.fragmentCpuUsages[fragmentIndex],
-            this.fragmentGpuUsages[fragmentIndex++]);
+        Map<ResourceType, Double> currentResourceUsages = new HashMap<>();
+        for (ResourceType resourceType : this.resourceTypes) {
+            currentResourceUsages.put(resourceType, this.resourceUsages.get(resourceType).get(fragmentIndex));
+        }
+
+        fragmentIndex++;
+
+        return new TraceFragment(this.fragmentDurations[fragmentIndex], currentResourceUsages);
+
+//        fragment.setCpuUsage(this.fragmentCpuUsages[fragmentIndex]);
+//
+//
+//
+//        if (Arrays.asList(resourceTypes).contains(ResourceType.GPU)) {
+//            return new TraceFragment(this.fragmentDurations[fragmentIndex], this.fragmentCpuUsages[fragmentIndex],
+//                this.fragmentGpuUsages[fragmentIndex++]);
+//        }
+//        return new TraceFragment(this.fragmentDurations[fragmentIndex], this.fragmentCpuUsages[fragmentIndex++]);
     }
 
     public boolean isCompleted() {
         return fragmentIndex >= this.fragmentDurations.length;
     }
-
 
     @Override
     public long checkpointInterval() {
@@ -167,8 +180,8 @@ public class TraceWorkload implements Workload {
         this.fragments.addFirst(fragment);
     }
 
-    public ResourceType[] getResourceTypes() {
-        return Arrays.stream(resourceTypes).filter(Objects::nonNull).toArray(ResourceType[]::new);
+    public Set<ResourceType> getResourceTypes() {
+        return this.resourceTypes;
     }
 
     @Override
@@ -197,7 +210,7 @@ public class TraceWorkload implements Workload {
         private final double checkpointIntervalScaling;
         private final ScalingPolicy scalingPolicy;
         private final int taskId;
-        private final ResourceType[] resourceTypes = new ResourceType[ResourceType.values().length];
+        private final Set<ResourceType> resourceTypes = new HashSet<>(1);
 
         /**
          * Construct a new {@link Builder} instance.
@@ -226,10 +239,10 @@ public class TraceWorkload implements Workload {
          */
         public void add(long duration, double cpuUsage, double gpuUsage, int gpuMemoryUsage) {
             if (cpuUsage > 0.0) {
-                this.resourceTypes[ResourceType.CPU.ordinal()] = ResourceType.CPU;
+                this.resourceTypes.add(ResourceType.CPU);
             }
             if (gpuUsage > 0.0) {
-                this.resourceTypes[ResourceType.GPU.ordinal()] = ResourceType.GPU;
+                this.resourceTypes.add(ResourceType.GPU);
             }
             fragments.add(fragments.size(), new TraceFragment(duration, cpuUsage, gpuUsage, gpuMemoryUsage));
         }

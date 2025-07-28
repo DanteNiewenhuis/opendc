@@ -245,7 +245,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         for (ResourceType resourceType : usedResourceTypes) {
             double demand = nextFragment.getResourceUsage(resourceType);
 
-            this.remainingWork.put(resourceType, this.scalingPolicy.getRemainingWork(demand, nextFragment.duration()));
+            this.remainingWork.put(resourceType, this.scalingPolicy.getRemainingWork(demand, nextFragment.getDuration()));
             this.totalRemainingWork += this.remainingWork.get(resourceType);
             this.workloadFinished.put(resourceType, false);
 
@@ -323,9 +323,9 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         // Create a new fragment based on the current fragment and remaining duration
         TraceFragment newFragment = new TraceFragment(
                 remainingDuration,
-                currentFragment.cpuUsage(),
-                currentFragment.gpuUsage(),
-                currentFragment.gpuMemoryUsage());
+                currentFragment.getCpuUsage(),
+                currentFragment.getGpuUsage(),
+                currentFragment.getGpuMemoryUsage());
 
         // Alter the snapshot by removing finished fragments
         this.snapshot.removeFragments(this.fragmentIndex);

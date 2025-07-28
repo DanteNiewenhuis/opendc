@@ -107,7 +107,7 @@ public fun runScenario(
             println("LOADED workload")
             println("LOADED workload")
 
-//            Thread.sleep(10000)
+            Thread.sleep(10000)
 
 
             val startTimeLong = workload.minOf { it.submissionTime }
@@ -174,12 +174,12 @@ public fun runScenario(
                 }
             }
 
-            service.replay(
-                timeSource,
-                workload,
-                failureModelSpec = scenario.failureModelSpec,
-                seed = seed,
-            )
+//            service.replay(
+//                timeSource,
+//                workload,
+//                failureModelSpec = scenario.failureModelSpec,
+//                seed = seed,
+//            )
         }
     }
 
