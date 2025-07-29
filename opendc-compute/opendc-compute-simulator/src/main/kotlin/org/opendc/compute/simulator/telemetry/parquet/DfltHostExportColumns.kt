@@ -58,6 +58,18 @@ public object DfltHostExportColumns {
             field = Types.required(INT64).named("timestamp_absolute"),
         ) { it.timestampAbsolute.toEpochMilli() }
 
+    public val ID: ExportColumn<HostTableReader> =
+        ExportColumn(
+            field =
+                Types.required(INT32).named("id")
+        ) {
+            if (it.hostInfo.name.startsWith("H01-"))
+                (it.hostInfo.name.substringAfter("H01-")).toInt()
+            else
+                // Fallback for legacy host names
+                0 // or throw an exception if you prefer
+        }
+
     public val NAME: ExportColumn<HostTableReader> =
         ExportColumn(
             field =
@@ -181,7 +193,6 @@ public object DfltHostExportColumns {
         setOf(
             TIMESTAMP_ABS,
             TIMESTAMP,
-            NAME,
-            CLUSTER_NAME,
+            ID,
         )
 }

@@ -100,7 +100,5 @@ public object DfltPowerSourceExportColumns {
         setOf(
             TIMESTAMP_ABS,
             TIMESTAMP,
-            NAME,
-            CLUSTER_NAME,
         )
 }

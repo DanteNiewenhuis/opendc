@@ -113,7 +113,5 @@ public object DfltBatteryExportColumns {
         setOf(
             TIMESTAMP_ABS,
             TIMESTAMP,
-            NAME,
-            CLUSTER_NAME,
         )
 }
