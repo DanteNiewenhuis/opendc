@@ -247,11 +247,6 @@ public class SimHost(
         guest.start()
     }
 
-//    public fun stop(task: ServiceTask) {
-//        val guest = requireNotNull(taskToGuestMap[task]) { "Unknown task ${task.name} at host $name" }
-//        guest.stop()
-//    }
-
     public fun delete(task: ServiceTask) {
         val guest = taskToGuestMap[task] ?: return
 
