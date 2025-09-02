@@ -66,7 +66,12 @@ public enum class FailurePrefab {
     Websites02Exp,
     Websites02Wbl,
     Websites02LogN,
-    Websites02Gam,
+    Websites02Gam;
+
+    public companion object {
+        public fun fromString(name: String): FailurePrefab? =
+            entries.find { it.name.equals(name, ignoreCase = true) }
+    }
 }
 
 /**
@@ -87,7 +92,7 @@ public fun createFailureModelPrefab(
     clock: InstantSource,
     service: ComputeService,
     random: RandomGenerator,
-    prefab: FailurePrefab,
+    prefab: FailurePrefab?,
 ): SampleBasedFailureModel {
     when (prefab) {
         FailurePrefab.G5k06Exp -> return createG5k06Exp(context, clock, service, random)

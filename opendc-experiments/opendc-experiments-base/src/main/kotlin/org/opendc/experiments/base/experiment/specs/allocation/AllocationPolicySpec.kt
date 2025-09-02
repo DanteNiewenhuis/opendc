@@ -69,7 +69,7 @@ public data class TimeShiftAllocationPolicySpec(
     val longForecastThreshold: Double = 0.35,
     val forecastSize: Int = 24,
     val taskStopper: TaskStopperSpec? = null,
-    val memorize: Boolean = true,
+    val memorize: Boolean = false,
 ) : AllocationPolicySpec
 
 public fun createComputeScheduler(

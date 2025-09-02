@@ -64,6 +64,7 @@ import org.opendc.compute.failure.prefab.createFailureModelPrefab
 import org.opendc.compute.simulator.service.ComputeService
 import java.io.File
 import java.time.InstantSource
+import java.util.random.RandomGenerator
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -113,9 +114,15 @@ public data class TraceBasedFailureModelSpec(
 @Serializable
 @SerialName("prefab")
 public data class PrefabFailureModelSpec(
-    public val prefabName: FailurePrefab,
+    public val prefabName: String,
 ) : FailureModelSpec {
-    override var name: String = prefabName.toString()
+    var prefab: FailurePrefab? = FailurePrefab.fromString(prefabName)
+
+    override var name: String = prefabName
+
+    init {
+        require(prefab != null) { "Prefab name $prefabName is not a FailurePrefab." }
+    }
 }
 
 /**
@@ -229,7 +236,7 @@ public fun createFailureModel(
     context: CoroutineContext,
     clock: InstantSource,
     service: ComputeService,
-    random: java.util.random.RandomGenerator,
+    random: RandomGenerator,
     failureModelSpec: FailureModelSpec?,
 ): FailureModel? {
     return when (failureModelSpec) {
@@ -254,10 +261,10 @@ public fun createFailureModel(
     context: CoroutineContext,
     clock: InstantSource,
     service: ComputeService,
-    random: java.util.random.RandomGenerator,
+    random: RandomGenerator,
     failureModel: PrefabFailureModelSpec,
 ): FailureModel {
-    return createFailureModelPrefab(context, clock, service, random, failureModel.prefabName)
+    return createFailureModelPrefab(context, clock, service, random, failureModel.prefab)
 }
 
 /**
@@ -274,7 +281,7 @@ public fun createFailureModel(
     context: CoroutineContext,
     clock: InstantSource,
     service: ComputeService,
-    random: java.util.random.RandomGenerator,
+    random: RandomGenerator,
     failureModel: TraceBasedFailureModelSpec,
 ): FailureModel {
     return TraceBasedFailureModel(context, clock, service, random, failureModel.pathToFile, failureModel.startPoint, failureModel.repeat)
@@ -294,7 +301,7 @@ public fun createFailureModel(
     context: CoroutineContext,
     clock: InstantSource,
     service: ComputeService,
-    random: java.util.random.RandomGenerator,
+    random: RandomGenerator,
     failureModel: CustomFailureModelSpec,
 ): FailureModel {
     val rng: org.apache.commons.math3.random.RandomGenerator = Well19937c(random.nextLong())
