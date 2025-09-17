@@ -43,11 +43,13 @@ import org.opendc.simulator.compute.workload.VirtualMachine;
 import org.opendc.simulator.engine.engine.FlowEngine;
 import org.opendc.simulator.engine.graph.FlowConsumer;
 import org.opendc.simulator.engine.graph.FlowDistributor;
+import org.opendc.simulator.engine.graph.FlowDistributorNew;
 import org.opendc.simulator.engine.graph.FlowEdge;
 import org.opendc.simulator.engine.graph.FlowNode;
 import org.opendc.simulator.engine.graph.FlowSupplier;
 import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFactory;
 import org.opendc.simulator.engine.graph.distributionPolicies.MaxMinFairnessFlowDistributor;
+import org.opendc.simulator.engine.graph.distributionPolicies.MaxMinFairnessFlowDistributorNew;
 
 /**
  * A machine that is able to execute {@link SimWorkload} objects.
@@ -61,7 +63,7 @@ public class SimMachine {
     private SimPsu psu;
     private Memory memory;
 
-    private final Hashtable<ResourceType, FlowDistributor> distributors = new Hashtable<>();
+    private final Hashtable<ResourceType, FlowDistributorNew> distributors = new Hashtable<>();
 
     private final Hashtable<ResourceType, ArrayList<ComputeResource>> computeResources = new Hashtable<>();
     private final List<ResourceType> availableResources;
@@ -195,7 +197,7 @@ public class SimMachine {
     public SimMachine(
             FlowEngine engine,
             MachineModel machineModel,
-            FlowDistributor powerDistributor,
+            FlowDistributorNew powerDistributor,
             PowerModel cpuPowerModel,
             @Nullable PowerModel gpuPowerModel,
             Consumer<Exception> completion) {
@@ -208,7 +210,11 @@ public class SimMachine {
         // Create the psu and cpu and connect them
         this.psu = new SimPsu(engine);
         new FlowEdge(this.psu, powerDistributor);
-        this.distributors.put(ResourceType.POWER, new MaxMinFairnessFlowDistributor(engine)); // Maybe First fit
+
+        // Create PSU distributor
+        this.distributors.put(ResourceType.POWER, new MaxMinFairnessFlowDistributorNew(engine, ResourceType.POWER,
+            ResourceType.POWER, ResourceType.values().length));
+//        this.distributors.put(ResourceType.POWER, new MaxMinFairnessFlowDistributor(engine)); // Maybe First fit
         new FlowEdge(this.distributors.get(ResourceType.POWER), this.psu);
 
         this.computeResources.put(
@@ -225,8 +231,12 @@ public class SimMachine {
 
         // Create a FlowDistributor and add the cpu as supplier
         this.distributors.put(
-                ResourceType.CPU,
-                FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getCpuDistributionStrategy()));
+            ResourceType.CPU,
+            new MaxMinFairnessFlowDistributorNew(engine, ResourceType.CPU,
+                ResourceType.CPU, machineModel.getCpuModel().getCoreCount()*2));
+//        this.distributors.put(
+//                ResourceType.CPU,
+//                FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getCpuDistributionStrategy()));
         new FlowEdge(
                 this.distributors.get(ResourceType.CPU),
                 (FlowSupplier) this.computeResources.get(ResourceType.CPU).getFirst(),
@@ -239,8 +249,12 @@ public class SimMachine {
 
         if (this.availableResources.contains(ResourceType.GPU)) {
             this.distributors.put(
-                    ResourceType.GPU,
-                    FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getGpuDistributionStrategy()));
+                ResourceType.GPU,
+                new MaxMinFairnessFlowDistributorNew(engine, ResourceType.GPU,
+                    ResourceType.GPU, machineModel.getCpuModel().getCoreCount()*2));
+//            this.distributors.put(
+//                    ResourceType.GPU,
+//                    FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getGpuDistributionStrategy()));
             ArrayList<ComputeResource> gpus = new ArrayList<>();
 
             for (GpuModel gpuModel : machineModel.getGpuModels()) {

@@ -37,6 +37,8 @@ import org.opendc.simulator.engine.engine.FlowEngine
 import org.opendc.simulator.engine.graph.FlowEdge
 import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFactory
 import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFactory.DistributionPolicy
+import org.opendc.simulator.engine.graph.distributionPolicies.MaxMinFairnessFlowDistributor
+import org.opendc.simulator.engine.graph.distributionPolicies.MaxMinFairnessFlowDistributorNew
 
 /**
  * A [ProvisioningStep] that provisions a list of hosts for a [ComputeService].
@@ -68,11 +70,14 @@ public class HostsProvisioningStep internal constructor(
             simPowerSources.add(simPowerSource)
             service.addPowerSource(simPowerSource)
 
-            val hostDistributor =
-                FlowDistributorFactory.getFlowDistributor(
-                    engine,
-                    DistributionPolicy.MAX_MIN_FAIRNESS,
-                )
+            val hostDistributor = MaxMinFairnessFlowDistributorNew(engine, ResourceType.POWER,
+                ResourceType.POWER, cluster.hostSpecs.size)
+
+//            val hostDistributor =
+//                FlowDistributorFactory.getFlowDistributor(
+//                    engine,
+//                    DistributionPolicy.MAX_MIN_FAIRNESS,
+//                )
 
             val carbonFragments = getCarbonFragments(cluster.powerSource.carbonTracePath)
 

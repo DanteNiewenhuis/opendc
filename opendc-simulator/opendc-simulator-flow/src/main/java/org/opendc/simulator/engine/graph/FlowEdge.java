@@ -34,8 +34,8 @@ public class FlowEdge {
     private FlowConsumer consumer;
     private FlowSupplier supplier;
 
-    private int consumerIndex = -1;
-    private int supplierIndex = -1;
+    private int consumerIndex;
+    private int supplierIndex;
 
     private double demand = 0.0;
     private double supply = 0.0;
