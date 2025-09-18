@@ -39,7 +39,7 @@ import org.opendc.simulator.compute.models.MachineModel
 import org.opendc.simulator.compute.models.MemoryUnit
 import org.opendc.simulator.compute.power.PowerModel
 import org.opendc.simulator.engine.engine.FlowEngine
-import org.opendc.simulator.engine.graph.FlowDistributor
+import org.opendc.simulator.engine.graph.FlowDistributorPS
 import java.time.Duration
 import java.time.Instant
 import java.time.InstantSource
@@ -64,7 +64,7 @@ public class SimHost(
     private val gpuPowerModel: PowerModel?,
     private val embodiedCarbon: Double,
     private val expectedLifetime: Double,
-    private val powerDistributor: FlowDistributor,
+    private val powerDistributor: FlowDistributorPS,
 ) : AutoCloseable {
     /**
      * The event listeners registered with this host.

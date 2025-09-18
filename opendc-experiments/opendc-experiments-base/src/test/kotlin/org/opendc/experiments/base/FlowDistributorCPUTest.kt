@@ -32,7 +32,7 @@ import java.util.ArrayList
 /**
  * Testing suite containing tests that specifically test the FlowDistributor
  */
-class FlowDistributorTest {
+class FlowDistributorCPUTest {
     /**
      * FlowDistributor test 1: A single fitting task
      * In this test, a single task is scheduled that should fit the FlowDistributor
@@ -201,10 +201,10 @@ class FlowDistributorTest {
         val monitor = runTest(topology, workload)
 
         assertAll(
-            { assertEquals(4000.0, monitor.taskCpuDemands[0]?.get(1)) { "The cpu demanded by task 0 is incorrect" } },
-            { assertEquals(2000.0, monitor.taskCpuDemands[0]?.get(10)) { "The cpu demanded by task 0 is incorrect" } },
-            { assertEquals(2000.0, monitor.taskCpuSupplied[0]?.get(1)) { "The cpu used by task 0 is incorrect" } },
-            { assertEquals(2000.0, monitor.taskCpuSupplied[0]?.get(10)) { "The cpu used by task 0 is incorrect" } },
+            { assertEquals(4000.0, monitor.taskCpuDemands[0]?.get(1)) { "The cpu demanded by task 0 at t=1 is incorrect" } },
+            { assertEquals(2000.0, monitor.taskCpuDemands[0]?.get(10)) { "The cpu demanded by task 0 at t=10 is incorrect" } },
+            { assertEquals(2000.0, monitor.taskCpuSupplied[0]?.get(1)) { "The cpu supplied to task 0 at t=1 is incorrect" } },
+            { assertEquals(2000.0, monitor.taskCpuSupplied[0]?.get(10)) { "The cpu supplied to task 0 at t=10 is incorrect" } },
             { assertEquals(4000.0, monitor.hostCpuDemands["H01"]?.get(1)) { "The cpu demanded by the host is incorrect" } },
             { assertEquals(2000.0, monitor.hostCpuDemands["H01"]?.get(10)) { "The cpu demanded by the host is incorrect" } },
             { assertEquals(2000.0, monitor.hostCpuSupplied["H01"]?.get(1)) { "The cpu used by the host is incorrect" } },
@@ -248,12 +248,12 @@ class FlowDistributorTest {
         assertAll(
             { assertEquals(1000.0, monitor.taskCpuDemands[0]?.get(1)) { "The cpu demanded by task 0 is incorrect" } },
             { assertEquals(3000.0, monitor.taskCpuDemands[0]?.get(10)) { "The cpu demanded by task 0 is incorrect" } },
-            { assertEquals(1000.0, monitor.taskCpuSupplied[0]?.get(1)) { "The cpu used by task 0 is incorrect" } },
-            { assertEquals(3000.0, monitor.taskCpuSupplied[0]?.get(10)) { "The cpu used by task 0 is incorrect" } },
-            { assertEquals(3000.0, monitor.taskCpuDemands[1]?.get(1)) { "The cpu demanded by task 0 is incorrect" } },
-            { assertEquals(1000.0, monitor.taskCpuDemands[1]?.get(10)) { "The cpu demanded by task 0 is incorrect" } },
-            { assertEquals(3000.0, monitor.taskCpuSupplied[1]?.get(1)) { "The cpu used by task 0 is incorrect" } },
-            { assertEquals(1000.0, monitor.taskCpuSupplied[1]?.get(10)) { "The cpu used by task 0 is incorrect" } },
+            { assertEquals(1000.0, monitor.taskCpuSupplied[0]?.get(1)) { "The cpu supplied to task 0 at t=1 is incorrect" } },
+            { assertEquals(3000.0, monitor.taskCpuSupplied[0]?.get(10)) { "The cpu supplied to task 0 at t=10 is incorrect" } },
+            { assertEquals(3000.0, monitor.taskCpuDemands[1]?.get(1)) { "The cpu demanded by task 1 is incorrect" } },
+            { assertEquals(1000.0, monitor.taskCpuDemands[1]?.get(10)) { "The cpu demanded by task 1 is incorrect" } },
+            { assertEquals(3000.0, monitor.taskCpuSupplied[1]?.get(1)) { "The cpu supplied to task 1 at t=1 is incorrect" } },
+            { assertEquals(1000.0, monitor.taskCpuSupplied[1]?.get(10)) { "The cpu supplied to task 1 at t=1 is incorrect" } },
             { assertEquals(4000.0, monitor.hostCpuDemands["H01"]?.get(1)) { "The cpu demanded by the host is incorrect" } },
             { assertEquals(4000.0, monitor.hostCpuDemands["H01"]?.get(10)) { "The cpu demanded by the host is incorrect" } },
             { assertEquals(4000.0, monitor.hostCpuSupplied["H01"]?.get(1)) { "The cpu used by the host is incorrect" } },

@@ -69,7 +69,7 @@ public class BestEffortFlowDistributor extends FlowDistributor {
             for (var entry : this.supplierEdges.entrySet()) {
                 int supplierIdx = entry.getKey();
                 FlowEdge supplierEdge = entry.getValue();
-                double currentSupply = this.currentIncomingSupplies.get(supplierIdx);
+                double currentSupply = this.incomingSupplies.get(supplierIdx);
 
                 if (currentSupply > 0 && remainingDemand > 0) {
                     // Try to satisfy as much demand as possible from this already active supplier
@@ -84,7 +84,7 @@ public class BestEffortFlowDistributor extends FlowDistributor {
                 for (var entry : this.supplierEdges.entrySet()) {
                     int supplierIdx = entry.getKey();
                     FlowEdge supplierEdge = entry.getValue();
-                    double currentSupply = this.currentIncomingSupplies.get(supplierIdx);
+                    double currentSupply = this.incomingSupplies.get(supplierIdx);
 
                     if (currentSupply == 0 && remainingDemand > 0) {
                         double demandForThisSupplier = Math.min(remainingDemand, supplierEdge.getCapacity());
@@ -119,7 +119,7 @@ public class BestEffortFlowDistributor extends FlowDistributor {
             // Use the distribution algorithm for supply allocation
             double[] supplies = this.distributeSupply(
                     this.incomingDemands,
-                    new ArrayList<>(this.currentIncomingSupplies.values()),
+                    new ArrayList<>(this.incomingSupplies.values()),
                     this.totalIncomingSupply);
 
             for (int idx = 0; idx < this.consumerEdges.size(); idx++) {

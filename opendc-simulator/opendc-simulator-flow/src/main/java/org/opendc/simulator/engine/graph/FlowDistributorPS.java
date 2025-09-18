@@ -28,10 +28,15 @@ import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFac
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * A {@link FlowDistributor} is a node that distributes supply from multiple suppliers to multiple consumers.
+ * A {@link FlowDistributorPS} is a node that distributes supply from multiple suppliers to multiple consumers.
  * It can be used to model host-level resource distribution, such as CPU, memory, and GPU distribution.
  * It is a subclass of {@link FlowNode} and implements both {@link FlowSupplier} and {@link FlowConsumer}.
  * It maintains a list of consumer edges and supplier edges, and it can handle incoming demands and supplies.
@@ -40,8 +45,8 @@ import java.util.*;
  * It uses a {@link FlowDistributorFactory.DistributionPolicy} to determine how to distribute the supply among the consumers.
  * The default distribution policy is MaxMinFairnessPolicy, which distributes the supply fairly among the consumers.
  */
-public abstract class FlowDistributor extends FlowNode implements FlowSupplier, FlowConsumer {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(FlowDistributor.class);
+public abstract class FlowDistributorPS extends FlowNode implements FlowSupplier, FlowConsumer {
+    protected static final Logger LOGGER = LoggerFactory.getLogger(FlowDistributorPS.class);
     protected final ArrayList<FlowEdge> consumerEdges = new ArrayList<>();
     protected HashMap<Integer, FlowEdge> supplierEdges =
             new HashMap<>(); // The suppliers that provide supply to this distributor
@@ -49,10 +54,9 @@ public abstract class FlowDistributor extends FlowNode implements FlowSupplier, 
     protected final ArrayList<Double> incomingDemands = new ArrayList<>(); // What is demanded by the consumers
     protected final ArrayList<Double> outgoingSupplies = new ArrayList<>(); // What is supplied to the consumers
 
-    protected double previousTotalDemand = 0.0;
     protected double totalIncomingDemand; // The total demand of all the consumers
     // AS index is based on the supplierIndex of the FlowEdge, ids of entries need to be stable
-    protected HashMap<Integer, Double> incomingSupplies =
+    protected HashMap<Integer, Double> currentIncomingSupplies =
             new HashMap<>(); // The current supply provided by the suppliers
     protected Double totalIncomingSupply = 0.0; // The total supply provided by the suppliers
 
@@ -66,7 +70,7 @@ public abstract class FlowDistributor extends FlowNode implements FlowSupplier, 
 
     protected double capacity; // What is the max capacity. Can probably be removed
 
-    public FlowDistributor(FlowEngine engine) {
+    public FlowDistributorPS(FlowEngine engine) {
         super(engine);
     }
 
@@ -128,7 +132,7 @@ public abstract class FlowDistributor extends FlowNode implements FlowSupplier, 
 
         this.supplierEdges.put(idx, supplierEdge);
         this.capacity += supplierEdge.getCapacity();
-        this.incomingSupplies.put(idx, 0.0);
+        this.currentIncomingSupplies.put(idx, 0.0);
         this.supplierResourceType = supplierEdge.getSupplierResourceType();
     }
 
@@ -184,7 +188,7 @@ public abstract class FlowDistributor extends FlowNode implements FlowSupplier, 
 
         this.supplierEdges.remove(idx);
         this.capacity -= supplierEdge.getCapacity();
-        this.incomingSupplies.put(idx, 0.0);
+        this.currentIncomingSupplies.put(idx, 0.0);
 
         if (this.supplierEdges.isEmpty()) {
             this.updatedDemands.clear();
@@ -229,9 +233,9 @@ public abstract class FlowDistributor extends FlowNode implements FlowSupplier, 
     public void handleIncomingSupply(FlowEdge supplierEdge, double newSupply) {
         // supplierIndex not always set, so we use 0 as default to avoid index out of bounds
         int idx = supplierEdge.getSupplierIndex() == -1 ? 0 : supplierEdge.getSupplierIndex();
-        double prevSupply = incomingSupplies.get(idx);
+        double prevSupply = currentIncomingSupplies.get(idx);
 
-        incomingSupplies.put(idx, newSupply);
+        currentIncomingSupplies.put(idx, newSupply);
         // only update the total supply if the new supply is different from the previous one
         this.totalIncomingSupply += (newSupply - prevSupply);
 

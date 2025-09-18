@@ -26,10 +26,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import org.opendc.simulator.engine.engine.FlowEngine;
 import org.opendc.simulator.engine.graph.FlowDistributor;
+import org.opendc.simulator.engine.graph.FlowDistributorCPU;
 import org.opendc.simulator.engine.graph.FlowEdge;
 
 /**
- * A {@link FlowDistributor} that implements Fixed Share GPU scheduling.
+ * A {@link FlowDistributorCPU} that implements Fixed Share GPU scheduling.
  *
  * This distributor allocates a dedicated, consistent portion of GPU resources to each VM (consumer),
  * ensuring predictable availability and stable performance. Each active consumer receives a fixed

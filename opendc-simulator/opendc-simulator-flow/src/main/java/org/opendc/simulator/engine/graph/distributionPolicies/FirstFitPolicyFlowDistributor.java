@@ -25,10 +25,11 @@ package org.opendc.simulator.engine.graph.distributionPolicies;
 import java.util.ArrayList;
 import org.opendc.simulator.engine.engine.FlowEngine;
 import org.opendc.simulator.engine.graph.FlowDistributor;
+import org.opendc.simulator.engine.graph.FlowDistributorCPU;
 import org.opendc.simulator.engine.graph.FlowEdge;
 
 /**
- * A {@link FlowDistributor} that implements the First Fit policy for distributing flow.
+ * A {@link FlowDistributorCPU} that implements the First Fit policy for distributing flow.
  *
  * This distributor allocates resources to consumers based on the first available supply that meets their demand.
  * It does not attempt to balance loads or optimize resource usage beyond the first fit principle.
@@ -84,7 +85,7 @@ public class FirstFitPolicyFlowDistributor extends FlowDistributor {
     @Override
     protected void updateOutgoingSupplies() {
         ArrayList<Double> currentPossibleSupplies = new ArrayList<>();
-        for (var currentIncomingSupply : currentIncomingSupplies.entrySet()) {
+        for (var currentIncomingSupply : incomingSupplies.entrySet()) {
             currentPossibleSupplies.add(currentIncomingSupply.getValue());
         }
 

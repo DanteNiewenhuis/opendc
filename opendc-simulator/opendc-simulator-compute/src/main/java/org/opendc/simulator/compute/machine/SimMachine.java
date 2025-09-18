@@ -42,12 +42,13 @@ import org.opendc.simulator.compute.workload.SimWorkload;
 import org.opendc.simulator.compute.workload.VirtualMachine;
 import org.opendc.simulator.engine.engine.FlowEngine;
 import org.opendc.simulator.engine.graph.FlowConsumer;
-import org.opendc.simulator.engine.graph.FlowDistributor;
+import org.opendc.simulator.engine.graph.FlowDistributorCPU;
+import org.opendc.simulator.engine.graph.FlowDistributorPS;
 import org.opendc.simulator.engine.graph.FlowEdge;
 import org.opendc.simulator.engine.graph.FlowNode;
 import org.opendc.simulator.engine.graph.FlowSupplier;
 import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFactory;
-import org.opendc.simulator.engine.graph.distributionPolicies.MaxMinFairnessFlowDistributor;
+import org.opendc.simulator.engine.graph.distributionPolicies.MaxMinFairnessFlowDistributorCPU;
 
 /**
  * A machine that is able to execute {@link SimWorkload} objects.
@@ -61,7 +62,7 @@ public class SimMachine {
     private SimPsu psu;
     private Memory memory;
 
-    private final FlowDistributor[] distributors = new FlowDistributor[ResourceType.values().length];
+    private final FlowDistributorCPU[] distributors = new FlowDistributorCPU[ResourceType.values().length];
     //    private final Hashtable<ResourceType, FlowDistributor> distributors = new Hashtable<>();
 
     private final List<ResourceType> availableResourceTypes;
@@ -196,7 +197,7 @@ public class SimMachine {
     public SimMachine(
             FlowEngine engine,
             MachineModel machineModel,
-            FlowDistributor powerDistributor,
+            FlowDistributorPS powerDistributor,
             PowerModel cpuPowerModel,
             @Nullable PowerModel gpuPowerModel,
             Consumer<Exception> completion) {
@@ -209,58 +210,67 @@ public class SimMachine {
         // Create the psu and cpu and connect them
         this.psu = new SimPsu(engine);
         new FlowEdge(this.psu, powerDistributor);
-        this.distributors[ResourceType.POWER.ordinal()] = new MaxMinFairnessFlowDistributor(engine); // Maybe First fit
+
+        // Create PSU distributor
+        this.distributors[ResourceType.POWER.ordinal()] = new MaxMinFairnessFlowDistributorCPU(engine);
+//        this.distributors.put(ResourceType.POWER, new MaxMinFairnessFlowDistributor(engine)); // Maybe First fit
         new FlowEdge(this.distributors[ResourceType.POWER.ordinal()], this.psu);
 
         this.computeResources.put(
-                ResourceType.CPU,
-                new ArrayList<>(List.of(new SimCpu(engine, this.machineModel.getCpuModel(), cpuPowerModel, 0))));
+            ResourceType.CPU,
+            new ArrayList<>(List.of(new SimCpu(engine, this.machineModel.getCpuModel(), cpuPowerModel, 0))));
 
         // Connect the CPU to the PSU
         new FlowEdge(
-                (FlowConsumer) this.computeResources.get(ResourceType.CPU).getFirst(),
-                (FlowSupplier) this.distributors[ResourceType.POWER.ordinal()],
-                ResourceType.POWER,
-                0,
-                -1);
+            (FlowConsumer) this.computeResources.get(ResourceType.CPU).getFirst(),
+            (FlowSupplier) this.distributors[ResourceType.POWER.ordinal()],
+            ResourceType.POWER,
+            0,
+            -1);
 
         // Create a FlowDistributor and add the cpu as supplier
         this.distributors[ResourceType.CPU.ordinal()] =
-                FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getCpuDistributionStrategy());
+            new MaxMinFairnessFlowDistributorCPU(engine);
+//        this.distributors.put(
+//                ResourceType.CPU,
+//                FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getCpuDistributionStrategy()));
         new FlowEdge(
-                this.distributors[ResourceType.CPU.ordinal()],
-                (FlowSupplier) this.computeResources.get(ResourceType.CPU).getFirst(),
-                ResourceType.CPU,
-                -1,
-                0);
+            this.distributors[ResourceType.CPU.ordinal()],
+            (FlowSupplier) this.computeResources.get(ResourceType.CPU).getFirst(),
+            ResourceType.CPU,
+            -1,
+            0);
 
         // TODO: include memory as flow node
         this.memory = new Memory(engine, this.machineModel.getMemory());
 
         if (this.availableResourceTypes.contains(ResourceType.GPU)) {
             this.distributors[ResourceType.GPU.ordinal()] =
-                    FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getGpuDistributionStrategy());
+                new MaxMinFairnessFlowDistributorCPU(engine);
+//            this.distributors.put(
+//                    ResourceType.GPU,
+//                    FlowDistributorFactory.getFlowDistributor(engine, this.machineModel.getGpuDistributionStrategy()));
             ArrayList<ComputeResource> gpus = new ArrayList<>();
 
             for (GpuModel gpuModel : machineModel.getGpuModels()) {
                 // create a new GPU
                 SimGpu gpu = new SimGpu(
-                        engine, gpuModel, gpuPowerModel, gpuModel.getId(), gpuModel.getVirtualizationOverheadModel());
+                    engine, gpuModel, gpuPowerModel, gpuModel.getId(), gpuModel.getVirtualizationOverheadModel());
                 gpus.add(gpu);
                 // Connect the GPU to the distributor
                 new FlowEdge(
-                        this.distributors[ResourceType.GPU.ordinal()],
-                        gpu,
-                        ResourceType.GPU,
-                        gpuModel.getId(),
-                        gpuModel.getId());
+                    this.distributors[ResourceType.GPU.ordinal()],
+                    gpu,
+                    ResourceType.GPU,
+                    gpuModel.getId(),
+                    gpuModel.getId());
                 // Connect the GPU to the PSU
                 new FlowEdge(
-                        gpu,
-                        this.distributors[ResourceType.POWER.ordinal()],
-                        ResourceType.POWER,
-                        gpuModel.getId(),
-                        gpuModel.getId());
+                    gpu,
+                    this.distributors[ResourceType.POWER.ordinal()],
+                    ResourceType.POWER,
+                    gpuModel.getId(),
+                    gpuModel.getId());
             }
             this.computeResources.put(ResourceType.GPU, gpus);
         }

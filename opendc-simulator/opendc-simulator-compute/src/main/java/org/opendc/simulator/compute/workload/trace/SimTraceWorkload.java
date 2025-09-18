@@ -268,7 +268,6 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         // Reset the remaining work for all resources
         this.totalRemainingWork = 0.0;
 
-        // TODO: only acceleration is considered, not memory
         for (ResourceType resourceType : usedResourceTypes) {
             double demand = nextFragment.getResourceUsage(resourceType);
 

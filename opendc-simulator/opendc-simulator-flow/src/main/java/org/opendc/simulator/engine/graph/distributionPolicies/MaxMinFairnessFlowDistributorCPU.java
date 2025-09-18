@@ -22,13 +22,12 @@
 
 package org.opendc.simulator.engine.graph.distributionPolicies;
 
-import org.opendc.simulator.engine.engine.FlowEngine;
-import org.opendc.simulator.engine.graph.FlowDistributor;
-import org.opendc.simulator.engine.graph.FlowEdge;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import org.opendc.simulator.engine.engine.FlowEngine;
+import org.opendc.simulator.engine.graph.FlowDistributorCPU;
+import org.opendc.simulator.engine.graph.FlowEdge;
 
 /**
  * A flow distributor that implements the max-min fairness distribution policy.
@@ -36,11 +35,11 @@ import java.util.Objects;
  * This policy distributes the available supply to consumers in a way that maximizes the minimum supply received by any
  * consumer, ensuring fairness across all consumers.
  */
-public class MaxMinFairnessFlowDistributor extends FlowDistributor {
+public class MaxMinFairnessFlowDistributorCPU extends FlowDistributorCPU {
 
     private boolean overloaded = false;
 
-    public MaxMinFairnessFlowDistributor(FlowEngine engine) {
+    public MaxMinFairnessFlowDistributorCPU(FlowEngine engine) {
         super(engine);
     }
 
@@ -52,13 +51,12 @@ public class MaxMinFairnessFlowDistributor extends FlowDistributor {
         }
 
         this.previousTotalDemand = this.totalIncomingDemand;
-        for (FlowEdge supplierEdge : this.supplierEdges.values()) {
-            this.pushOutgoingDemand(supplierEdge, this.totalIncomingDemand / this.supplierEdges.size());
+
+        for (int supplierIndex : this.usedSupplierIndices) {
+            this.pushOutgoingDemand(this.supplierEdges[supplierIndex], this.totalIncomingDemand / this.numSuppliers);
         }
 
         this.outgoingDemandUpdateNeeded = false;
-
-//        this.invalidate();
     }
 
     // TODO: This should probably be moved to the distribution strategy
@@ -71,11 +69,11 @@ public class MaxMinFairnessFlowDistributor extends FlowDistributor {
 
             double[] supplies = this.distributeSupply(
                     this.incomingDemands,
-                    new ArrayList<>(this.incomingSupplies.values()),
+                    this.incomingSupplies,
                     this.totalIncomingSupply);
 
-            for (int idx = 0; idx < this.consumerEdges.size(); idx++) {
-                this.pushOutgoingSupply(this.consumerEdges.get(idx), supplies[idx], this.getConsumerResourceType());
+            for (int consumerIndex: this.usedConsumerIndices) {
+                this.pushOutgoingSupply(this.consumerEdges[consumerIndex], supplies[consumerIndex], this.getConsumerResourceType());
             }
 
         } else {
@@ -83,39 +81,42 @@ public class MaxMinFairnessFlowDistributor extends FlowDistributor {
             // If the distributor was overloaded before, but is not anymore:
             //      provide all consumers with their demand
             if (this.overloaded) {
-                for (int idx = 0; idx < this.consumerEdges.size(); idx++) {
-                    if (!Objects.equals(this.outgoingSupplies.get(idx), this.incomingDemands.get(idx))) {
+                for (int consumerIndex: this.usedConsumerIndices) {
+                    if (!Objects.equals(this.outgoingSupplies[consumerIndex], this.incomingDemands[consumerIndex])) {
                         this.pushOutgoingSupply(
-                                this.consumerEdges.get(idx),
-                                this.incomingDemands.get(idx),
-                                this.getConsumerResourceType());
+                            this.consumerEdges[consumerIndex],
+                            this.incomingDemands[consumerIndex],
+                            this.getConsumerResourceType());
                     }
+
                 }
                 this.overloaded = false;
             }
 
             // Update the supplies of the consumers that changed their demand in the current cycle
             else {
-                for (int idx : this.updatedDemands) {
-                    this.pushOutgoingSupply(
-                            this.consumerEdges.get(idx), this.incomingDemands.get(idx), this.getConsumerResourceType());
+                for (int consumerIndex = 0; consumerIndex < this.updatedDemands.length; consumerIndex++) {
+                    if (this.updatedDemands[consumerIndex]) {
+                        this.pushOutgoingSupply(
+                            this.consumerEdges[consumerIndex], this.incomingDemands[consumerIndex], this.getConsumerResourceType());
+                    }
                 }
             }
         }
 
-        this.updatedDemands.clear();
+        Arrays.fill(this.updatedDemands, false);
     }
 
     private record Demand(int idx, double value) {}
 
-    public double[] distributeSupply(ArrayList<Double> demands, ArrayList<Double> currentSupply, double totalSupply) {
-        int inputSize = demands.size();
+    public double[] distributeSupply(double[] demands, double[] currentSupply, double totalSupply) {
+        int inputSize = demands.length;
 
         final double[] supplies = new double[inputSize];
         final Demand[] tempDemands = new Demand[inputSize];
 
         for (int i = 0; i < inputSize; i++) {
-            tempDemands[i] = new Demand(i, demands.get(i));
+            tempDemands[i] = new Demand(i, demands[i]);
         }
 
         Arrays.sort(tempDemands, (o1, o2) -> {

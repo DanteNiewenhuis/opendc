@@ -23,7 +23,7 @@
 package org.opendc.simulator.engine.graph.distributionPolicies;
 
 import org.opendc.simulator.engine.engine.FlowEngine;
-import org.opendc.simulator.engine.graph.FlowDistributor;
+import org.opendc.simulator.engine.graph.FlowDistributorPS;
 import org.opendc.simulator.engine.graph.FlowEdge;
 
 import java.util.ArrayList;
@@ -36,29 +36,22 @@ import java.util.Objects;
  * This policy distributes the available supply to consumers in a way that maximizes the minimum supply received by any
  * consumer, ensuring fairness across all consumers.
  */
-public class MaxMinFairnessFlowDistributor extends FlowDistributor {
+public class MaxMinFairnessFlowDistributorPS extends FlowDistributorPS {
 
     private boolean overloaded = false;
 
-    public MaxMinFairnessFlowDistributor(FlowEngine engine) {
+    public MaxMinFairnessFlowDistributorPS(FlowEngine engine) {
         super(engine);
     }
 
     protected void updateOutgoingDemand() {
-        if (this.totalIncomingDemand == this.previousTotalDemand) {
-            this.outgoingDemandUpdateNeeded = false;
-            this.updateOutgoingSupplies();
-            return;
-        }
-
-        this.previousTotalDemand = this.totalIncomingDemand;
         for (FlowEdge supplierEdge : this.supplierEdges.values()) {
             this.pushOutgoingDemand(supplierEdge, this.totalIncomingDemand / this.supplierEdges.size());
         }
 
         this.outgoingDemandUpdateNeeded = false;
 
-//        this.invalidate();
+        this.invalidate();
     }
 
     // TODO: This should probably be moved to the distribution strategy
@@ -71,7 +64,7 @@ public class MaxMinFairnessFlowDistributor extends FlowDistributor {
 
             double[] supplies = this.distributeSupply(
                     this.incomingDemands,
-                    new ArrayList<>(this.incomingSupplies.values()),
+                    new ArrayList<>(this.currentIncomingSupplies.values()),
                     this.totalIncomingSupply);
 
             for (int idx = 0; idx < this.consumerEdges.size(); idx++) {
