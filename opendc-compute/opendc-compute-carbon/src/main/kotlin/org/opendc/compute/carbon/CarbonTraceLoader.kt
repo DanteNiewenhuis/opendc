@@ -22,7 +22,7 @@
 
 package org.opendc.compute.carbon
 
-import org.opendc.simulator.compute.power.CarbonFragment
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonOpenDCFragment
 import org.opendc.trace.Trace
 import org.opendc.trace.conv.CARBON_INTENSITY
 import org.opendc.trace.conv.CARBON_TIMESTAMP
@@ -40,14 +40,14 @@ public class CarbonTraceLoader {
     /**
      * The cache of workloads.
      */
-    private val cache = ConcurrentHashMap<String, SoftReference<List<CarbonFragment>>>()
+    private val cache = ConcurrentHashMap<String, SoftReference<List<CarbonOpenDCFragment>>>()
 
     private val builder = CarbonFragmentNewBuilder()
 
     /**
      * Read the metadata into a workload.
      */
-    private fun parseCarbon(trace: Trace): List<CarbonFragment> {
+    private fun parseCarbon(trace: Trace): List<CarbonOpenDCFragment> {
         val reader = checkNotNull(trace.getTable(TABLE_CARBON)).newReader()
 
         val startTimeCol = reader.resolve(CARBON_TIMESTAMP)
@@ -76,7 +76,7 @@ public class CarbonTraceLoader {
     /**
      * Load the Carbon Trace at the given path.
      */
-    public fun get(pathToFile: File): List<CarbonFragment> {
+    public fun get(pathToFile: File): List<CarbonOpenDCFragment> {
         val trace = Trace.open(pathToFile, "carbon")
 
         return parseCarbon(trace)
@@ -96,7 +96,7 @@ public class CarbonTraceLoader {
         /**
          * The total load of the trace.
          */
-        val fragments: MutableList<CarbonFragment> = mutableListOf()
+        val fragments: MutableList<CarbonOpenDCFragment> = mutableListOf()
 
         /**
          * Add a fragment to the trace.
@@ -109,7 +109,7 @@ public class CarbonTraceLoader {
             carbonIntensity: Double,
         ) {
             fragments.add(
-                CarbonFragment(
+                CarbonOpenDCFragment(
                     startTime.toEpochMilli(),
                     Long.MAX_VALUE,
                     carbonIntensity,

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import org.opendc.common.ResourceType;
 import org.opendc.simulator.compute.cpu.SimCpu;
+import org.opendc.simulator.compute.power.carbon.CarbonModel;
+import org.opendc.simulator.compute.power.carbon.CarbonReceiver;
 import org.opendc.simulator.engine.engine.FlowEngine;
 import org.opendc.simulator.engine.graph.FlowEdge;
 import org.opendc.simulator.engine.graph.FlowNode;

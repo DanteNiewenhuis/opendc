@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 AtLarge Research
+ * Copyright (c) 2024 AtLarge Research
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +20,46 @@
  * SOFTWARE.
  */
 
-@file:JvmName("ComputeWorkloadsNew")
+package org.opendc.simulator.compute.power.carbon.CarbonFragments;
 
-package org.opendc.compute.carbon
-
-import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonOpenDCFragment
-import java.io.File
-import javax.management.InvalidAttributeValueException
+import org.opendc.simulator.compute.power.carbon.CarbonModel;
 
 /**
- * Construct a workload from a trace.
+ * An object holding the carbon intensity during a specific time frame.
+ * Used by {@link CarbonModel}.
  */
-public fun getCarbonFragments(pathToFile: String?): List<CarbonOpenDCFragment>? {
-    if (pathToFile == null) {
-        return null
+public class CarbonOpenDCFragment {
+    private long startTime;
+    private long endTime;
+    private double carbonIntensity;
+
+    public CarbonOpenDCFragment(long startTime, long endTime, double carbonIntensity) {
+        this.setStartTime(startTime);
+        this.setEndTime(endTime);
+        this.setCarbonIntensity(carbonIntensity);
     }
 
-    return getCarbonFragments(File(pathToFile))
-}
-
-/**
- * Construct a workload from a trace.
- */
-public fun getCarbonFragments(file: File): List<CarbonOpenDCFragment> {
-    if (!file.exists()) {
-        throw InvalidAttributeValueException("The carbon trace cannot be found")
+    public double getCarbonIntensity() {
+        return carbonIntensity;
     }
 
-    return CarbonTraceLoader().get(file)
+    public void setCarbonIntensity(double carbonIntensity) {
+        this.carbonIntensity = carbonIntensity;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
 }

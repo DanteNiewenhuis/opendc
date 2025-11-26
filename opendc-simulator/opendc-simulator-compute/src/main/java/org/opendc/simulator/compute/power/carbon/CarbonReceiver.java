@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 AtLarge Research
+ * Copyright (c) 2025 AtLarge Research
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,44 +20,13 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.compute.power;
+package org.opendc.simulator.compute.power.carbon;
 
-/**
- * An object holding the carbon intensity during a specific time frame.
- * Used by {@link CarbonModel}.
- */
-public class CarbonFragment {
-    private long startTime;
-    private long endTime;
-    private double carbonIntensity;
+public interface CarbonReceiver {
 
-    public CarbonFragment(long startTime, long endTime, double carbonIntensity) {
-        this.setStartTime(startTime);
-        this.setEndTime(endTime);
-        this.setCarbonIntensity(carbonIntensity);
-    }
+    public void updateCarbonIntensity(double carbonIntensity);
 
-    public double getCarbonIntensity() {
-        return carbonIntensity;
-    }
+    public void setCarbonModel(CarbonModel carbonModel);
 
-    public void setCarbonIntensity(double carbonIntensity) {
-        this.carbonIntensity = carbonIntensity;
-    }
-
-    public long getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
+    public void removeCarbonModel(CarbonModel carbonModel);
 }

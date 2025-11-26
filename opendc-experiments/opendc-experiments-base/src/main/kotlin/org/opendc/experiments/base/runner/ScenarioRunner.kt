@@ -40,8 +40,8 @@ import org.opendc.experiments.base.experiment.specs.allocation.createComputeSche
 import org.opendc.experiments.base.experiment.specs.allocation.createTaskStopper
 import org.opendc.experiments.base.experiment.specs.getScalingPolicy
 import org.opendc.experiments.base.experiment.specs.getWorkloadLoader
-import org.opendc.simulator.compute.power.CarbonModel
-import org.opendc.simulator.compute.power.CarbonReceiver
+import org.opendc.simulator.compute.power.carbon.CarbonModel
+import org.opendc.simulator.compute.power.carbon.CarbonReceiver
 import org.opendc.simulator.kotlin.runSimulation
 import java.io.File
 import java.time.Duration

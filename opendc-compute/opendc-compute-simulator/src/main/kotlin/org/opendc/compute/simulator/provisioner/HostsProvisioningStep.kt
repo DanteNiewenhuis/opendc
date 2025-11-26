@@ -29,10 +29,11 @@ import org.opendc.compute.simulator.service.ComputeService
 import org.opendc.compute.topology.specs.ClusterSpec
 import org.opendc.compute.topology.specs.HostSpec
 import org.opendc.compute.topology.specs.createSimBatteryPolicy
-import org.opendc.simulator.compute.power.CarbonModel
+import org.opendc.simulator.compute.power.carbon.CarbonModel
 import org.opendc.simulator.compute.power.SimPowerSource
 import org.opendc.simulator.compute.power.batteries.BatteryAggregator
 import org.opendc.simulator.compute.power.batteries.SimBattery
+import org.opendc.simulator.compute.power.carbon.CarbonModels.CarbonOpenDCModel
 import org.opendc.simulator.engine.engine.FlowEngine
 import org.opendc.simulator.engine.graph.FlowEdge
 import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFactory
@@ -81,7 +82,7 @@ public class HostsProvisioningStep internal constructor(
             var carbonModel: CarbonModel? = null
             // Create Carbon Model
             if (carbonFragments != null) {
-                carbonModel = CarbonModel(engine, carbonFragments, startTime)
+                carbonModel = CarbonOpenDCModel(engine, carbonFragments, startTime)
                 carbonModel.addReceiver(simPowerSource)
                 ctx.registry.register(serviceDomain, CarbonModel::class.java, carbonModel)
             }
