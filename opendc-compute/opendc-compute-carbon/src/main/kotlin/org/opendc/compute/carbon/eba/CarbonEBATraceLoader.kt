@@ -20,13 +20,21 @@
  * SOFTWARE.
  */
 
-package org.opendc.compute.carbon
+package org.opendc.compute.carbon.eba
 
-import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonOpenDCFragment
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonEBAFragment
 import org.opendc.trace.Trace
-import org.opendc.trace.conv.CARBON_INTENSITY
-import org.opendc.trace.conv.CARBON_TIMESTAMP
-import org.opendc.trace.conv.TABLE_CARBON
+import org.opendc.trace.conv.CARBON_EBA_COL
+import org.opendc.trace.conv.CARBON_EBA_INTENSITY
+import org.opendc.trace.conv.CARBON_EBA_NG
+import org.opendc.trace.conv.CARBON_EBA_NUC
+import org.opendc.trace.conv.CARBON_EBA_OIL
+import org.opendc.trace.conv.CARBON_EBA_OTH
+import org.opendc.trace.conv.CARBON_EBA_SUN
+import org.opendc.trace.conv.CARBON_EBA_TIMESTAMP
+import org.opendc.trace.conv.CARBON_EBA_WAT
+import org.opendc.trace.conv.CARBON_EBA_WND
+import org.opendc.trace.conv.TABLE_CARBON_EBA
 import java.io.File
 import java.lang.ref.SoftReference
 import java.time.Instant
@@ -36,29 +44,46 @@ import java.util.concurrent.ConcurrentHashMap
  * A helper class for loading compute workload traces into memory.
  *
  */
-public class CarbonTraceLoader {
+public class CarbonEBATraceLoader {
     /**
      * The cache of workloads.
      */
-    private val cache = ConcurrentHashMap<String, SoftReference<List<CarbonOpenDCFragment>>>()
+    private val cache = ConcurrentHashMap<String, SoftReference<List<CarbonEBAFragment>>>()
 
     private val builder = CarbonFragmentNewBuilder()
 
     /**
      * Read the metadata into a workload.
      */
-    private fun parseCarbon(trace: Trace): List<CarbonOpenDCFragment> {
-        val reader = checkNotNull(trace.getTable(TABLE_CARBON)).newReader()
+    private fun parseCarbon(trace: Trace): List<CarbonEBAFragment> {
+        val reader = checkNotNull(trace.getTable(TABLE_CARBON_EBA)).newReader()
 
-        val startTimeCol = reader.resolve(CARBON_TIMESTAMP)
-        val carbonIntensityCol = reader.resolve(CARBON_INTENSITY)
+        val startTimeCol = reader.resolve(CARBON_EBA_TIMESTAMP)
+        val carbonIntensityCol = reader.resolve(CARBON_EBA_INTENSITY)
+        val wndCol = reader.resolve(CARBON_EBA_WND)
+        val sunCol = reader.resolve(CARBON_EBA_SUN)
+        val watCol = reader.resolve(CARBON_EBA_WAT)
+        val oilCol = reader.resolve(CARBON_EBA_OIL)
+        val ngCol = reader.resolve(CARBON_EBA_NG)
+        val colCol = reader.resolve(CARBON_EBA_COL)
+        val nucCol = reader.resolve(CARBON_EBA_NUC)
+        val othCol = reader.resolve(CARBON_EBA_OTH)
 
         try {
             while (reader.nextRow()) {
                 val startTime = reader.getInstant(startTimeCol)!!
                 val carbonIntensity = reader.getDouble(carbonIntensityCol)
 
-                builder.add(startTime, carbonIntensity)
+                val wnd = reader.getLong(wndCol)
+                val sun = reader.getLong(sunCol)
+                val wat = reader.getLong(watCol)
+                val oil = reader.getLong(oilCol)
+                val ng = reader.getLong(ngCol)
+                val col = reader.getLong(colCol)
+                val nuc = reader.getLong(nucCol)
+                val oth = reader.getLong(othCol)
+
+                builder.add(startTime, carbonIntensity, wnd, sun, wat, oil, ng, col, nuc, oth)
             }
 
             // Make sure the virtual machines are ordered by start time
@@ -76,8 +101,8 @@ public class CarbonTraceLoader {
     /**
      * Load the Carbon Trace at the given path.
      */
-    public fun get(pathToFile: File): List<CarbonOpenDCFragment> {
-        val trace = Trace.open(pathToFile, "carbon")
+    public fun get(pathToFile: File): List<CarbonEBAFragment> {
+        val trace = Trace.open(pathToFile, "carbon_eba")
 
         return parseCarbon(trace)
     }
@@ -96,7 +121,7 @@ public class CarbonTraceLoader {
         /**
          * The total load of the trace.
          */
-        val fragments: MutableList<CarbonOpenDCFragment> = mutableListOf()
+        val fragments: MutableList<CarbonEBAFragment> = mutableListOf()
 
         /**
          * Add a fragment to the trace.
@@ -107,12 +132,28 @@ public class CarbonTraceLoader {
         fun add(
             startTime: Instant,
             carbonIntensity: Double,
+            wnd: Long,
+            sun: Long,
+            wat: Long,
+            oil: Long,
+            ng: Long,
+            col: Long,
+            nuc: Long,
+            oth: Long,
         ) {
             fragments.add(
-                CarbonOpenDCFragment(
+                CarbonEBAFragment(
                     startTime.toEpochMilli(),
                     Long.MAX_VALUE,
                     carbonIntensity,
+                    wnd,
+                    sun,
+                    wat,
+                    oil,
+                    ng,
+                    col,
+                    nuc,
+                    oth,
                 ),
             )
         }

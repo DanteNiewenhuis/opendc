@@ -45,11 +45,10 @@ public abstract class CarbonModel extends FlowNode {
      * Construct a CarbonModel
      *
      * @param engine The {@link FlowEngine} the node belongs to
-     * @param carbonFragments A list of Carbon Fragments defining the carbon intensity at different time frames
      * @param startTime The start time of the simulation. This is used to go from relative time (used by the clock)
      *                  to absolute time (used by carbon fragments).
      */
-    public CarbonModel(FlowEngine engine, List<CarbonOpenDCFragment> carbonFragments, long startTime) {
+    public CarbonModel(FlowEngine engine, long startTime) {
         super(engine);
 
         this.startTime = startTime;
@@ -93,6 +92,8 @@ public abstract class CarbonModel extends FlowNode {
     public abstract void addReceiver(CarbonReceiver receiver);
 
     public abstract double[] getForecast(int forecastSize);
+
+    public abstract Map<Integer, Long> getAvailablePowers();
 
     @Override
     public Map<FlowEdge.NodeType, List<FlowEdge>> getConnectedEdges() {

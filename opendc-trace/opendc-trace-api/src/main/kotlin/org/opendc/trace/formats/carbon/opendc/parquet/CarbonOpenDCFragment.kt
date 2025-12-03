@@ -20,31 +20,14 @@
  * SOFTWARE.
  */
 
-@file:JvmName("Tables")
+package org.opendc.trace.formats.carbon.opendc.parquet
 
-package org.opendc.trace.conv
-
-/**
- * A table containing all tasks in a workload.
- */
-public const val TABLE_TASKS: String = "tasks"
+import java.time.Instant
 
 /**
- * A table containing all resource states in a workload.
+ * A task in the Workflow Trace Format.
  */
-public const val TABLE_FRAGMENTS: String = "fragments"
-
-/**
- * A table containing the carbon intensities of the region
- */
-public const val TABLE_CARBON_OPENDC: String = "carbon_opendc"
-
-/**
- * A table containing the carbon intensities of the region
- */
-public const val TABLE_CARBON_EBA: String = "carbon_eba"
-
-/**
- * A table containing failures that can be injected during simulation.
- */
-public const val TABLE_FAILURES: String = "failures"
+internal data class CarbonOpenDCFragment(
+    val timestamp: Instant,
+    val carbonIntensity: Double,
+)

@@ -22,10 +22,14 @@
 
 package org.opendc.compute.topology.specs
 
+import org.opendc.compute.carbon.CarbonTraceType
+
+
 // TODO: add name to class
 public data class PowerSourceSpec(
     val name: String = "unknown",
     val meta: Map<String, Any> = emptyMap(),
     val totalPower: Long = Long.MAX_VALUE,
     val carbonTracePath: String? = null,
+    val carbonTraceType: CarbonTraceType = CarbonTraceType.OpenDC
 )

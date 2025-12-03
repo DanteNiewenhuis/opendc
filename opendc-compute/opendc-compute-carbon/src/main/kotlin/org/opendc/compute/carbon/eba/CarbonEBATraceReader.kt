@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 AtLarge Research
+ * Copyright (c) 2021 AtLarge Research
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,24 +20,33 @@
  * SOFTWARE.
  */
 
-package org.opendc.trace.formats.carbon.parquet
+@file:JvmName("ComputeWorkloadsNew")
 
-import org.apache.parquet.schema.LogicalTypeAnnotation
-import org.apache.parquet.schema.MessageType
-import org.apache.parquet.schema.PrimitiveType
-import org.apache.parquet.schema.Types
+package org.opendc.compute.carbon.eba
 
-private val CARBON_SCHEMA_v1: MessageType =
-    Types.buildMessage()
-        .addFields(
-            Types
-                .optional(PrimitiveType.PrimitiveTypeName.INT64)
-                .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
-                .named("timestamp"),
-            Types
-                .optional(PrimitiveType.PrimitiveTypeName.DOUBLE)
-                .named("carbon_intensity"),
-        )
-        .named("carbon_intensity_fragment")
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonEBAFragment
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonOpenDCFragment
+import java.io.File
+import javax.management.InvalidAttributeValueException
 
-public val CARBON_SCHEMA: MessageType = CARBON_SCHEMA_v1
+/**
+ * Construct a workload from a trace.
+ */
+public fun getCarbonEBAFragments(pathToFile: String?): List<CarbonEBAFragment>? {
+    if (pathToFile == null) {
+        return null
+    }
+
+    return getCarbonEBAFragments(File(pathToFile))
+}
+
+/**
+ * Construct a workload from a trace.
+ */
+public fun getCarbonEBAFragments(file: File): List<CarbonEBAFragment> {
+    if (!file.exists()) {
+        throw InvalidAttributeValueException("The carbon trace cannot be found")
+    }
+
+    return CarbonEBATraceLoader().get(file)
+}

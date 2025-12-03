@@ -22,13 +22,14 @@
 
 package org.opendc.simulator.compute.power.carbon.CarbonFragments;
 
+import org.opendc.simulator.compute.power.carbon.CarbonFragment;
 import org.opendc.simulator.compute.power.carbon.CarbonModel;
 
 /**
  * An object holding the carbon intensity during a specific time frame.
  * Used by {@link CarbonModel}.
  */
-public class CarbonOpenDCFragment {
+public class CarbonOpenDCFragment implements CarbonFragment {
     private long startTime;
     private long endTime;
     private double carbonIntensity;

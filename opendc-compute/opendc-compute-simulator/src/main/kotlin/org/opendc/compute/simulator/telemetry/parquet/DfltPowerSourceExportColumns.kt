@@ -24,6 +24,7 @@ package org.opendc.compute.simulator.telemetry.parquet
 
 import org.apache.parquet.io.api.Binary
 import org.apache.parquet.schema.LogicalTypeAnnotation
+import org.apache.parquet.schema.PrimitiveType
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.FLOAT
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.INT64
@@ -92,6 +93,91 @@ public object DfltPowerSourceExportColumns {
         ExportColumn(
             field = Types.required(FLOAT).named("carbon_emission"),
         ) { it.carbonEmission }
+
+    public val WND_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("wnd_power"),
+        ) { it.wndPower }
+
+    public val SUN_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("sun_power"),
+        ) { it.sunPower }
+
+    public val WAT_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("wat_power"),
+        ) { it.watPower }
+
+    public val OIL_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("oil_power"),
+        ) { it.oilPower }
+
+    public val NG_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("ng_power"),
+        ) { it.ngPower }
+
+    public val COL_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("col_power"),
+        ) { it.colPower }
+
+    public val NUC_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("nuc_power"),
+        ) { it.nucPower }
+
+    public val OTH_POWER: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(INT64).named("oth_power"),
+        ) { it.othPower }
+
+    public val WND_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("wnd_coverage"),
+        ) { it.wndCoverage }
+
+    public val SUN_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("sun_coverage"),
+        ) { it.sunCoverage }
+
+    public val WAT_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("wat_coverage"),
+        ) { it.watCoverage }
+
+    public val OIL_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("oil_coverage"),
+        ) { it.oilCoverage }
+
+    public val NG_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("ng_coverage"),
+        ) { it.ngCoverage }
+
+    public val COL_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("col_coverage"),
+        ) { it.colCoverage }
+
+    public val NUC_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("nuc_coverage"),
+        ) { it.nucCoverage }
+
+    public val OTH_COVERAGE: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("oth_coverage"),
+        ) { it.othCoverage }
+
+    public val WND_SUN_Coverage: ExportColumn<PowerSourceTableReader> =
+        ExportColumn(
+            field = Types.required(FLOAT).named("wnd_sun_coverage"),
+        ) { it.wndSunCoverage }
 
     /**
      * The columns that are always included in the output file.

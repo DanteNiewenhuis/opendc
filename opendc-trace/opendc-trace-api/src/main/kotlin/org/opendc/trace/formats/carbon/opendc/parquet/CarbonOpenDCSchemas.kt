@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 AtLarge Research
+ * Copyright (c) 2025 AtLarge Research
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,24 @@
  * SOFTWARE.
  */
 
-package org.opendc.trace.formats.carbon.parquet
+package org.opendc.trace.formats.carbon.opendc.parquet
 
-import java.time.Instant
+import org.apache.parquet.schema.LogicalTypeAnnotation
+import org.apache.parquet.schema.MessageType
+import org.apache.parquet.schema.PrimitiveType
+import org.apache.parquet.schema.Types
 
-/**
- * A task in the Workflow Trace Format.
- */
-internal data class CarbonFragment(
-    val timestamp: Instant,
-    val carbonIntensity: Double,
-)
+private val CARBON_SCHEMA_v1: MessageType =
+    Types.buildMessage()
+        .addFields(
+            Types
+                .optional(PrimitiveType.PrimitiveTypeName.INT64)
+                .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
+                .named("timestamp"),
+            Types
+                .optional(PrimitiveType.PrimitiveTypeName.DOUBLE)
+                .named("carbon_intensity"),
+        )
+        .named("carbon_intensity_fragment")
+
+public val CARBON_SCHEMA: MessageType = CARBON_SCHEMA_v1

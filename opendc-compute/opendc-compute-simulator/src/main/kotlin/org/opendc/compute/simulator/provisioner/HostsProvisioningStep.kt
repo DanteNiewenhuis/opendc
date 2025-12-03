@@ -23,6 +23,7 @@
 package org.opendc.compute.simulator.provisioner
 
 import org.opendc.common.ResourceType
+import org.opendc.compute.carbon.CarbonTraceType
 import org.opendc.compute.carbon.getCarbonFragments
 import org.opendc.compute.simulator.host.SimHost
 import org.opendc.compute.simulator.service.ComputeService
@@ -33,6 +34,9 @@ import org.opendc.simulator.compute.power.carbon.CarbonModel
 import org.opendc.simulator.compute.power.SimPowerSource
 import org.opendc.simulator.compute.power.batteries.BatteryAggregator
 import org.opendc.simulator.compute.power.batteries.SimBattery
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonEBAFragment
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonOpenDCFragment
+import org.opendc.simulator.compute.power.carbon.CarbonModels.CarbonEBAModel
 import org.opendc.simulator.compute.power.carbon.CarbonModels.CarbonOpenDCModel
 import org.opendc.simulator.engine.engine.FlowEngine
 import org.opendc.simulator.engine.graph.FlowEdge
@@ -77,12 +81,20 @@ public class HostsProvisioningStep internal constructor(
                     1,
                 )
 
-            val carbonFragments = getCarbonFragments(cluster.powerSource.carbonTracePath)
+            val carbonFragments = getCarbonFragments(cluster.powerSource.carbonTracePath, cluster.powerSource.carbonTraceType)
 
             var carbonModel: CarbonModel? = null
             // Create Carbon Model
             if (carbonFragments != null) {
-                carbonModel = CarbonOpenDCModel(engine, carbonFragments, startTime)
+                if (cluster.powerSource.carbonTraceType == CarbonTraceType.OpenDC) {
+                    carbonModel = CarbonOpenDCModel(engine, carbonFragments.map{it as CarbonOpenDCFragment}, startTime)
+                }
+                else if (cluster.powerSource.carbonTraceType == CarbonTraceType.EBA) {
+                    carbonModel = CarbonEBAModel(engine, carbonFragments.map{it as CarbonEBAFragment }, startTime)
+                }
+                else {
+                    throw IllegalArgumentException("Unsupported carbon trace type: ${cluster.powerSource.carbonTraceType}")
+                }
                 carbonModel.addReceiver(simPowerSource)
                 ctx.registry.register(serviceDomain, CarbonModel::class.java, carbonModel)
             }

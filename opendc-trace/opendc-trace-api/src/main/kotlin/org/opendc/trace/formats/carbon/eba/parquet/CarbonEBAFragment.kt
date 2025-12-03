@@ -20,16 +20,22 @@
  * SOFTWARE.
  */
 
-@file:JvmName("CarbonColumns")
+package org.opendc.trace.formats.carbon.eba.parquet
 
-package org.opendc.trace.conv
-
-/**
- * A column containing the timestamp of the carbon intensity measurement.
- */
-public const val CARBON_TIMESTAMP: String = "timestamp"
+import java.time.Instant
 
 /**
- * A column containing the intensity of the carbon when sampled.
+ * A task in the Workflow Trace Format.
  */
-public const val CARBON_INTENSITY: String = "carbon_intensity"
+internal data class CarbonEBAFragment(
+    val timestamp: Instant,
+    val carbonIntensity: Double,
+    val wnd: Long,
+    val sun: Long,
+    val wat: Long,
+    val oil: Long,
+    val ng: Long,
+    val col: Long,
+    val nuc: Long,
+    val oth: Long
+)

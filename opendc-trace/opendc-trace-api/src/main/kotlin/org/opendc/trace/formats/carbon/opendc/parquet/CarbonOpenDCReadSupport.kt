@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.opendc.trace.formats.carbon.parquet
+package org.opendc.trace.formats.carbon.opendc.parquet
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.parquet.hadoop.api.InitContext
@@ -28,22 +28,22 @@ import org.apache.parquet.hadoop.api.ReadSupport
 import org.apache.parquet.io.api.RecordMaterializer
 import org.apache.parquet.schema.MessageType
 import org.apache.parquet.schema.Types
-import org.opendc.trace.conv.CARBON_INTENSITY
-import org.opendc.trace.conv.CARBON_TIMESTAMP
+import org.opendc.trace.conv.CARBON_OPENDC_INTENSITY
+import org.opendc.trace.conv.CARBON_OPENDC_TIMESTAMP
 
 /**
- * A [ReadSupport] instance for [CarbonFragment] objects.
+ * A [ReadSupport] instance for [CarbonOpenDCFragment] objects.
  *
  * @param projection The projection of the table to read.
  */
-internal class CarbonReadSupport(private val projection: List<String>?) : ReadSupport<CarbonFragment>() {
+internal class CarbonOpenDCReadSupport(private val projection: List<String>?) : ReadSupport<CarbonOpenDCFragment>() {
     /**
      * Mapping of table columns to their Parquet column names.
      */
     private val colMap =
         mapOf(
-            CARBON_TIMESTAMP to "timestamp",
-            CARBON_INTENSITY to "carbon_intensity",
+            CARBON_OPENDC_TIMESTAMP to "timestamp",
+            CARBON_OPENDC_INTENSITY to "carbon_intensity",
         )
 
     override fun init(context: InitContext): ReadContext {
@@ -70,5 +70,5 @@ internal class CarbonReadSupport(private val projection: List<String>?) : ReadSu
         keyValueMetaData: Map<String, String>,
         fileSchema: MessageType,
         readContext: ReadContext,
-    ): RecordMaterializer<CarbonFragment> = CarbonRecordMaterializer(readContext.requestedSchema)
+    ): RecordMaterializer<CarbonOpenDCFragment> = CarbonOpenDCRecordMaterializer(readContext.requestedSchema)
 }

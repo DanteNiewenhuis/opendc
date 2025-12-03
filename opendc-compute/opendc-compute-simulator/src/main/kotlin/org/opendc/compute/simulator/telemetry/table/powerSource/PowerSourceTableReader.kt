@@ -73,4 +73,38 @@ public interface PowerSourceTableReader : Exportable {
      * The current carbon emission since the last deadline in g.
      */
     public val carbonEmission: Double
+
+    public val wndPower: Long
+
+    public val sunPower: Long
+
+    public val watPower: Long
+
+    public val oilPower: Long
+
+    public val ngPower: Long
+
+    public val colPower: Long
+
+    public val nucPower: Long
+
+    public val othPower: Long
+
+    public val wndCoverage: Double
+
+    public val sunCoverage: Double
+
+    public val watCoverage: Double
+
+    public val oilCoverage: Double
+
+    public val ngCoverage: Double
+
+    public val colCoverage: Double
+
+    public val nucCoverage: Double
+
+    public val othCoverage: Double
+
+    public val wndSunCoverage: Double
 }

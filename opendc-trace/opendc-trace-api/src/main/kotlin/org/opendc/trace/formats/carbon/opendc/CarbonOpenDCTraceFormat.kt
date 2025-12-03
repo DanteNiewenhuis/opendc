@@ -20,16 +20,16 @@
  * SOFTWARE.
  */
 
-package org.opendc.trace.formats.carbon
+package org.opendc.trace.formats.carbon.opendc
 
 import org.opendc.trace.TableColumn
 import org.opendc.trace.TableColumnType
 import org.opendc.trace.TableReader
 import org.opendc.trace.TableWriter
-import org.opendc.trace.conv.CARBON_INTENSITY
-import org.opendc.trace.conv.CARBON_TIMESTAMP
-import org.opendc.trace.conv.TABLE_CARBON
-import org.opendc.trace.formats.carbon.parquet.CarbonReadSupport
+import org.opendc.trace.conv.CARBON_OPENDC_INTENSITY
+import org.opendc.trace.conv.CARBON_OPENDC_TIMESTAMP
+import org.opendc.trace.conv.TABLE_CARBON_OPENDC
+import org.opendc.trace.formats.carbon.opendc.parquet.CarbonOpenDCReadSupport
 import org.opendc.trace.spi.TableDetails
 import org.opendc.trace.spi.TraceFormat
 import org.opendc.trace.util.parquet.LocalParquetReader
@@ -38,25 +38,25 @@ import java.nio.file.Path
 /**
  * A [TraceFormat] implementation for the Carbon Intensity trace.
  */
-public class CarbonTraceFormat : TraceFormat {
+public class CarbonOpenDCTraceFormat : TraceFormat {
     override val name: String = "carbon_intensity"
 
     override fun create(path: Path) {
         throw UnsupportedOperationException("Writing not supported for this format")
     }
 
-    override fun getTables(path: Path): List<String> = listOf(TABLE_CARBON)
+    override fun getTables(path: Path): List<String> = listOf(TABLE_CARBON_OPENDC)
 
     override fun getDetails(
         path: Path,
         table: String,
     ): TableDetails {
         return when (table) {
-            TABLE_CARBON ->
+            TABLE_CARBON_OPENDC ->
                 TableDetails(
                     listOf(
-                        TableColumn(CARBON_TIMESTAMP, TableColumnType.Instant),
-                        TableColumn(CARBON_INTENSITY, TableColumnType.Double),
+                        TableColumn(CARBON_OPENDC_TIMESTAMP, TableColumnType.Instant),
+                        TableColumn(CARBON_OPENDC_INTENSITY, TableColumnType.Double),
                     ),
                 )
             else -> throw IllegalArgumentException("Table $table not supported")
@@ -69,9 +69,9 @@ public class CarbonTraceFormat : TraceFormat {
         projection: List<String>?,
     ): TableReader {
         return when (table) {
-            TABLE_CARBON -> {
-                val reader = LocalParquetReader(path, CarbonReadSupport(projection))
-                CarbonTableReader(reader)
+            TABLE_CARBON_OPENDC -> {
+                val reader = LocalParquetReader(path, CarbonOpenDCReadSupport(projection))
+                CarbonOpenDCTableReader(reader)
             }
             else -> throw IllegalArgumentException("Table $table not supported")
         }

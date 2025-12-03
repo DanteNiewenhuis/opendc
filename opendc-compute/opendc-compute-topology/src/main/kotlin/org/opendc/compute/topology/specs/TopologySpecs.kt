@@ -28,6 +28,7 @@ import org.opendc.common.units.DataRate
 import org.opendc.common.units.DataSize
 import org.opendc.common.units.Frequency
 import org.opendc.common.units.Power
+import org.opendc.compute.carbon.CarbonTraceType
 import org.opendc.simulator.compute.power.batteries.BatteryAggregator
 import org.opendc.simulator.compute.power.batteries.SimBattery
 import org.opendc.simulator.compute.power.batteries.policy.BatteryPolicy
@@ -274,6 +275,7 @@ public data class PowerSourceJSONSpec(
     val name: String = "PowerSource",
     val maxPower: Long = Long.MAX_VALUE,
     val carbonTracePath: String? = null,
+    val carbonTraceType: CarbonTraceType = CarbonTraceType.OpenDC,
 ) {
     public companion object {
         public val DFLT: PowerSourceJSONSpec =

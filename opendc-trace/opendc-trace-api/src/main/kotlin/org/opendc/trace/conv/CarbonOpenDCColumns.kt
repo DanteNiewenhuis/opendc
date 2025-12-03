@@ -20,31 +20,16 @@
  * SOFTWARE.
  */
 
-@file:JvmName("Tables")
+@file:JvmName("CarbonOpenDCColumns")
 
 package org.opendc.trace.conv
 
 /**
- * A table containing all tasks in a workload.
+ * A column containing the timestamp of the carbon intensity measurement.
  */
-public const val TABLE_TASKS: String = "tasks"
+public const val CARBON_OPENDC_TIMESTAMP: String = "timestamp"
 
 /**
- * A table containing all resource states in a workload.
+ * A column containing the intensity of the carbon when sampled.
  */
-public const val TABLE_FRAGMENTS: String = "fragments"
-
-/**
- * A table containing the carbon intensities of the region
- */
-public const val TABLE_CARBON_OPENDC: String = "carbon_opendc"
-
-/**
- * A table containing the carbon intensities of the region
- */
-public const val TABLE_CARBON_EBA: String = "carbon_eba"
-
-/**
- * A table containing failures that can be injected during simulation.
- */
-public const val TABLE_FAILURES: String = "failures"
+public const val CARBON_OPENDC_INTENSITY: String = "carbon_intensity"

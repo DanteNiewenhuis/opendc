@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import org.opendc.common.ResourceType;
 import org.opendc.simulator.compute.cpu.SimCpu;
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonEBAFragment;
 import org.opendc.simulator.compute.power.carbon.CarbonModel;
 import org.opendc.simulator.compute.power.carbon.CarbonReceiver;
 import org.opendc.simulator.engine.engine.FlowEngine;
@@ -39,12 +40,12 @@ import org.opendc.simulator.engine.graph.FlowSupplier;
 public final class SimPowerSource extends FlowNode implements FlowSupplier, CarbonReceiver {
     private long lastUpdate;
 
-    private double powerDemand = 0.0f;
-    private double powerSupplied = 0.0f;
-    private double totalEnergyUsage = 0.0f;
+    private double powerDemand = 0.0;
+    private double powerSupplied = 0.0;
+    private double totalEnergyUsage = 0.0;
 
-    private double carbonIntensity = 0.0f;
-    private double totalCarbonEmission = 0.0f;
+    private double carbonIntensity = 0.0;
+    private double totalCarbonEmission = 0.0;
 
     private FlowEdge distributorEdge;
 
@@ -99,6 +100,105 @@ public final class SimPowerSource extends FlowNode implements FlowSupplier, Carb
         return this.totalCarbonEmission;
     }
 
+    public double getWndEnergyUsed() {
+        return wndEnergyUsed;
+    }
+
+    public double getWndCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (wndEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getSunEnergyUsed() {
+        return sunEnergyUsed;
+    }
+
+    public double getSunCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (sunEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getWatEnergyUsed() {
+        return watEnergyUsed;
+    }
+
+    public double getWatCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (watEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getOilEnergyUsed() {
+        return oilEnergyUsed;
+    }
+
+    public double getOilCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (oilEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getNgEnergyUsed() {
+        return ngEnergyUsed;
+    }
+
+    public double getNgCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (ngEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getColEnergyUsed() {
+        return colEnergyUsed;
+    }
+
+    public double getColCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (colEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getNucEnergyUsed() {
+        return nucEnergyUsed;
+    }
+
+    public double getNucCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (nucEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getOthEnergyUsed() {
+        return othEnergyUsed;
+    }
+
+    public double getOthCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (othEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
+    public double getWndSunEnergyUsed() {
+        return wndSunEnergyUsed;
+    }
+
+    public double getWndSunCoverage() {
+        if (totalEnergyUsage == 0.0) {
+            return 0.0;
+        }
+        return (wndSunEnergyUsed / totalEnergyUsage) * 100.0;
+    }
+
     @Override
     public double getCapacity() {
         return this.capacity;
@@ -110,6 +210,14 @@ public final class SimPowerSource extends FlowNode implements FlowSupplier, Carb
 
     public String getClusterName() {
         return clusterName;
+    }
+
+    public Map<Integer, Long> getAvailablePowers() {
+        if (this.carbonModel != null) {
+            return this.carbonModel.getAvailablePowers();
+        } else {
+            return Map.of();
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +252,62 @@ public final class SimPowerSource extends FlowNode implements FlowSupplier, Carb
         return Long.MAX_VALUE;
     }
 
+    private double wndEnergyUsed = 0.0;
+    private double sunEnergyUsed = 0.0;
+    private double watEnergyUsed = 0.0;
+    private double oilEnergyUsed = 0.0;
+    private double ngEnergyUsed = 0.0;
+    private double colEnergyUsed = 0.0;
+    private double nucEnergyUsed = 0.0;
+    private double othEnergyUsed = 0.0;
+
+    private double wndSunEnergyUsed = 0.0;
+
+    private void updateCoverage(long passedTime) {
+        Map<Integer, Long> availablePowers = getAvailablePowers();
+        if (availablePowers.isEmpty()) {
+            return;
+        }
+
+        double maxWndPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.WND.ordinal(), 0L);
+        double wndPower = Math.min(this.powerSupplied, maxWndPower);
+
+        double maxSunPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.SUN.ordinal(), 0L);
+        double sunPower = Math.min(this.powerSupplied, maxSunPower);
+
+        double maxWatPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.WAT.ordinal(), 0L);
+        double watPower = Math.min(this.powerSupplied, maxWatPower);
+
+        double maxOilPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.OIL.ordinal(), 0L);
+        double oilPower = Math.min(this.powerSupplied, maxOilPower);
+
+        double maxNgPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.NG.ordinal(), 0L);
+        double ngPower = Math.min(this.powerSupplied, maxNgPower);
+
+        double maxColPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.COL.ordinal(), 0L);
+        double colPower = Math.min(this.powerSupplied, maxColPower);
+
+        double maxNucPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.NUC.ordinal(), 0L);
+        double nucPower = Math.min(this.powerSupplied, maxNucPower);
+
+        double maxOthPower = (double) availablePowers.getOrDefault(CarbonEBAFragment.PowerSourceType.OTH.ordinal(), 0L);
+        double othPower = Math.min(this.powerSupplied, maxOthPower);
+
+        double maxWndSunPower = maxWndPower + maxSunPower;
+        double wndSunPower = Math.min(this.powerSupplied, maxWndSunPower);
+
+        wndEnergyUsed += (wndPower * (passedTime * 0.001)); // in Wh
+        sunEnergyUsed += (sunPower * (passedTime * 0.001)); // in Wh
+        watEnergyUsed += (watPower * (passedTime * 0.001)); // in Wh
+        oilEnergyUsed += (oilPower * (passedTime * 0.001)); // in Wh
+        ngEnergyUsed += (ngPower * (passedTime * 0.001)); // in Wh
+        colEnergyUsed += (colPower * (passedTime * 0.001)); // in Wh
+        nucEnergyUsed += (nucPower * (passedTime * 0.001)); // in Wh
+        othEnergyUsed += (othPower * (passedTime * 0.001)); // in Wh
+
+        wndSunEnergyUsed += (wndSunPower * (passedTime * 0.001)); // in Wh
+    }
+
     public void updateCounters() {
         updateCounters(clock.millis());
     }
@@ -158,6 +322,8 @@ public final class SimPowerSource extends FlowNode implements FlowSupplier, Carb
         long passedTime = now - lastUpdate;
         if (passedTime > 0) {
             double energyUsage = (this.powerSupplied * passedTime * 0.001);
+
+            updateCoverage(passedTime);
 
             // Compute the energy usage of the machine
             this.totalEnergyUsage += energyUsage;

@@ -6,7 +6,8 @@
     "workloads": [{
         "pathToFile": "src/test/resources/workloadTraces/bitbrains-small",
         "type": "ComputeWorkload",
-        "submissionTime": "2024-03-01T00:00:00"
+        "submissionTime": "2024-03-01T00:00:00",
+        "scalingPolicy":  "Perfect"
     }],
     "allocationPolicies": [
         {

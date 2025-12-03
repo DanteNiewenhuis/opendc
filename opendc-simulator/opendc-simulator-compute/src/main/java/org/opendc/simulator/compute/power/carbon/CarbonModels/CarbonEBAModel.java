@@ -1,6 +1,7 @@
 package org.opendc.simulator.compute.power.carbon.CarbonModels;
 
-import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonEBAFragment.PowerSourceType;
+import org.opendc.simulator.compute.power.carbon.CarbonFragment;
+import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonEBAFragment;
 import org.opendc.simulator.compute.power.carbon.CarbonFragments.CarbonOpenDCFragment;
 import org.opendc.simulator.compute.power.carbon.CarbonModel;
 import org.opendc.simulator.compute.power.carbon.CarbonReceiver;
@@ -9,10 +10,11 @@ import org.opendc.simulator.engine.graph.FlowEdge;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public class CarbonOpenDCModel extends CarbonModel {
-    private final List<CarbonOpenDCFragment> fragments;
-    private CarbonOpenDCFragment current_fragment;
+public class CarbonEBAModel extends CarbonModel {
+    private final List<CarbonEBAFragment> fragments;
+    private CarbonEBAFragment current_fragment;
 
     private int fragment_index;
 
@@ -24,7 +26,7 @@ public class CarbonOpenDCModel extends CarbonModel {
      * @param startTime The start time of the simulation. This is used to go from relative time (used by the clock)
      *                  to absolute time (used by carbon fragments).
      */
-    public CarbonOpenDCModel(FlowEngine engine, List<CarbonOpenDCFragment> carbonFragments, long startTime) {
+    public CarbonEBAModel(FlowEngine engine, List<CarbonEBAFragment> carbonFragments, long startTime) {
         super(engine, startTime);
 
         this.fragments = carbonFragments;
@@ -33,7 +35,6 @@ public class CarbonOpenDCModel extends CarbonModel {
         this.current_fragment = this.fragments.get(this.fragment_index);
         this.pushCarbonIntensity(this.current_fragment.getCarbonIntensity());
     }
-
 
     /**
      * Traverse the fragments to find the fragment that matches the given absoluteTime
@@ -88,21 +89,12 @@ public class CarbonOpenDCModel extends CarbonModel {
                 Math.min(this.fragment_index + 1, this.fragments.size() - 1),
                 Math.min(this.fragment_index + forecastSize, this.fragments.size()))
             .stream()
-            .mapToDouble(CarbonOpenDCFragment::getCarbonIntensity)
+            .mapToDouble(CarbonEBAFragment::getCarbonIntensity)
             .toArray();
     }
 
     public Map<Integer, Long> getAvailablePowers() {
-        return Map.of(
-            PowerSourceType.WND.ordinal(), 0L,
-            PowerSourceType.SUN.ordinal(), 0L,
-            PowerSourceType.WAT.ordinal(), 0L,
-            PowerSourceType.OIL.ordinal(), 0L,
-            PowerSourceType.NG.ordinal(),  0L,
-            PowerSourceType.COL.ordinal(), 0L,
-            PowerSourceType.NUC.ordinal(), 0L,
-            PowerSourceType.OTH.ordinal(), 0L
-        );
+        return this.current_fragment.getAvailablePowers();
     }
 
     @Override

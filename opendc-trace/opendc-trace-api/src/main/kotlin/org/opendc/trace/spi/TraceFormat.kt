@@ -24,7 +24,8 @@ package org.opendc.trace.spi
 
 import org.opendc.trace.TableReader
 import org.opendc.trace.TableWriter
-import org.opendc.trace.formats.carbon.CarbonTraceFormat
+import org.opendc.trace.formats.carbon.eba.CarbonEBATraceFormat
+import org.opendc.trace.formats.carbon.opendc.CarbonOpenDCTraceFormat
 import org.opendc.trace.formats.failure.FailureTraceFormat
 import org.opendc.trace.formats.workload.WorkloadTraceFormat
 import java.nio.file.Path
@@ -116,7 +117,8 @@ public interface TraceFormat {
         @JvmStatic
         public fun byName(name: String): TraceFormat? {
             return when (name) {
-                "carbon" -> CarbonTraceFormat()
+                "carbon_opendc" -> CarbonOpenDCTraceFormat()
+                "carbon_eba" -> CarbonEBATraceFormat()
                 "failure" -> FailureTraceFormat()
                 "workload" -> WorkloadTraceFormat()
                 else -> null

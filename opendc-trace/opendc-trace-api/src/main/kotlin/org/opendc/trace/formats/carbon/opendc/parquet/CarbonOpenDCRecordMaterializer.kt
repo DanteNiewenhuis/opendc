@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.opendc.trace.formats.carbon.parquet
+package org.opendc.trace.formats.carbon.opendc.parquet
 
 import org.apache.parquet.io.api.Converter
 import org.apache.parquet.io.api.GroupConverter
@@ -30,9 +30,9 @@ import org.apache.parquet.schema.MessageType
 import java.time.Instant
 
 /**
- * A [RecordMaterializer] for [CarbonFragment] records.
+ * A [RecordMaterializer] for [CarbonOpenDCFragment] records.
  */
-internal class CarbonRecordMaterializer(schema: MessageType) : RecordMaterializer<CarbonFragment>() {
+internal class CarbonOpenDCRecordMaterializer(schema: MessageType) : RecordMaterializer<CarbonOpenDCFragment>() {
     /**
      * State of current record being read.
      */
@@ -76,8 +76,8 @@ internal class CarbonRecordMaterializer(schema: MessageType) : RecordMaterialize
             override fun getConverter(fieldIndex: Int): Converter = converters[fieldIndex]
         }
 
-    override fun getCurrentRecord(): CarbonFragment =
-        CarbonFragment(
+    override fun getCurrentRecord(): CarbonOpenDCFragment =
+        CarbonOpenDCFragment(
             localTimestamp,
             localCarbonIntensity,
         )
