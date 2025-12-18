@@ -58,6 +58,7 @@ public class GreenifierWorkloadLoader(private val baseDir: File): WorkloadLoader
                     duration = duration,
                     durations = task.runTimes,
                     deadline = submissionTime,
+                    energyConsumptions = task.energyConsumption,
                     nature = "",
                     dependencies = dependenciesString
                 )

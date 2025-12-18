@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 AtLarge Research
+ * Copyright (c) 2021 AtLarge Research
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,29 @@
  * SOFTWARE.
  */
 
-package org.opendc.simulator.compute.workload;
+package org.opendc.compute.simulator.scheduler.weights
 
-import java.util.Map;
-import java.util.function.Consumer;
-import org.opendc.simulator.compute.machine.SimMachine;
-import org.opendc.simulator.engine.graph.FlowSupplier;
+import org.opendc.compute.simulator.service.HostView
+import org.opendc.compute.simulator.service.ServiceTask
 
-public interface Workload {
+/**
+ * A [HostWeigher] that weighs the hosts based on the available RAM (memory) on the host.
+ *
+ * @param multiplier Weight multiplier ratio. A positive value will result in the scheduler preferring hosts with more
+ * available memory, and a negative number will result in the scheduler preferring hosts with less memory.
+ */
+public class DurationWeigher(override val multiplier: Double = 1.0) : HostWeigher {
+    override fun getWeight(
+        hostView: HostView,
+        task: ServiceTask,
+    ): Double {
+        val durations = task.workload.durations()
+        val hostName = hostView.host.getName()
 
-    Map<String, Long> durations();
-    Map<String, Double> energyConsumptions();
+        val duration = durations[hostName] ?: return 99999999999.0
 
-    long checkpointInterval();
+        return duration.toDouble()
+    }
 
-    long checkpointDuration();
-
-    double checkpointIntervalScaling();
-
-    SimWorkload startWorkload(FlowSupplier supplier);
-
-    SimWorkload startWorkload(FlowSupplier supplier, String hostName);
-
-    SimWorkload startWorkload(FlowSupplier supplier, SimMachine machine, Consumer<Exception> completion);
+    override fun toString(): String = "DurationWeigher"
 }

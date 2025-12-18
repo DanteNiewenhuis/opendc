@@ -49,9 +49,10 @@ public data class Task(
     var submissionTime: Long,
     val duration: Long,
     val durations: Map<String, Long>? = null,
+    val energyConsumptions: Map<String, Double>? = null,
     val dependencies: List<String> = emptyList(),
     val nature: String?,
     var deadline: Long,
-    val trace: TraceWorkload = TraceWorkload(arrayListOf<TraceFragment>(), durations, 0,
+    val trace: TraceWorkload = TraceWorkload(arrayListOf<TraceFragment>(), durations,  energyConsumptions, 0,
         0, 1.0, NoDelayScaling(), name)
 )

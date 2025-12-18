@@ -337,8 +337,13 @@ public class SimHost(
     }
 
     public fun getCpuStats(task: ServiceTask): GuestCpuStats {
-        val guest = requireNotNull(taskToGuestMap[task]) { "Unknown task ${task.name} at host $name" }
-        return guest.getCpuStats()
+        try {
+            val guest = requireNotNull(taskToGuestMap[task]) { "Unknown task ${task.name} at host $name" }
+            return guest.getCpuStats()
+        }
+        catch (e: java.lang.IllegalArgumentException) {
+            throw e
+        }
     }
 
     override fun hashCode(): Int = name.hashCode()

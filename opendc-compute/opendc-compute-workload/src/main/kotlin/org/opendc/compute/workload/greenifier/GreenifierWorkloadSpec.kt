@@ -21,7 +21,12 @@ public data class TaskSpec(
     val cpuUsage: Frequency,
     val dependencies: List<Int>,
     val memCapacity: DataSize,
-    val energyConsumption: Map<String, Energy>,
-    val runTimes: Map<String, Long>,
+    var energyConsumption: Map<String, Double>,
+    var runTimes: Map<String, Long>,
     val submissionTime: String
-)
+) {
+    init {
+        runTimes = runTimes.mapValues {(_, value) -> value * 10000};
+        energyConsumption = energyConsumption.mapValues {(_, value) -> value * 10000};
+    }
+}

@@ -41,7 +41,8 @@ public class TraceWorkload implements Workload {
     private double maxCpuDemand = 0.0;
     private int maxCoreCount = 0;
 
-    private Map<String, Long> durations;
+    private final Map<String, Long> durations;
+    private final Map<String, Double> energyConsumptions;
 
     public String getTaskName() {
         return taskName;
@@ -58,6 +59,7 @@ public class TraceWorkload implements Workload {
     public TraceWorkload(
             ArrayList<TraceFragment> fragments,
             Map<String, Long> durations,
+            Map<String, Double> energyConsumptions,
             long checkpointInterval,
             long checkpointDuration,
             double checkpointIntervalScaling,
@@ -65,6 +67,7 @@ public class TraceWorkload implements Workload {
             String taskName) {
         this.fragments = fragments;
         this.durations = durations;
+        this.energyConsumptions = energyConsumptions;
         this.checkpointInterval = checkpointInterval;
         this.checkpointDuration = checkpointDuration;
         this.checkpointIntervalScaling = checkpointIntervalScaling;
@@ -86,6 +89,17 @@ public class TraceWorkload implements Workload {
     public ArrayList<TraceFragment> getFragments() {
         return fragments;
     }
+
+    @Override
+    public Map<String, Long> durations() {
+        return durations;
+    }
+
+    @Override
+    public Map<String, Double> energyConsumptions() {
+        return energyConsumptions;
+    }
+
 
     @Override
     public long checkpointInterval() {
@@ -129,10 +143,13 @@ public class TraceWorkload implements Workload {
     @Override
     public SimWorkload startWorkload(FlowSupplier supplier, String hostName) {
 
-        if (fragments.size() == 0) {
+        long duration = this.durations.get(hostName);
+        double powerDraw = this.energyConsumptions.get(hostName) / this.durations.get(hostName);
+
+        if (fragments.isEmpty()) {
             fragments.addFirst(new TraceFragment(
-                this.durations.get(hostName),
-                1,
+                duration,
+                powerDraw,
                 1
             ));
         }
@@ -197,6 +214,7 @@ public class TraceWorkload implements Workload {
         public TraceWorkload build() {
             return new TraceWorkload(
                     this.fragments,
+                    Collections.emptyMap(),
                     Collections.emptyMap(),
                     this.checkpointInterval,
                     this.checkpointDuration,

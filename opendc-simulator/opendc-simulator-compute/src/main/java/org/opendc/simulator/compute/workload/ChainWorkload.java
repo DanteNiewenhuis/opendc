@@ -23,6 +23,7 @@
 package org.opendc.simulator.compute.workload;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.opendc.simulator.compute.machine.SimMachine;
 import org.opendc.simulator.engine.graph.FlowSupplier;
@@ -39,6 +40,16 @@ public record ChainWorkload(
             return;
         }
         this.workloads.subList(0, numberOfWorkloads).clear();
+    }
+
+    @Override
+    public Map<String, Long> durations() {
+        return Map.of();
+    }
+
+    @Override
+    public Map<String, Double> energyConsumptions() {
+        return Map.of();
     }
 
     @Override

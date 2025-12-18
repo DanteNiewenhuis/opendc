@@ -29,6 +29,8 @@ import org.opendc.compute.simulator.scheduler.filters.RamFilter
 import org.opendc.compute.simulator.scheduler.filters.VCpuFilter
 import org.opendc.compute.simulator.scheduler.timeshift.TimeshiftScheduler
 import org.opendc.compute.simulator.scheduler.weights.CoreRamWeigher
+import org.opendc.compute.simulator.scheduler.weights.DurationWeigher
+import org.opendc.compute.simulator.scheduler.weights.EnergyConsumptionWeigher
 import org.opendc.compute.simulator.scheduler.weights.InstanceCountWeigher
 import org.opendc.compute.simulator.scheduler.weights.RamWeigher
 import org.opendc.compute.simulator.scheduler.weights.VCpuWeigher
@@ -48,6 +50,8 @@ public enum class ComputeSchedulerEnum {
     Random,
     TaskNumMemorizing,
     Timeshift,
+    Duration,
+    EnergyConsumption
 }
 
 public fun createPrefabComputeScheduler(
@@ -127,6 +131,16 @@ public fun createPrefabComputeScheduler(
                 windowSize = 168,
                 clock = clock,
                 random = SplittableRandom(seeder.nextLong()),
+            )
+        ComputeSchedulerEnum.Duration ->
+            FilterScheduler(
+                filters = listOf(ComputeFilter(), VCpuFilter(cpuAllocationRatio), RamFilter(ramAllocationRatio)),
+                weighers = listOf(DurationWeigher(multiplier = -1.0)),
+            )
+        ComputeSchedulerEnum.EnergyConsumption ->
+            FilterScheduler(
+                filters = listOf(ComputeFilter(), VCpuFilter(cpuAllocationRatio), RamFilter(ramAllocationRatio)),
+                weighers = listOf(EnergyConsumptionWeigher(multiplier = -1.0)),
             )
     }
 }
