@@ -1,0 +1,195 @@
+[
+  {
+    "commit": "816332cbaf256c405a109d8cc16fec8f15df907e",
+    "pr": null,
+    "timestamp": "2026-05-21T11:36:37.923860+00:00",
+    "results": [
+      {
+        "jmhVersion": "1.36",
+        "benchmark": "org.opendc.experiments.CIBenchmark.surfHalfYearBenchmark",
+        "mode": "ss",
+        "threads": 1,
+        "forks": 1,
+        "jvm": "/usr/lib/jvm/temurin-21-jdk-amd64/bin/java",
+        "jvmArgs": [
+          "-Dfile.encoding=UTF-8",
+          "-Djava.io.tmpdir=/home/runner/work/opendc/opendc/opendc-experiments/opendc-experiments-base/build/tmp/jmh",
+          "-Duser.country",
+          "-Duser.language=en",
+          "-Duser.variant"
+        ],
+        "jdkVersion": "21.0.11",
+        "vmName": "OpenJDK 64-Bit Server VM",
+        "vmVersion": "21.0.11+10-LTS",
+        "warmupIterations": 1,
+        "warmupTime": "single-shot",
+        "warmupBatchSize": 1,
+        "measurementIterations": 5,
+        "measurementTime": "single-shot",
+        "measurementBatchSize": 1,
+        "primaryMetric": {
+          "score": 27503.360309399995,
+          "scoreError": 2052.1581742106123,
+          "scoreConfidence": [
+            25451.20213518938,
+            29555.51848361061
+          ],
+          "scorePercentiles": {
+            "0.0": 27074.961718,
+            "50.0": 27407.894057,
+            "90.0": 28388.565139,
+            "95.0": 28388.565139,
+            "99.0": 28388.565139,
+            "99.9": 28388.565139,
+            "99.99": 28388.565139,
+            "99.999": 28388.565139,
+            "99.9999": 28388.565139,
+            "100.0": 28388.565139
+          },
+          "scoreUnit": "ms/op",
+          "rawData": [
+            [
+              28388.565139,
+              27540.159513,
+              27074.961718,
+              27407.894057,
+              27105.22112
+            ]
+          ]
+        },
+        "secondaryMetrics": {},
+        "heapMetric": {
+          "avgMb": 2072.2387,
+          "avgStdMb": 110.5509,
+          "maxMb": 3334.4482,
+          "maxStdMb": 43.9436
+        },
+        "_meta_commit": "816332cbaf256c405a109d8cc16fec8f15df907e"
+      },
+      {
+        "jmhVersion": "1.36",
+        "benchmark": "org.opendc.experiments.CIBenchmark.surfMonthBenchmark",
+        "mode": "ss",
+        "threads": 1,
+        "forks": 1,
+        "jvm": "/usr/lib/jvm/temurin-21-jdk-amd64/bin/java",
+        "jvmArgs": [
+          "-Dfile.encoding=UTF-8",
+          "-Djava.io.tmpdir=/home/runner/work/opendc/opendc/opendc-experiments/opendc-experiments-base/build/tmp/jmh",
+          "-Duser.country",
+          "-Duser.language=en",
+          "-Duser.variant"
+        ],
+        "jdkVersion": "21.0.11",
+        "vmName": "OpenJDK 64-Bit Server VM",
+        "vmVersion": "21.0.11+10-LTS",
+        "warmupIterations": 1,
+        "warmupTime": "single-shot",
+        "warmupBatchSize": 1,
+        "measurementIterations": 5,
+        "measurementTime": "single-shot",
+        "measurementBatchSize": 1,
+        "primaryMetric": {
+          "score": 1989.0776815999998,
+          "scoreError": 1227.7852456570674,
+          "scoreConfidence": [
+            761.2924359429323,
+            3216.862927257067
+          ],
+          "scorePercentiles": {
+            "0.0": 1750.952295,
+            "50.0": 1850.118433,
+            "90.0": 2523.748528,
+            "95.0": 2523.748528,
+            "99.0": 2523.748528,
+            "99.9": 2523.748528,
+            "99.99": 2523.748528,
+            "99.999": 2523.748528,
+            "99.9999": 2523.748528,
+            "100.0": 2523.748528
+          },
+          "scoreUnit": "ms/op",
+          "rawData": [
+            [
+              2523.748528,
+              2037.491529,
+              1850.118433,
+              1783.077623,
+              1750.952295
+            ]
+          ]
+        },
+        "secondaryMetrics": {},
+        "heapMetric": {
+          "avgMb": 706.8559,
+          "avgStdMb": 167.3913,
+          "maxMb": 1027.5826,
+          "maxStdMb": 269.8773
+        },
+        "_meta_commit": "816332cbaf256c405a109d8cc16fec8f15df907e"
+      },
+      {
+        "jmhVersion": "1.36",
+        "benchmark": "org.opendc.experiments.CIBenchmark.surfWeekBenchmark",
+        "mode": "ss",
+        "threads": 1,
+        "forks": 1,
+        "jvm": "/usr/lib/jvm/temurin-21-jdk-amd64/bin/java",
+        "jvmArgs": [
+          "-Dfile.encoding=UTF-8",
+          "-Djava.io.tmpdir=/home/runner/work/opendc/opendc/opendc-experiments/opendc-experiments-base/build/tmp/jmh",
+          "-Duser.country",
+          "-Duser.language=en",
+          "-Duser.variant"
+        ],
+        "jdkVersion": "21.0.11",
+        "vmName": "OpenJDK 64-Bit Server VM",
+        "vmVersion": "21.0.11+10-LTS",
+        "warmupIterations": 1,
+        "warmupTime": "single-shot",
+        "warmupBatchSize": 1,
+        "measurementIterations": 5,
+        "measurementTime": "single-shot",
+        "measurementBatchSize": 1,
+        "primaryMetric": {
+          "score": 1943.8428616,
+          "scoreError": 1137.979085246691,
+          "scoreConfidence": [
+            805.863776353309,
+            3081.8219468466914
+          ],
+          "scorePercentiles": {
+            "0.0": 1779.031741,
+            "50.0": 1813.910457,
+            "90.0": 2470.461598,
+            "95.0": 2470.461598,
+            "99.0": 2470.461598,
+            "99.9": 2470.461598,
+            "99.99": 2470.461598,
+            "99.999": 2470.461598,
+            "99.9999": 2470.461598,
+            "100.0": 2470.461598
+          },
+          "scoreUnit": "ms/op",
+          "rawData": [
+            [
+              2470.461598,
+              1851.308088,
+              1804.502424,
+              1813.910457,
+              1779.031741
+            ]
+          ]
+        },
+        "secondaryMetrics": {},
+        "heapMetric": {
+          "avgMb": 321.2172,
+          "avgStdMb": 53.7773,
+          "maxMb": 505.5769,
+          "maxStdMb": 57.8611
+        },
+        "_meta_commit": "816332cbaf256c405a109d8cc16fec8f15df907e"
+      }
+    ]
+  }
+]
