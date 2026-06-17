@@ -129,3 +129,6 @@ opendc-experiments/opendc-experiments-m3sa/src/test/resources/outputs/*
 opendc-experiments/opendc-experiments-m3sa/src/test/resources/outputs
 opendc-experiments/opendc-experiments-m3sa/analysis.txt
 opendc-experiments/opendc-experiments-m3sa/src/test/resources/outputs/analysis.txt
+
+graphify-out/cost.json
+graphify-out/cache/
