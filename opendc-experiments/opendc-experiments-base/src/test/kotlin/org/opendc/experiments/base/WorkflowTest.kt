@@ -25,7 +25,7 @@ package org.opendc.experiments.base
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.simulator.compute.workload.trace.TraceFragment
 import java.util.ArrayList
 
@@ -45,7 +45,7 @@ class WorkflowTest {
      */
     @Test
     fun testWorkflow1() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -132,7 +132,7 @@ class WorkflowTest {
      */
     @Test
     fun testWorkflow2() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -238,7 +238,7 @@ class WorkflowTest {
      */
     @Test
     fun testWorkflow3() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -353,7 +353,7 @@ class WorkflowTest {
      */
     @Test
     fun testWorkflow4() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -468,7 +468,7 @@ class WorkflowTest {
      */
     @Test
     fun testWorkflow5() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,

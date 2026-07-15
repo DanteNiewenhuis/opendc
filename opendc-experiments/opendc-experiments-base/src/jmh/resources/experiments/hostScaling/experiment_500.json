@@ -1,9 +1,9 @@
 {
     "topologies": [
-        {"pathToFile": "src/jmh/resources/topologies/workloadScaling/surf.json"}
+        {"pathToFile": "src/jmh/resources/topologies/hostScaling/topology_500.json"}
     ],
     "workloads": [{
-        "pathToFile": "src/jmh/resources/workloadTraces/workloadScaling/surf_halfyear",
+        "pathToFile": "src/jmh/resources/workloadTraces/taskScaling/1K_tasks",
         "type": "ComputeWorkload",
         "submissionTime": "2024-03-01T00:00:00"
     }],

@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.simulator.compute.virtualization.OverheadModels.ConstantVirtualizationOverhead
 import org.opendc.simulator.compute.virtualization.OverheadModels.NoVirtualizationOverHead
 import org.opendc.simulator.compute.virtualization.OverheadModels.ShareBasedVirtualizationOverhead
@@ -114,7 +114,7 @@ class VirtualizationOverheadTests {
     @Test
     fun noVirtualizationOverheadModelTest() {
         val topology = createTopology("virtualizationOverhead/single_gpu_no_overhead.json")
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -140,7 +140,7 @@ class VirtualizationOverheadTests {
     @Test
     fun constantVirtualizationOverheadModelTest() {
         val topology = createTopology("virtualizationOverhead/single_gpu_constant_overhead.json")
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -168,7 +168,7 @@ class VirtualizationOverheadTests {
     @Test
     fun customConstantVirtualizationOverheadModelTest() {
         val topology = createTopology("virtualizationOverhead/single_gpu_custom_constant_overhead.json")
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -196,7 +196,7 @@ class VirtualizationOverheadTests {
     @Test
     fun shareBasedVirtualizationOverheadModelTest() {
         val topology = createTopology("virtualizationOverhead/single_gpu_share_based_overhead.json")
-        val workload1: ArrayList<ServiceTask> =
+        val workload1: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -209,7 +209,7 @@ class VirtualizationOverheadTests {
                 ),
             )
 
-        val workload2: ArrayList<ServiceTask> =
+        val workload2: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -231,7 +231,7 @@ class VirtualizationOverheadTests {
                 ),
             )
 
-        val workload3: ArrayList<ServiceTask> =
+        val workload3: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,

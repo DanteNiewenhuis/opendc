@@ -48,24 +48,31 @@ import java.util.concurrent.TimeUnit
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 open class WorkloadBenchmark : OpenDCBenchmark() {
-    /** Runs the simulation with the SURF one-week workload trace. */
-    @Benchmark
-    fun surfWeekBenchmark() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_week.json"))
-        File("output").deleteRecursively()
-    }
+//    /** Runs the simulation with the SURF one-week workload trace. */
+//    @Benchmark
+//    fun surfWeekBenchmark() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_week.json"))
+//        File("output").deleteRecursively()
+//    }
+//
+//    /** Runs the simulation with the SURF one-month workload trace. */
+//    @Benchmark
+//    fun surfMonthBenchmark() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_month.json"))
+//        File("output").deleteRecursively()
+//    }
+//
+//    /** Runs the simulation with the SURF half-year workload trace. */
+//    @Benchmark
+//    fun surfHalfYearBenchmark() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_halfyear.json"))
+//        File("output").deleteRecursively()
+//    }
 
-    /** Runs the simulation with the SURF one-month workload trace. */
+    /** Runs the simulation with the Solvinity workload trace. */
     @Benchmark
-    fun surfMonthBenchmark() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_month.json"))
-        File("output").deleteRecursively()
-    }
-
-    /** Runs the simulation with the SURF half-year workload trace. */
-    @Benchmark
-    fun surfHalfYearBenchmark() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_halfyear.json"))
+    fun solvinityBenchmark() {
+        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/solvinity.json"))
         File("output").deleteRecursively()
     }
 }

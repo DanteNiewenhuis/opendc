@@ -25,7 +25,7 @@ package org.opendc.experiments.base
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.simulator.compute.workload.trace.TraceFragment
 import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFactory.DistributionPolicy
 import java.util.ArrayList
@@ -86,7 +86,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun equalShareDistributionPolicyTest1() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -163,7 +163,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun equalShareDistributionPolicyTest2() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -259,7 +259,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun fixedShareDistributionPolicyTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -305,7 +305,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun fixedShareDistributionPolicyContentionTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -366,7 +366,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun fixedShareDistributionPolicyMultipleTasksTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -428,7 +428,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun bestEffortDistributionPolicyBasicTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -507,7 +507,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun bestEffortDistributionPolicyContentionTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -556,7 +556,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun bestEffortDistributionPolicyUtilizationOptimizationTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -592,7 +592,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun bestEffortDistributionPolicyVaryingDemandsTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -639,7 +639,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun bestEffortDistributionPolicyFairnessTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -718,7 +718,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun firstFitDistributionPolicyGpuPlacementTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -768,7 +768,7 @@ class DistributionPoliciesTest {
      */
     @Test
     fun firstFitDistributionPolicyOverdemandTest() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,

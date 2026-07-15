@@ -22,14 +22,14 @@
 
 package org.opendc.compute.workload
 import mu.KotlinLogging
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 public abstract class WorkloadLoader(private val submissionTime: String? = null) {
     private val logger = KotlinLogging.logger {}
 
-    public fun reScheduleTasks(workload: List<ServiceTask>) {
+    public fun reScheduleTasks(workload: List<TaskSpec>) {
         if (submissionTime == null) {
             return
         }
@@ -45,12 +45,12 @@ public abstract class WorkloadLoader(private val submissionTime: String? = null)
         }
     }
 
-    public abstract fun load(): List<ServiceTask>
+    public abstract fun load(): MutableList<TaskSpec>
 
     /**
      * Load the workload at sample tasks until a fraction of the workload is loaded
      */
-    public fun sampleByLoad(fraction: Double): List<ServiceTask> {
+    public fun sampleByLoad(fraction: Double): MutableList<TaskSpec> {
         val workload = this.load()
 
         reScheduleTasks(workload)
@@ -63,7 +63,7 @@ public abstract class WorkloadLoader(private val submissionTime: String? = null)
             throw Error("The fraction of tasks to load cannot be 0.0 or lower")
         }
 
-        val res = mutableListOf<ServiceTask>()
+        val res = mutableListOf<TaskSpec>()
 
         val totalLoad = workload.sumOf { it.totalCPULoad }
         val desiredLoad = totalLoad * fraction
@@ -78,6 +78,7 @@ public abstract class WorkloadLoader(private val submissionTime: String? = null)
 
         logger.info { "Sampled ${workload.size} VMs (fraction $fraction) into subset of ${res.size} VMs" }
 
-        return res.sortedBy { it.submittedAt }
+        res.sortBy { it.submittedAt }
+        return res
     }
 }

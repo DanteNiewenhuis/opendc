@@ -554,7 +554,9 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
 
             SimHost host = hv.getHost();
 
-            // Remove request from queue
+            // The scheduler dequeues the request on SUCCESS, so it is dead from here on: release the
+            // task's reference to it, otherwise a running task retains its request until deletion.
+            task.setRequest(null);
             tasksPending--;
 
             LOGGER.info("Assigned task {} to host {}", task, host);
@@ -645,11 +647,13 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
         }
 
         @NotNull
-        public ServiceTask newTask(ServiceTask task) {
+        public ServiceTask newTask(TaskSpec spec, long simulationOffset) {
 
             checkOpen();
 
             final ComputeService service = this.service;
+
+            final ServiceTask task = new ServiceTask(spec, simulationOffset);
 
             task.setService(service);
 
@@ -660,6 +664,11 @@ public final class ComputeService implements AutoCloseable, CarbonReceiver {
             task.start();
 
             return task;
+        }
+
+        @NotNull
+        public ServiceTask newTask(TaskSpec spec) {
+            return newTask(spec, 0L);
         }
 
         @Nullable

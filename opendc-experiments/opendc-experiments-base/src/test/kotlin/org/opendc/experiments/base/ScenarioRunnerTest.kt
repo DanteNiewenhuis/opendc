@@ -29,7 +29,7 @@ import org.opendc.compute.simulator.scheduler.MemorizingScheduler
 import org.opendc.compute.simulator.scheduler.filters.ComputeFilter
 import org.opendc.compute.simulator.scheduler.filters.RamFilter
 import org.opendc.compute.simulator.scheduler.filters.VCpuFilter
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.simulator.compute.workload.trace.TraceFragment
 import java.util.ArrayList
 
@@ -49,7 +49,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario1() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -86,7 +86,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario2() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -139,7 +139,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario3() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -184,7 +184,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario4() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -230,7 +230,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario5() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -278,7 +278,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario6() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -325,7 +325,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario7() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -371,7 +371,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario8() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -416,7 +416,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario9() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -471,7 +471,7 @@ class ScenarioRunnerTest {
      */
     @Test
     fun testScenario10() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,

@@ -25,7 +25,7 @@ package org.opendc.experiments.base
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.simulator.compute.workload.trace.TraceFragment
 import java.util.ArrayList
 
@@ -40,7 +40,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor1() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -76,7 +76,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor2() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -112,7 +112,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor3() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -148,7 +148,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor4() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -184,7 +184,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor5() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -220,7 +220,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor6() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -269,7 +269,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor7() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -317,7 +317,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor8() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -377,7 +377,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor9() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -433,7 +433,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor10() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -496,7 +496,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor11() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -525,7 +525,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor12() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -556,8 +556,8 @@ class FlowDistributorTest {
     fun testFlowDistributor13() {
         val numTasks = 1000
 
-        val workload: ArrayList<ServiceTask> =
-            arrayListOf<ServiceTask>().apply {
+        val workload: ArrayList<TaskSpec> =
+            arrayListOf<TaskSpec>().apply {
                 repeat(numTasks) {
                     this.add(
                         createTestTask(
@@ -585,7 +585,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor14() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -635,7 +635,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor15() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -684,7 +684,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor16() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -733,7 +733,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor17() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -782,7 +782,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor18() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -851,7 +851,7 @@ class FlowDistributorTest {
      */
     @Test
     fun testFlowDistributor19() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,

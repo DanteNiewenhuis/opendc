@@ -23,7 +23,7 @@
 package org.opendc.experiments.base.experiment.specs
 
 import kotlinx.serialization.Serializable
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.compute.workload.ComputeWorkloadLoader
 import org.opendc.compute.workload.WorkloadLoader
 import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
@@ -127,7 +127,7 @@ public fun getWorkloadLoader(
 public fun getWorkload(
     workloadSpec: WorkloadSpec,
     checkpointModelSpec: CheckpointModelSpec?,
-): List<ServiceTask> {
+): MutableList<TaskSpec> {
     val workloadLoader =
         getWorkloadLoader(
             workloadSpec,

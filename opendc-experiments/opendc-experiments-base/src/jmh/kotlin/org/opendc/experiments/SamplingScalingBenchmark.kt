@@ -85,12 +85,12 @@ open class SamplingScalingBenchmark : OpenDCBenchmark() {
         File("output").deleteRecursively()
     }
 
-    /** Runs the simulation producing 5 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark5K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_5K.json"))
-        File("output").deleteRecursively()
-    }
+//    /** Runs the simulation producing 5 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark5K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_5K.json"))
+//        File("output").deleteRecursively()
+//    }
 
     /** Runs the simulation producing 10 000 export samples. */
     @Benchmark
@@ -99,26 +99,26 @@ open class SamplingScalingBenchmark : OpenDCBenchmark() {
         File("output").deleteRecursively()
     }
 
-    /** Runs the simulation producing 20 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark20K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_20K.json"))
-        File("output").deleteRecursively()
-    }
+//    /** Runs the simulation producing 20 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark20K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_20K.json"))
+//        File("output").deleteRecursively()
+//    }
 
-    /** Runs the simulation producing 30 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark30K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_30K.json"))
-        File("output").deleteRecursively()
-    }
+//    /** Runs the simulation producing 30 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark30K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_30K.json"))
+//        File("output").deleteRecursively()
+//    }
 
-    /** Runs the simulation producing 40 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark40K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_40K.json"))
-        File("output").deleteRecursively()
-    }
+//    /** Runs the simulation producing 40 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark40K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_40K.json"))
+//        File("output").deleteRecursively()
+//    }
 
     /** Runs the simulation producing 50 000 export samples. */
     @Benchmark
@@ -127,33 +127,33 @@ open class SamplingScalingBenchmark : OpenDCBenchmark() {
         File("output").deleteRecursively()
     }
 
-    /** Runs the simulation producing 60 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark60K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_60K.json"))
-        File("output").deleteRecursively()
-    }
-
-    /** Runs the simulation producing 70 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark70K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_70K.json"))
-        File("output").deleteRecursively()
-    }
-
-    /** Runs the simulation producing 80 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark80K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_80K.json"))
-        File("output").deleteRecursively()
-    }
-
-    /** Runs the simulation producing 90 000 export samples. */
-    @Benchmark
-    fun samplingScalingBenchmark90K() {
-        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_90K.json"))
-        File("output").deleteRecursively()
-    }
+//    /** Runs the simulation producing 60 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark60K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_60K.json"))
+//        File("output").deleteRecursively()
+//    }
+//
+//    /** Runs the simulation producing 70 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark70K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_70K.json"))
+//        File("output").deleteRecursively()
+//    }
+//
+//    /** Runs the simulation producing 80 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark80K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_80K.json"))
+//        File("output").deleteRecursively()
+//    }
+//
+//    /** Runs the simulation producing 90 000 export samples. */
+//    @Benchmark
+//    fun samplingScalingBenchmark90K() {
+//        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/samplingScaling/experiment_90K.json"))
+//        File("output").deleteRecursively()
+//    }
 
     /** Runs the simulation producing 100 000 export samples. */
     @Benchmark

@@ -34,8 +34,34 @@ plugins {
 
 jmh {
     resultFormat.set("JSON")
-    val jmhIncludes = findProperty("jmhIncludes") as? String ?: ".*WorkloadNoExportBenchmark.*"
-    includes.add(jmhIncludes)
+
+    // NOTE: The me.champeau.jmh plugin joins all `includes` entries into a single
+    // comma-separated string and passes it to JMH as ONE regex, so multiple list
+    // entries do not act as an OR. Combine the benchmarks into one alternation regex.
+    val jmhBenchmarks =
+        listOf(
+//        "HostScalingBenchmark",
+//        "FragmentScalingBenchmark",
+//        "TaskScalingBenchmark",
+//        "SamplingScalingBenchmark",
+            "WorkloadBenchmark",
+        )
+
+    includes.add(".*(" + jmhBenchmarks.joinToString("|") + ").*")
+}
+
+// The workload traces under src/jmh/resources (~1 GB: borg, marconi, solvinity, ...)
+// are read from the filesystem via relative paths at benchmark runtime -- see the
+// `--experiment-path` arguments and the `pathToFile` fields in the experiment JSON,
+// which are opened with FileInputStream, not loaded from the classpath. Bundling them
+// into the JMH uber-jar makes the `jmhJar` task hang for minutes before any benchmark
+// starts, so exclude them from JMH resource processing and packaging.
+sourceSets.named("jmh") {
+    resources.exclude("workloadTraces/**")
+}
+
+tasks.named<Jar>("jmhJar") {
+    exclude("workloadTraces/**")
 }
 
 tasks.named("jmh") {

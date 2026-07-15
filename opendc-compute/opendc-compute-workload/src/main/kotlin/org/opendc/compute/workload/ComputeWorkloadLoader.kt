@@ -23,7 +23,7 @@
 package org.opendc.compute.workload
 
 import mu.KotlinLogging
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.simulator.compute.workload.trace.TraceWorkload
 import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy
@@ -73,7 +73,7 @@ public class ComputeWorkloadLoader(
     /**
      * The cache of workloads.
      */
-    private val cache = ConcurrentHashMap<File, SoftReference<List<ServiceTask>>>()
+    private val cache = ConcurrentHashMap<File, SoftReference<List<TaskSpec>>>()
 
     /**
      * Read the fragments into memory.
@@ -123,7 +123,7 @@ public class ComputeWorkloadLoader(
     private fun parseTasks(
         trace: Trace,
         fragments: Map<Int, Builder>,
-    ): List<ServiceTask> {
+    ): MutableList<TaskSpec> {
         val reader = checkNotNull(trace.getTable(TABLE_TASKS)).newReader()
 
         val idCol = reader.resolve(TASK_ID)
@@ -140,7 +140,7 @@ public class ComputeWorkloadLoader(
         val deferrableCol = reader.resolve(TASK_DEFERRABLE)
         val deadlineCol = reader.resolve(TASK_DEADLINE)
 
-        val entries = mutableListOf<ServiceTask>()
+        val entries = mutableListOf<TaskSpec>()
 
         return try {
             while (reader.nextRow()) {
@@ -168,20 +168,10 @@ public class ComputeWorkloadLoader(
                 val gpuCoreCount = reader.getInt(gpuCoreCountCol) // Default to 0 if not present
                 val gpuMemory = 0L // currently not implemented
 
-                var parents = reader.getSet(parentsCol, Int::class.java) // No dependencies in the trace
-                var children = reader.getSet(childrenCol, Int::class.java) // No dependencies in the trace
-
-                var parentsOutput: ArrayList<Int>? = null
-
-                if (parents?.isEmpty() == true) {
-                    parentsOutput = null
-                } else {
-                    parentsOutput = ArrayList(parents!!)
-                }
-
-                if (children?.isEmpty() == true) {
-                    children = null
-                }
+                val parents =
+                    reader.getSet(parentsCol, Int::class.java)?.takeIf { it.isNotEmpty() }?.toIntArray()
+                val children =
+                    reader.getSet(childrenCol, Int::class.java)?.takeIf { it.isNotEmpty() }?.toIntArray()
 
                 var deferrable = reader.getBoolean(deferrableCol)
                 var deadline = reader.getLong(deadlineCol)
@@ -194,7 +184,7 @@ public class ComputeWorkloadLoader(
                 val totalLoad = builder.totalLoad
 
                 entries.add(
-                    ServiceTask(
+                    TaskSpec(
                         id,
                         name,
                         submissionTime,
@@ -209,7 +199,7 @@ public class ComputeWorkloadLoader(
                         builder.build(),
                         deferrable,
                         deadline,
-                        parentsOutput,
+                        parents,
                         children,
                     ),
                 )
@@ -230,7 +220,7 @@ public class ComputeWorkloadLoader(
     /**
      * Load the trace at the specified [pathToFile].
      */
-    override fun load(): List<ServiceTask> {
+    override fun load(): MutableList<TaskSpec> {
         val trace = Trace.open(pathToFile, "workload")
         val fragments = parseFragments(trace)
         val vms = parseTasks(trace, fragments)

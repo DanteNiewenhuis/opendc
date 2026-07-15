@@ -34,7 +34,7 @@ import org.opendc.compute.simulator.scheduler.filters.RamFilter
 import org.opendc.compute.simulator.scheduler.filters.VCpuFilter
 import org.opendc.compute.simulator.scheduler.weights.CoreRamWeigher
 import org.opendc.compute.simulator.service.ComputeService
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.compute.simulator.telemetry.ComputeMonitor
 import org.opendc.compute.simulator.telemetry.table.host.HostTableReader
 import org.opendc.compute.simulator.telemetry.table.powerSource.PowerSourceTableReader
@@ -77,7 +77,7 @@ fun createTestTask(
     scalingPolicy: ScalingPolicy = NoDelayScaling(),
     parents: ArrayList<Int> = ArrayList<Int>(),
     children: Set<Int> = emptySet(),
-): ServiceTask {
+): TaskSpec {
     var usedResources = arrayOf<ResourceType>()
     if (fragments.any { it.cpuUsage > 0.0 }) {
         usedResources += ResourceType.CPU
@@ -86,7 +86,7 @@ fun createTestTask(
         usedResources += ResourceType.GPU
     }
 
-    return ServiceTask(
+    return TaskSpec(
         id,
         name,
         LocalDateTime.parse(submissionTime).toInstant(ZoneOffset.UTC).toEpochMilli(),
@@ -109,14 +109,14 @@ fun createTestTask(
         ),
         false,
         -1,
-        parents,
-        children,
+        parents.takeIf { it.isNotEmpty() }?.toIntArray(),
+        children.takeIf { it.isNotEmpty() }?.toIntArray(),
     )
 }
 
 fun runTest(
     topology: List<ClusterSpec>,
-    workload: ArrayList<ServiceTask>,
+    workload: ArrayList<TaskSpec>,
     failureModelSpec: FailureModelSpec? = null,
     computeScheduler: ComputeScheduler =
         FilterScheduler(
@@ -143,12 +143,8 @@ fun runTest(
             service.setTasksExpected(workload.size)
             service.setMetricReader(provisioner.getMonitor())
 
-            val workloadCopy = ArrayList<ServiceTask>()
-            for (task in workload) {
-                workloadCopy.add(task.copy())
-            }
-
-            service.replay(timeSource, ArrayDeque(workloadCopy), failureModelSpec = failureModelSpec)
+            // Specs carry no runtime state, so they can be replayed directly without copying.
+            service.replay(timeSource, ArrayDeque(workload), failureModelSpec = failureModelSpec)
         }
     }
 

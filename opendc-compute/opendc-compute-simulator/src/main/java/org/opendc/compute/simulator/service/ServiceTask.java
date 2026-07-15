@@ -22,10 +22,7 @@
 
 package org.opendc.compute.simulator.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.opendc.compute.api.TaskState;
 import org.opendc.compute.simulator.TaskWatcher;
@@ -36,35 +33,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link ServiceTask} provided by {@link ComputeService}.
+ * The runtime state of a task being simulated by {@link ComputeService}.
+ *
+ * <p>The task's input data lives on the {@link TaskSpec} this was created from, and is exposed here by
+ * delegation. Only state that exists once a task is in flight is held directly, so that a trace can be kept
+ * resident as specs without paying for runtime fields on tasks that have not been submitted.
  */
 public class ServiceTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTask.class);
 
+    private final TaskSpec spec;
+
     private ComputeService service;
-    private final int id;
-    private final ArrayList<Integer> parents;
-    private final Set<Integer> children;
+    private final int[] parents; // nullable; live entries in [0, numParents)
+    private int numParents;
 
-    private final String name;
-    private final boolean deferrable;
-
-    private final long duration;
+    /**
+     * The deadline in simulation time, derived once from the spec's trace-time deadline. -1 if the task has
+     * none.
+     */
     private long deadline;
+
+    /**
+     * The current workload. Starts as the spec's, but is replaced by {@code Client.rescheduleTask} and nulled
+     * by {@link #delete()}.
+     */
     public Workload workload;
 
-    private final int cpuCoreCount;
-    private final double cpuCapacity;
-    private final double totalCPULoad;
-    private final long memorySize;
-
-    private final int gpuCoreCount;
-    private final double gpuCapacity;
-    private final long gpuMemorySize;
-
-    private final List<TaskWatcher> watchers = new ArrayList<>(1);
-    private int stateOrdinal = TaskState.CREATED.ordinal();
-    private long submittedAt;
+    private TaskWatcher watcher = null;
+    private byte stateOrdinal = (byte) TaskState.CREATED.ordinal();
     private long scheduledAt;
     private long finishedAt;
     private SimHost host = null;
@@ -72,14 +69,18 @@ public class ServiceTask {
 
     private SchedulingRequest request = null;
 
-    private int numFailures = 0;
-    private int numPauses = 0;
+    private short numFailures = 0;
+    private short numPauses = 0;
 
     private long schedulingDelay = 0;
 
     /// //////////////////////////////////////////////////////////////////////////////////////////////////
     /// Getters and Setters
     /// //////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public TaskSpec getSpec() {
+        return spec;
+    }
 
     public ComputeService getService() {
         return service;
@@ -90,27 +91,23 @@ public class ServiceTask {
     }
 
     public int getId() {
-        return id;
+        return spec.getId();
     }
 
-    public ArrayList<Integer> getParents() {
-        return parents;
-    }
-
-    public Set<Integer> getChildren() {
-        return children;
+    public int[] getChildren() {
+        return spec.getChildren();
     }
 
     public String getName() {
-        return name;
+        return spec.getName();
     }
 
     public boolean getDeferrable() {
-        return deferrable;
+        return spec.getDeferrable();
     }
 
     public long getDuration() {
-        return duration;
+        return spec.getDuration();
     }
 
     public long getDeadline() {
@@ -130,35 +127,31 @@ public class ServiceTask {
     }
 
     public int getCpuCoreCount() {
-        return cpuCoreCount;
+        return spec.getCpuCoreCount();
     }
 
     public double getCpuCapacity() {
-        return cpuCapacity;
+        return spec.getCpuCapacity();
     }
 
     public double getTotalCPULoad() {
-        return totalCPULoad;
+        return spec.getTotalCPULoad();
     }
 
     public long getMemorySize() {
-        return memorySize;
+        return spec.getMemorySize();
     }
 
     public int getGpuCoreCount() {
-        return gpuCoreCount;
+        return spec.getGpuCoreCount();
     }
 
     public double getGpuCapacity() {
-        return gpuCapacity;
+        return spec.getGpuCapacity();
     }
 
     public long getGpuMemorySize() {
-        return gpuMemorySize;
-    }
-
-    public List<TaskWatcher> getWatchers() {
-        return watchers;
+        return spec.getGpuMemorySize();
     }
 
     @NotNull
@@ -171,7 +164,8 @@ public class ServiceTask {
             return;
         }
 
-        for (TaskWatcher watcher : watchers) {
+        final TaskWatcher watcher = this.watcher;
+        if (watcher != null) {
             watcher.onStateChanged(this, newState);
         }
         if (newState == TaskState.FAILED) {
@@ -184,23 +178,11 @@ public class ServiceTask {
             this.finishedAt = this.service.getClock().millis();
         }
 
-        this.stateOrdinal = newState.ordinal();
-    }
-
-    public int getStateOrdinal() {
-        return stateOrdinal;
-    }
-
-    public void setStateOrdinal(int stateOrdinal) {
-        this.stateOrdinal = stateOrdinal;
+        this.stateOrdinal = (byte) newState.ordinal();
     }
 
     public long getSubmittedAt() {
-        return submittedAt;
-    }
-
-    public void setSubmittedAt(long submittedAt) {
-        this.submittedAt = submittedAt;
+        return spec.getSubmittedAt();
     }
 
     public long getScheduledAt() {
@@ -251,7 +233,7 @@ public class ServiceTask {
     }
 
     public void setNumFailures(int numFailures) {
-        this.numFailures = numFailures;
+        this.numFailures = (short) numFailures;
     }
 
     public int getNumPauses() {
@@ -259,70 +241,36 @@ public class ServiceTask {
     }
 
     public void setNumPauses(int numPauses) {
-        this.numPauses = numPauses;
+        this.numPauses = (short) numPauses;
     }
 
     /// //////////////////////////////////////////////////////////////////////////////////////////////////
     /// Constructor and Public Methods
     /// //////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public ServiceTask(
-            int id,
-            String name,
-            long submissionTime,
-            long duration,
-            int cpuCoreCount,
-            double cpuCapacity,
-            double totalCPULoad,
-            long memorySize,
-            int gpuCoreCount,
-            double gpuCapacity,
-            long gpuMemorySize,
-            Workload workload,
-            boolean deferrable,
-            long deadline,
-            ArrayList<Integer> parents,
-            Set<Integer> children) {
-        this.id = id;
-        this.name = name;
-        this.submittedAt = submissionTime;
-        this.duration = duration;
-        this.workload = workload;
+    /**
+     * Create the runtime state for a task described by {@code spec}.
+     *
+     * @param simulationOffset The offset between trace time and simulation time. The spec's trace-time
+     *                         deadline is converted to simulation time by subtracting it.
+     */
+    public ServiceTask(TaskSpec spec, long simulationOffset) {
+        this.spec = spec;
 
-        this.cpuCoreCount = cpuCoreCount;
-        this.cpuCapacity = cpuCapacity;
-        this.totalCPULoad = totalCPULoad;
-        this.memorySize = memorySize;
+        // The spec's parents are shared across every task built from it; take a private copy, since
+        // removeFromParents mutates it as the DAG resolves.
+        final int[] specParents = spec.getParents();
+        this.parents = specParents == null ? null : specParents.clone();
+        this.numParents = this.parents == null ? 0 : this.parents.length;
 
-        this.gpuCoreCount = gpuCoreCount;
-        this.gpuCapacity = gpuCapacity;
-        this.gpuMemorySize = gpuMemorySize;
+        this.workload = spec.getWorkload();
 
-        this.deferrable = deferrable;
-        this.deadline = deadline;
-
-        this.parents = parents;
-        this.children = children;
+        final long traceDeadline = spec.getDeadline();
+        this.deadline = traceDeadline == -1L ? -1L : traceDeadline - simulationOffset;
     }
 
-    public ServiceTask copy() {
-        return new ServiceTask(
-                this.id,
-                this.name,
-                this.submittedAt,
-                this.duration,
-                this.cpuCoreCount,
-                this.cpuCapacity,
-                this.totalCPULoad,
-                this.memorySize,
-                this.gpuCoreCount,
-                this.gpuCapacity,
-                0,
-                this.workload,
-                this.deferrable,
-                this.deadline,
-                this.parents == null ? null : new ArrayList<>(this.parents),
-                this.children == null ? null : Set.copyOf(this.children));
+    public ServiceTask(TaskSpec spec) {
+        this(spec, 0L);
     }
 
     public void start() {
@@ -337,30 +285,41 @@ public class ServiceTask {
                 LOGGER.warn("User tried to start deleted task");
                 throw new IllegalStateException("Task is deleted");
             case CREATED:
-                LOGGER.info("User requested to start task {}", id);
+                LOGGER.info("User requested to start task {}", getId());
                 setState(TaskState.PROVISIONING);
                 assert request == null : "Scheduling request already active";
                 request = service.schedule(this);
                 break;
             case PAUSED:
-                LOGGER.info("User requested to start task after pause {}", id);
+                LOGGER.info("User requested to start task after pause {}", getId());
                 setState(TaskState.PROVISIONING);
                 request = service.schedule(this, false);
                 break;
             case FAILED:
-                LOGGER.info("User requested to start task after failure {}", id);
+                LOGGER.info("User requested to start task after failure {}", getId());
                 setState(TaskState.PROVISIONING);
                 request = service.schedule(this, false);
                 break;
         }
     }
 
+    /**
+     * Attach a watcher to this task. Only a single watcher is supported; call {@link #unwatch} before
+     * attaching a different one.
+     *
+     * @throws IllegalStateException if a watcher is already attached.
+     */
     public void watch(@NotNull TaskWatcher watcher) {
-        watchers.add(watcher);
+        if (this.watcher != null) {
+            throw new IllegalStateException("Task " + getId() + " already has a watcher attached");
+        }
+        this.watcher = watcher;
     }
 
     public void unwatch(@NotNull TaskWatcher watcher) {
-        watchers.remove(watcher);
+        if (this.watcher == watcher) {
+            this.watcher = null;
+        }
     }
 
     public void delete() {
@@ -380,15 +339,15 @@ public class ServiceTask {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ServiceTask task = (ServiceTask) o;
-        return service.equals(task.service) && id == task.id;
+        return service.equals(task.service) && getId() == task.getId();
     }
 
     public int hashCode() {
-        return Objects.hash(service, id);
+        return Objects.hash(service, getId());
     }
 
     public String toString() {
-        return "Task[uid=" + this.id + ",name=" + this.name + ",state=" + this.getState() + "]";
+        return "Task[uid=" + getId() + ",name=" + getName() + ",state=" + this.getState() + "]";
     }
 
     /**
@@ -402,38 +361,28 @@ public class ServiceTask {
         }
     }
 
-    public void removeFromParents(List<Integer> completedTasks) {
-        if (this.parents == null) {
-            return;
-        }
-
-        for (int task : completedTasks) {
-            this.removeFromParents(task);
-        }
-    }
-
     public void removeFromParents(int completedTask) {
         if (this.parents == null) {
             return;
         }
 
-        this.parents.remove(Integer.valueOf(completedTask));
+        // Swap-remove: order is irrelevant, and a not-present id is a no-op.
+        for (int i = 0; i < numParents; i++) {
+            if (parents[i] == completedTask) {
+                parents[i] = parents[numParents - 1];
+                numParents--;
+                return;
+            }
+        }
     }
 
     public boolean hasChildren() {
-        if (children == null) {
-            return false;
-        }
-
-        return !children.isEmpty();
+        final int[] children = spec.getChildren();
+        return children != null && children.length > 0;
     }
 
     public boolean hasParents() {
-        if (parents == null) {
-            return false;
-        }
-
-        return !parents.isEmpty();
+        return numParents > 0;
     }
 
     public long getSchedulingDelay() {

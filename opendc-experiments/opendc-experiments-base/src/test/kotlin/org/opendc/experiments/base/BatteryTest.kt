@@ -25,7 +25,7 @@ package org.opendc.experiments.base
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.experiments.base.experiment.specs.TraceBasedFailureModelSpec
 import org.opendc.simulator.compute.workload.trace.TraceFragment
 import java.util.ArrayList
@@ -39,7 +39,7 @@ class BatteryTest {
      */
     @Test
     fun testBattery1() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -65,7 +65,7 @@ class BatteryTest {
      */
     @Test
     fun testBattery2() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -92,7 +92,7 @@ class BatteryTest {
      */
     @Test
     fun testBattery3() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -120,7 +120,7 @@ class BatteryTest {
      */
     @Test
     fun testBattery4() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -147,7 +147,7 @@ class BatteryTest {
      */
     @Test
     fun testBattery5() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -188,8 +188,8 @@ class BatteryTest {
     fun testBattery6() {
         val numTasks = 1000
 
-        val workload: ArrayList<ServiceTask> =
-            arrayListOf<ServiceTask>().apply {
+        val workload: ArrayList<TaskSpec> =
+            arrayListOf<TaskSpec>().apply {
                 repeat(numTasks) {
                     this.add(
                         createTestTask(
@@ -215,7 +215,7 @@ class BatteryTest {
      */
     @Test
     fun testBattery7() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,
@@ -248,7 +248,7 @@ class BatteryTest {
      */
     @Test
     fun testBattery8() {
-        val workload: ArrayList<ServiceTask> =
+        val workload: ArrayList<TaskSpec> =
             arrayListOf(
                 createTestTask(
                     id = 0,

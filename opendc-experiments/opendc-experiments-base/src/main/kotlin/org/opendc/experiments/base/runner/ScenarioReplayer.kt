@@ -34,6 +34,7 @@ import org.opendc.compute.failure.models.FailureModel
 import org.opendc.compute.simulator.TaskWatcher
 import org.opendc.compute.simulator.service.ComputeService
 import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.compute.simulator.service.TaskSpec
 import org.opendc.experiments.base.experiment.specs.FailureModelSpec
 import org.opendc.experiments.base.experiment.specs.createFailureModel
 import java.time.InstantSource
@@ -81,7 +82,7 @@ public class RunningTaskWatcher : TaskWatcher {
  */
 public suspend fun ComputeService.replay(
     clock: InstantSource,
-    trace: List<ServiceTask>,
+    trace: MutableList<TaskSpec>,
     failureModelSpec: FailureModelSpec? = null,
     seed: Long = 0,
     submitImmediately: Boolean = false,
@@ -103,9 +104,18 @@ public suspend fun ComputeService.replay(
 
             var simulationOffset = Long.MIN_VALUE
 
-            for (serviceTask in trace.sortedBy { it.submittedAt }) {
+            // The trace is consumed destructively so that a spec becomes garbage as soon as its ServiceTask
+            // does, rather than being pinned by the caller's list for the whole run. Popping from the tail
+            // keeps that O(1); removing from the head of an ArrayList would be O(n) per task. Sort ascending
+            // and reverse rather than sorting descending: sortByDescending is stable, so it would leave tasks
+            // sharing a submission time in an order that the tail-pop then flips.
+            trace.sortBy { it.submittedAt }
+            trace.reverse()
+
+            while (trace.isNotEmpty()) {
+                val taskSpec = trace.removeAt(trace.size - 1)
                 val now = clock.millis()
-                val start = serviceTask.submittedAt
+                val start = taskSpec.submittedAt
 
                 // Set the simulationOffset based on the starting time of the first task
                 if (simulationOffset == Long.MIN_VALUE) {
@@ -115,13 +125,17 @@ public suspend fun ComputeService.replay(
                 // Delay the task based on the startTime given by the trace.
                 if (!submitImmediately) {
                     delay(max(0, (start - now - simulationOffset)))
-                    serviceTask.deadline -= simulationOffset
                 }
+
+                // The spec's deadline is in trace time; ServiceTask converts it to simulation time. When
+                // submitting immediately the trace timeline is not followed, so no conversion applies.
+                val deadlineOffset = if (submitImmediately) 0L else simulationOffset
 
                 launch {
                     val task =
                         client.newTask(
-                            serviceTask,
+                            taskSpec,
+                            deadlineOffset,
                         )
 
                     val taskWatcher = RunningTaskWatcher()
