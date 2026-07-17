@@ -40,10 +40,10 @@ jmh {
     // entries do not act as an OR. Combine the benchmarks into one alternation regex.
     val jmhBenchmarks =
         listOf(
-//        "HostScalingBenchmark",
-//        "FragmentScalingBenchmark",
-//        "TaskScalingBenchmark",
-//        "SamplingScalingBenchmark",
+            "HostScalingBenchmark",
+            "FragmentScalingBenchmark",
+            "TaskScalingBenchmark",
+            "SamplingScalingBenchmark",
             "WorkloadBenchmark",
         )
 
@@ -67,27 +67,39 @@ tasks.named<Jar>("jmhJar") {
 tasks.named("jmh") {
     doLast {
         val resultsFile = layout.buildDirectory.file("results/jmh/results.json").get().asFile
-        val heapFile = layout.buildDirectory.file("heap-stats.csv").get().asFile
-        if (!resultsFile.exists() || !heapFile.exists()) return@doLast
+        val statsFile = layout.buildDirectory.file("memory-stats.csv").get().asFile
+        if (!resultsFile.exists() || !statsFile.exists()) return@doLast
 
-        val heapByBenchmark =
-            heapFile.readLines().associate { line ->
+        // Columns: benchmark, heap avg/avgStd/peak/peakStd, rss avg/avgStd/peak/peakStd (all MB).
+        fun Double.orNull() = if (isNaN()) null else this
+        val memoryByBenchmark =
+            statsFile.readLines().associate { line ->
                 val cols = line.split(",")
                 cols[0].trim('"') to
                     mapOf(
-                        "avgMb" to cols[1].toDouble(),
-                        "avgStdMb" to cols[2].toDouble(),
-                        "maxMb" to cols[3].toDouble(),
-                        "maxStdMb" to cols[4].toDouble(),
+                        "heap" to
+                            mapOf(
+                                "avgMb" to cols[1].toDouble().orNull(),
+                                "avgStdMb" to cols[2].toDouble().orNull(),
+                                "peakMb" to cols[3].toDouble().orNull(),
+                                "peakStdMb" to cols[4].toDouble().orNull(),
+                            ),
+                        "rss" to
+                            mapOf(
+                                "avgMb" to cols[5].toDouble().orNull(),
+                                "avgStdMb" to cols[6].toDouble().orNull(),
+                                "peakMb" to cols[7].toDouble().orNull(),
+                                "peakStdMb" to cols[8].toDouble().orNull(),
+                            ),
                     )
             }
-        heapFile.delete()
+        statsFile.delete()
 
         @Suppress("UNCHECKED_CAST")
         val results = groovy.json.JsonSlurper().parse(resultsFile) as List<MutableMap<String, Any>>
         for (entry in results) {
             val benchmark = entry["benchmark"] as String
-            heapByBenchmark[benchmark]?.let { entry["heapMetric"] = it }
+            memoryByBenchmark[benchmark]?.let { entry["memoryMetric"] = it }
         }
 
         resultsFile.writeText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(results)))

@@ -39,8 +39,8 @@ import java.util.concurrent.TimeUnit
  * benchmark that measures simulation performance for workloads with
  * increasing number of fragments from 1 to 10k.
  *
- * Each benchmark runs a full workload and measures runtime and [HeapStats]
- * (average and peak heap).
+ * Each benchmark runs a full workload and measures runtime and [MemoryStats]
+ * (average and peak heap live-set and process RSS).
  *
  * Every benchmark simulates a workload consisting of 1000 tasks.
  * However, the number of fragments increases from 1 to 10k.
