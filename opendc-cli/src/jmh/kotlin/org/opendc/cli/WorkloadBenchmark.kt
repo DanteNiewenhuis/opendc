@@ -22,11 +22,9 @@
 
 @file:Suppress("DEPRECATION")
 
-package org.opendc.sdk.runner
+package org.opendc.cli
 
-import org.opendc.sdk.model.generators.generateTopology
-import org.opendc.sdk.model.generators.generateWorkload
-import org.opendc.sdk.runner.harness.runBenchmark
+import org.opendc.experiments.base.runner.ExperimentCommand
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
 import org.openjdk.jmh.annotations.Fork
@@ -36,31 +34,40 @@ import org.openjdk.jmh.annotations.OutputTimeUnit
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.State
 import org.openjdk.jmh.annotations.Warmup
+import java.io.File
 import java.util.concurrent.TimeUnit
 
+/**
+ * JMH benchmark that measures simulation performance across real-world workload
+ * datasets of varying size and duration, with telemetry export enabled.
+ *
+ * JFR profiling and heap statistics collection are provided by [OpenDCBenchmark].
+ */
 @State(Scope.Thread)
 @Fork(1)
 @Warmup(iterations = 1, batchSize = 1)
 @Measurement(iterations = 5, batchSize = 1)
 @BenchmarkMode(Mode.SingleShotTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-open class TaskScalingBenchmark : OpenDCBenchmark() {
+open class WorkloadBenchmark : OpenDCBenchmark() {
+    /** Runs the simulation with the SURF one-week workload trace. */
     @Benchmark
-    fun testBenchmark() {
-        val workload = generateWorkload(50000)
-        val topology = generateTopology(100)
-        val monitor = runBenchmark(topology, workload)
+    fun surfWeekBenchmark() {
+        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_week.json"))
+        File("output").deleteRecursively()
     }
 
-//    @Benchmark
-//    fun surfMonthBenchmark() {
-//        RunCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_month.json"))
-//        File("output").deleteRecursively()
-//    }
-//
-//    @Benchmark
-//    fun surfHalfYearBenchmark() {
-//        RunCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_halfyear.json"))
-//        File("output").deleteRecursively()
-//    }
+    /** Runs the simulation with the SURF one-month workload trace. */
+    @Benchmark
+    fun surfMonthBenchmark() {
+        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_month.json"))
+        File("output").deleteRecursively()
+    }
+
+    /** Runs the simulation with the SURF half-year workload trace. */
+    @Benchmark
+    fun surfHalfYearBenchmark() {
+        ExperimentCommand().main(arrayOf("--experiment-path", "src/jmh/resources/experiments/workloadScaling/surf_halfyear.json"))
+        File("output").deleteRecursively()
+    }
 }

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.compute.topology.specs.ClusterSpec
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 /**
@@ -205,7 +205,7 @@ class GpuTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -214,7 +214,7 @@ class GpuTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,

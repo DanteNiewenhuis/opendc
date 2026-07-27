@@ -25,6 +25,7 @@
 package org.opendc.experiments.base
 
 import org.opendc.common.ResourceType
+import org.opendc.compute.api.SimpleTaskDescription
 import org.opendc.compute.simulator.provisioner.Provisioner
 import org.opendc.compute.simulator.provisioner.registerComputeMonitor
 import org.opendc.compute.simulator.provisioner.setupComputeService
@@ -46,8 +47,8 @@ import org.opendc.compute.topology.clusterTopology
 import org.opendc.compute.topology.specs.ClusterSpec
 import org.opendc.experiments.base.experiment.specs.FailureModelSpec
 import org.opendc.experiments.base.runner.replay
-import org.opendc.simulator.compute.workload.trace.TraceFragment
-import org.opendc.simulator.compute.workload.trace.TraceWorkload
+import org.opendc.simulator.compute.workload.trace.TaskFragment
+import org.opendc.simulator.compute.workload.trace.TaskWorkload
 import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy
 import org.opendc.simulator.kotlin.runSimulation
@@ -72,7 +73,7 @@ fun createTestTask(
     duration: Long = 0L,
     cpuCoreCount: Int = 1,
     gpuCoreCount: Int = 0,
-    fragments: ArrayList<TraceFragment>,
+    fragments: ArrayList<TaskFragment>,
     checkpointInterval: Long = 0L,
     checkpointDuration: Long = 0L,
     checkpointIntervalScaling: Double = 1.0,
@@ -89,18 +90,22 @@ fun createTestTask(
     }
 
     return ServiceTask(
-        id,
-        name,
-        LocalDateTime.parse(submissionTime).toInstant(ZoneOffset.UTC).toEpochMilli(),
-        duration,
-        cpuCoreCount,
-        fragments.maxOf { it.cpuUsage },
-        1800000.0,
-        memCapacity,
-        gpuCoreCount,
-        fragments.maxOfOrNull { it.gpuUsage } ?: 0.0,
-        0L,
-        TraceWorkload(
+        SimpleTaskDescription(
+            id = id,
+            name = name,
+            submissionTimeMs = LocalDateTime.parse(submissionTime).toInstant(ZoneOffset.UTC).toEpochMilli(),
+            durationMs = duration,
+            cpuCoreCount = cpuCoreCount,
+            cpuCapacityMHz = fragments.maxOf { it.cpuUsage },
+            memoryMiB = memCapacity,
+            gpuCoreCount = gpuCoreCount,
+            gpuCapacityMHz = fragments.maxOfOrNull { it.gpuUsage } ?: 0.0,
+            gpuMemoryMiB = 0L,
+            deferrable = false,
+            deadlineMs = -1,
+            childrenIds = children,
+        ),
+        TaskWorkload(
             fragments,
             checkpointInterval,
             checkpointDuration,
@@ -109,10 +114,8 @@ fun createTestTask(
             id,
             usedResources,
         ),
-        false,
-        -1,
         parents,
-        children,
+        1800000.0,
     )
 }
 

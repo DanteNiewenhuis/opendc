@@ -30,7 +30,7 @@ import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.simulator.compute.virtualization.OverheadModels.ConstantVirtualizationOverhead
 import org.opendc.simulator.compute.virtualization.OverheadModels.NoVirtualizationOverHead
 import org.opendc.simulator.compute.virtualization.OverheadModels.ShareBasedVirtualizationOverhead
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 class VirtualizationOverheadTests {
@@ -120,7 +120,7 @@ class VirtualizationOverheadTests {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -146,7 +146,7 @@ class VirtualizationOverheadTests {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -174,7 +174,7 @@ class VirtualizationOverheadTests {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -202,7 +202,7 @@ class VirtualizationOverheadTests {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -215,7 +215,7 @@ class VirtualizationOverheadTests {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -224,7 +224,7 @@ class VirtualizationOverheadTests {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -237,7 +237,7 @@ class VirtualizationOverheadTests {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -246,7 +246,7 @@ class VirtualizationOverheadTests {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -255,7 +255,7 @@ class VirtualizationOverheadTests {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,

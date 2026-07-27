@@ -8,6 +8,10 @@ plugins {
 dependencies {
     api(libs.jackson.annotations)
     api(projects.opendc.opendcCommon)
+    api(projects.opendcSimulator.opendcSimulatorCompute)
+    api(projects.opendcCompute.opendcComputeSimulator)
+    implementation(projects.opendcTrace.opendcTraceApi)
+    implementation(libs.kotlin.logging)
     implementation(libs.kotlinx.serialization.json)
 
     testImplementation(kotlin("test"))

@@ -24,7 +24,7 @@ package org.opendc.simulator.compute
 
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.opendc.simulator.compute.machine.SimMachine
-import org.opendc.simulator.compute.workload.trace.TraceWorkload
+import org.opendc.simulator.compute.workload.trace.TaskWorkload
 
 /**
  * Run the specified [SimWorkloadNew] on this machine and suspend execution util [workload] has finished.
@@ -35,7 +35,7 @@ import org.opendc.simulator.compute.workload.trace.TraceWorkload
  * @throws IllegalStateException if a workload is already active on the machine or if the machine is closed.
  */
 public suspend fun SimMachine.runWorkload(
-    workload: TraceWorkload,
+    workload: TaskWorkload,
     meta: Map<String, Any> = emptyMap(),
 ) {
     return suspendCancellableCoroutine { cont ->

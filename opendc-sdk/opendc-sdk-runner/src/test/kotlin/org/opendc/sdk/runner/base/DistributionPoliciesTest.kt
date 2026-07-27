@@ -92,7 +92,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
@@ -169,7 +169,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 4000.0),
                         ),
                     cpuCoreCount = 0,
@@ -178,7 +178,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 4000.0),
                         ),
                     cpuCoreCount = 0,
@@ -265,7 +265,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 4000.0),
                         ),
                     cpuCoreCount = 0,
@@ -311,7 +311,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 6000.0),
                         ),
                     cpuCoreCount = 0,
@@ -372,7 +372,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 3000.0),
                         ),
                     cpuCoreCount = 0,
@@ -381,7 +381,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 3000.0),
                         ),
                     cpuCoreCount = 0,
@@ -434,7 +434,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1500.0),
                         ),
                     cpuCoreCount = 0,
@@ -513,7 +513,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 3000.0),
                         ),
                     cpuCoreCount = 0,
@@ -522,7 +522,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 2500.0),
                         ),
                     cpuCoreCount = 0,
@@ -562,7 +562,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
@@ -598,7 +598,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 3500.0),
                         ),
                     cpuCoreCount = 0,
@@ -607,7 +607,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 500.0),
                         ),
                     cpuCoreCount = 0,
@@ -645,7 +645,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
@@ -654,7 +654,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
@@ -663,7 +663,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
@@ -724,7 +724,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1500.0),
                         ),
                     cpuCoreCount = 0,
@@ -733,7 +733,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
@@ -774,7 +774,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
@@ -783,7 +783,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
@@ -792,7 +792,7 @@ class DistributionPoliciesTest {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1500.0),
                         ),
                     cpuCoreCount = 0,

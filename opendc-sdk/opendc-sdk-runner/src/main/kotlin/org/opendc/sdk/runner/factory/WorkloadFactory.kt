@@ -22,40 +22,40 @@
 
 package org.opendc.sdk.runner.factory
 
-import org.opendc.common.ResourceType
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.compute.workload.ComputeWorkloadLoader
-import org.opendc.sdk.model.checkpoint.CheckpointSpec
+import org.opendc.sdk.model.workload.loader.ComputeWorkloadLoader
+import org.opendc.sdk.model.checkpoint.CheckpointModelSpec
 import org.opendc.sdk.model.resource.ResourceReference
 import org.opendc.sdk.model.workload.InlineWorkloadSpec
 import org.opendc.sdk.model.workload.ScalingPolicySpec
 import org.opendc.sdk.model.workload.TaskSpec
 import org.opendc.sdk.model.workload.TraceWorkloadSpec
 import org.opendc.sdk.model.workload.WorkloadSpec
-import org.opendc.simulator.compute.workload.trace.TraceFragment
 import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import org.opendc.simulator.compute.workload.trace.scaling.PerfectScaling
 import java.nio.file.Path
-import org.opendc.simulator.compute.workload.trace.TraceWorkload as EngineTraceWorkload
 import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy as EngineScalingPolicy
 
 /**
  * Materializes an SDK [WorkloadSpec] into the engine's list of [ServiceTask]s. Trace workloads are
  * loaded from the resource resolved by [resolve]; inline workloads are built in memory.
  */
-internal fun WorkloadSpec.toServiceTasks(
-    checkpoint: CheckpointSpec?,
+internal fun WorkloadSpec.getTasks(
+    checkpointModel: CheckpointModelSpec?,
     resolve: (ResourceReference) -> Path,
-): List<ServiceTask> =
+): List<TaskSpec> =
     when (this) {
-        is TraceWorkloadSpec -> loadTrace(resolve(source), checkpoint)
-        is InlineWorkloadSpec -> tasks.map { it.toServiceTask(scalingPolicy.toEngine(), checkpoint) }
+        is TraceWorkloadSpec -> return loadTrace(resolve(source), checkpointModel)
+        is InlineWorkloadSpec -> {
+            tasks.forEach{ it.setCheckpointModel(checkpointModel)}
+            return tasks
+        }
     }
 
 private fun TraceWorkloadSpec.loadTrace(
     path: Path,
-    checkpoint: CheckpointSpec?,
-): List<ServiceTask> =
+    checkpoint: CheckpointModelSpec?,
+): List<TaskSpec> =
     ComputeWorkloadLoader(
         path.toFile(),
         submissionTime,
@@ -66,50 +66,30 @@ private fun TraceWorkloadSpec.loadTrace(
         deferAll,
     ).sampleByLoad(sampleFraction)
 
-private fun TaskSpec.toServiceTask(
-    scaling: EngineScalingPolicy,
-    checkpoint: CheckpointSpec?,
-): ServiceTask {
-    val engineFragments =
-        ArrayList(
-            fragments.map { TraceFragment(it.duration.toMsLong(), it.cpuUsage.toMHz(), it.gpuUsage.toMHz(), it.gpuMemory.toMiB().toInt()) },
-        )
-    val usedResources =
-        buildList {
-            if (fragments.any { it.cpuUsage.toMHz() > 0.0 }) add(ResourceType.CPU)
-            if (fragments.any { it.gpuUsage.toMHz() > 0.0 }) add(ResourceType.GPU)
-        }.toTypedArray()
-    val workload =
-        EngineTraceWorkload(
-            engineFragments,
-            checkpoint.intervalMs(),
-            checkpoint.durationMs(),
-            checkpoint.scaling(),
-            scaling,
-            id,
-            usedResources,
-        )
+public fun TaskSpec.toServiceTask(): ServiceTask {
+    // NOTE: `workload.fragments` here *is* this TaskSpec's own ArrayList - no copy is made.
+    // EngineTraceWorkload mutates the list it is given in place as it consumes fragments (it
+    // clears/prepends entries), so once this TaskSpec has been materialized into a running
+    // ServiceTask, its fragments are no longer a reliable snapshot: they get drained as the
+    // simulation progresses, and the same TaskSpec must not be materialized into a second
+    // ServiceTask concurrently/afterwards. `workload` itself only carries the checkpoint/scaling
+    // placeholders `toTaskWorkload` filled in at construction time, so a fresh, correctly-configured
+    // EngineTraceWorkload is still built here from its fragments and resource types.
+    //
+    // ServiceTask reads its other resource fields (id, name, cpuCapacity, memory, ...) straight
+    // from this TaskSpec (passed as a TaskDescription) instead of duplicating them - see
+    // ServiceTask.java. `totalLoad()` is still recomputed separately, since it currently uses a
+    // different formula than the stored TaskSpec.totalLoad (see ServiceTask's totalCPULoad field).
     return ServiceTask(
-        id,
-        name,
-        submissionTime.toMsLong(),
-        duration.toMsLong(),
-        cpuCoreCount,
-        cpuCapacity.toMHz(),
-        totalLoad(),
-        memory.toMiB().toLong(),
-        gpuCoreCount,
-        gpuCapacity.toMHz(),
-        gpuMemory.toMiB().toLong(),
+        this,
         workload,
-        deferrable,
-        deadline?.toMsLong() ?: -1L,
         ArrayList(parents),
-        children,
+        totalLoad(),
     )
 }
 
-private fun TaskSpec.totalLoad(): Double = fragments.sumOf { it.cpuUsage.toMHz() * it.duration.toHours() }
+
+private fun TaskSpec.totalLoad(): Double = workload.fragments.sumOf { it.cpuUsage() * (it.duration() / 3_600_000.0) }
 
 private fun ScalingPolicySpec.toEngine(): EngineScalingPolicy =
     when (this) {
@@ -117,8 +97,8 @@ private fun ScalingPolicySpec.toEngine(): EngineScalingPolicy =
         ScalingPolicySpec.Perfect -> PerfectScaling()
     }
 
-private fun CheckpointSpec?.intervalMs(): Long = this?.interval?.toMsLong() ?: 0L
+private fun CheckpointModelSpec?.intervalMs(): Long = this?.interval?.toMsLong() ?: 0L
 
-private fun CheckpointSpec?.durationMs(): Long = this?.duration?.toMsLong() ?: 0L
+private fun CheckpointModelSpec?.durationMs(): Long = this?.duration?.toMsLong() ?: 0L
 
-private fun CheckpointSpec?.scaling(): Double = this?.intervalScaling ?: 1.0
+private fun CheckpointModelSpec?.scaling(): Double = this?.intervalScaling ?: 1.0

@@ -49,7 +49,7 @@ import kotlin.io.path.exists
  * cannot: loading a Parquet workload trace, a `sqrt` power model, carbon on a power source, a
  * multi-scenario cartesian sweep, the parquet output layout, and typed in-memory capture.
  */
-class TraceWorkloadTest {
+class TaskWorkloadTest {
     @Test
     fun `runs a trace workload across scenarios and produces typed results and parquet`() {
         val design =

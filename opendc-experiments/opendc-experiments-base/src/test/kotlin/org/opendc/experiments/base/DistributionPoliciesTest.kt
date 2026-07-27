@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import org.opendc.simulator.engine.graph.distributionPolicies.FlowDistributorFactory.DistributionPolicy
 import java.util.ArrayList
 
@@ -92,7 +92,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -169,7 +169,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 4000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -178,7 +178,7 @@ class DistributionPoliciesTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 4000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -265,7 +265,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 4000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -311,7 +311,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 6000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 6000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -372,7 +372,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 3000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -381,7 +381,7 @@ class DistributionPoliciesTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 3000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -434,7 +434,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1500.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1500.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -513,7 +513,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 3000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -522,7 +522,7 @@ class DistributionPoliciesTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 2500.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2500.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -562,7 +562,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -598,7 +598,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 3500.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 3500.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -607,7 +607,7 @@ class DistributionPoliciesTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 500.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 500.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -645,7 +645,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -654,7 +654,7 @@ class DistributionPoliciesTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -663,7 +663,7 @@ class DistributionPoliciesTest {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -724,7 +724,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1500.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1500.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -733,7 +733,7 @@ class DistributionPoliciesTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 2,
@@ -774,7 +774,7 @@ class DistributionPoliciesTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -783,7 +783,7 @@ class DistributionPoliciesTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -792,7 +792,7 @@ class DistributionPoliciesTest {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1500.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1500.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,

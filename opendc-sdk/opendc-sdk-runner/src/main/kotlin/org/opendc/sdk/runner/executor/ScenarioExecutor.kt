@@ -35,11 +35,11 @@ import org.opendc.sdk.model.experiment.ScenarioSpec
 import org.opendc.sdk.model.resource.ResourceProvisioner
 import org.opendc.sdk.model.scheduler.TimeShiftAllocationPolicySpec
 import org.opendc.sdk.runner.RunResult
+import org.opendc.sdk.runner.factory.getTasks
 import org.opendc.sdk.runner.factory.toClusterSpecs
 import org.opendc.sdk.runner.factory.toEngine
 import org.opendc.sdk.runner.factory.toExportSettings
 import org.opendc.sdk.runner.factory.toScheduler
-import org.opendc.sdk.runner.factory.toServiceTasks
 import org.opendc.sdk.runner.sink.OutputSink
 import org.opendc.sdk.runner.sink.RunContext
 import org.opendc.sdk.runner.sink.SinkSession
@@ -96,8 +96,12 @@ private class ScenarioRun(
     private val service: ComputeService get() = engine.resolve(ComputeService::class.java)
 
     suspend fun execute(): RunResult {
-        val workload = scenario.workload.toServiceTasks(scenario.checkpointModel, resources::resolve)
-        val startTime = workload.minOf { it.submittedAt }
+        val workload = scenario.workload.getTasks(scenario.checkpointModel, resources::resolve)
+
+        println("Tasks Loaded")
+        Thread.sleep(10000)
+
+        val startTime = workload.minOf { it.submissionTime }.toMsLong()
         val clusters = scenario.topology.toClusterSpecs(resources::resolve)
 
         provisionDatacenter(clusters, startTime)
@@ -134,6 +138,7 @@ private class ScenarioRun(
         startTime: Long,
         taskCount: Int,
     ): List<SinkSession> {
+        return listOf()
         val export = scenario.exportModel.toExportSettings(gpuCount)
         val context = RunContext(scenario, experimentName, scenarioId, seed, gpuCount, taskCount, export)
         val sessions = sinks.map { it.open(context) }
@@ -154,6 +159,8 @@ private class ScenarioRun(
 
         service.setTasksExpected(taskCount)
         service.addMetricReader(engine.getMonitors())
+
+
         return sessions
     }
 

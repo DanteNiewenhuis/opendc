@@ -51,7 +51,7 @@ The model is one shape with three front doors. All three produce the same `Exper
 - **Topology.** A [`Topology`] is simply its list of `Cluster`s — hosts, CPUs/GPUs,
   memory, power models, power sources, and batteries defined directly in the model. A
   topology is always concrete; there is no reference/inline split.
-- **Workload: trace vs. inline.** A [`Workload`] is either a `TraceWorkload` (a
+- **Workload: trace vs. inline.** A [`Workload`] is either a `TaskWorkload` (a
   `ResourceReference` to trace data, with sampling and scaling options) or an
   `InlineWorkload` (a list of `Task`s, each with its `TaskFragment` execution profile).
 - **ResourceReference.** The indirection that keeps the model path-agnostic. Bulk external

@@ -24,10 +24,10 @@ package org.opendc.sdk.runner.base
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
-import org.opendc.sdk.model.workload.TaskFragmentSpec
 import org.opendc.sdk.model.workload.TaskSpec
 import org.opendc.sdk.runner.base.harness.createTestTask
 import org.opendc.sdk.runner.base.harness.createTopology
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import org.opendc.sdk.runner.base.harness.fragment
 import org.opendc.sdk.runner.base.harness.runTest
 
@@ -43,7 +43,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                             fragment(10 * 60 * 1000, 2000.0),
                         ),
@@ -73,7 +73,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 3000.0),
                             fragment(10 * 60 * 1000, 4000.0),
                         ),
@@ -103,7 +103,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                             fragment(10 * 60 * 1000, 4000.0),
                         ),
@@ -133,7 +133,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 4000.0),
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
@@ -163,7 +163,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 4000.0),
                             fragment(10 * 60 * 1000, 2000.0),
                         ),
@@ -193,7 +193,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                             fragment(10 * 60 * 1000, 3000.0),
                         ),
@@ -202,7 +202,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 3000.0),
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
@@ -236,7 +236,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 6000.0),
                             fragment(10 * 60 * 1000, 5000.0),
                         ),
@@ -245,7 +245,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 5000.0),
                             fragment(10 * 60 * 1000, 6000.0),
                         ),
@@ -280,7 +280,7 @@ class FlowDistributorTest {
                     id = 0,
                     submissionTime = "2024-02-01T10:00",
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                             fragment(10 * 60 * 1000, 2000.0),
                         ),
@@ -290,7 +290,7 @@ class FlowDistributorTest {
                     id = 1,
                     submissionTime = "2024-02-01T10:05",
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
@@ -332,7 +332,7 @@ class FlowDistributorTest {
                     id = 0,
                     submissionTime = "2024-02-01T10:00",
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(20 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
@@ -341,7 +341,7 @@ class FlowDistributorTest {
                     id = 1,
                     submissionTime = "2024-02-01T10:05",
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1500.0),
                         ),
                     cpuCoreCount = 1,
@@ -380,7 +380,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(5 * 60 * 1000, 1000.0),
                             fragment(5 * 60 * 1000, 1500.0),
                             fragment(5 * 60 * 1000, 2500.0),
@@ -391,7 +391,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(20 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
@@ -436,7 +436,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        arrayListOf<TaskFragmentSpec>().apply {
+                        arrayListOf<TaskFragment>().apply {
                             repeat(1) { this.add(fragment(10 * 60 * 1000, 3000.0)) }
                         },
                     cpuCoreCount = 1,
@@ -458,7 +458,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        arrayListOf<TaskFragmentSpec>().apply {
+                        arrayListOf<TaskFragment>().apply {
                             repeat(1000) { this.add(fragment(10 * 60 * 1000, 2000.0)) }
                         },
                     cpuCoreCount = 1,
@@ -484,7 +484,7 @@ class FlowDistributorTest {
                         createTestTask(
                             id = 0,
                             fragments =
-                                listOf(fragment(10 * 60 * 1000, 2000.0)),
+                                arrayListOf(fragment(10 * 60 * 1000, 2000.0)),
                             cpuCoreCount = 1,
                         ),
                     )
@@ -506,7 +506,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                             fragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
@@ -551,7 +551,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -595,7 +595,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
@@ -639,7 +639,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 2000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -681,7 +681,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -689,7 +689,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -745,7 +745,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 0.0),
                         ),
                     cpuCoreCount = 1,
@@ -753,7 +753,7 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,

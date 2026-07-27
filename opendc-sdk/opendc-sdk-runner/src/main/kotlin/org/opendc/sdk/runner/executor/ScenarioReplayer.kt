@@ -32,12 +32,15 @@ import org.opendc.compute.simulator.TaskWatcher
 import org.opendc.compute.simulator.service.ComputeService
 import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.sdk.model.resource.ResourceReference
+import org.opendc.sdk.model.workload.TaskSpec
 import org.opendc.sdk.runner.factory.toEngine
+import org.opendc.sdk.runner.factory.toServiceTask
 import java.nio.file.Path
 import java.time.InstantSource
 import java.util.Random
 import kotlin.coroutines.coroutineContext
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 import org.opendc.sdk.model.failure.FailureModelSpec as SdkFailureModel
 
 /**
@@ -50,7 +53,7 @@ import org.opendc.sdk.model.failure.FailureModelSpec as SdkFailureModel
  */
 internal suspend fun ComputeService.replay(
     clock: InstantSource,
-    trace: List<ServiceTask>,
+    trace: List<TaskSpec>,
     failureModel: SdkFailureModel,
     seed: Long,
     resolve: (ResourceReference) -> Path,
@@ -58,25 +61,45 @@ internal suspend fun ComputeService.replay(
 ) {
     val client = newClient()
     val engineFailure = failureModel.toEngine(coroutineContext, clock, this, Random(seed), resolve)
+
+    // Built here, before the `coroutineScope` lambda below, so that lambda's compiled closure
+    // captures only this draining queue - not `trace`. A lambda captures whatever outer variables
+    // it references as permanent fields of its own closure object for the lambda's whole lifetime,
+    // regardless of how early in its body they're used - so referencing `trace` from inside the
+    // loop kept the entire original list (and every TaskSpec in it) reachable for the whole run.
+    val queue = ArrayDeque(trace.sortedBy { it.submissionTime })
+
     try {
         coroutineScope {
             engineFailure?.start()
             var simulationOffset = Long.MIN_VALUE
-            for (task in trace.sortedBy { it.submittedAt }) {
+
+            var i = 0
+            while (queue.isNotEmpty()) {
+                if (i == 999_999) {
+                    println("Tasks 999_999")
+                    Thread.sleep(10000)
+                }
+                i ++;
+
+                val task = queue.removeFirst()
+
+                val serviceTask = task.toServiceTask()
+
                 val now = clock.millis()
-                val start = task.submittedAt
+                val start = task.submissionTime.toMsLong()
                 if (simulationOffset == Long.MIN_VALUE) simulationOffset = start - now
                 if (!submitImmediately) {
-                    delay(max(0, start - now - simulationOffset))
-                    task.deadline -= simulationOffset
+                    delay(max(0, start - now - simulationOffset).milliseconds)
+                    serviceTask.deadline -= simulationOffset
                 }
-                launch {
-                    val submitted = client.newTask(task)
-                    val watcher = RunningTaskWatcher()
-                    watcher.lock()
-                    submitted.watch(watcher)
-                    watcher.await()
-                }
+//                launch {
+//                    val submitted = client.newTask(serviceTask)
+//                    val watcher = RunningTaskWatcher()
+//                    watcher.lock()
+//                    submitted.watch(watcher)
+//                    watcher.await()
+//                }
             }
         }
         yield()
@@ -103,6 +126,9 @@ internal class RunningTaskWatcher : TaskWatcher {
         task: ServiceTask,
         newState: TaskState,
     ) {
-        if (unlockStates.contains(newState)) mutex.unlock()
+        if (unlockStates.contains(newState))
+        {
+            mutex.unlock()
+        }
     }
 }

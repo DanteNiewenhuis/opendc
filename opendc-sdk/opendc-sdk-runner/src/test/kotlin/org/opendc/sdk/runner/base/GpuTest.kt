@@ -205,7 +205,7 @@ class GpuTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
@@ -214,7 +214,7 @@ class GpuTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,

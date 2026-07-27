@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.common.units.TimeDelta
-import org.opendc.sdk.model.checkpoint.CheckpointSpec
+import org.opendc.sdk.model.checkpoint.CheckpointModelSpec
 import org.opendc.sdk.model.failure.TraceBasedFailureSpec
 import org.opendc.sdk.model.resource.NamedReference
 import org.opendc.sdk.runner.base.harness.createTestTask
@@ -46,7 +46,7 @@ class BatteryTest {
             listOf(
                 createTestTask(
                     id = 0,
-                    fragments = listOf(fragment(10 * 60 * 1000, 1000.0)),
+                    fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)),
                     submissionTime = "2022-01-01T00:00",
                 ),
             )
@@ -70,7 +70,7 @@ class BatteryTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
@@ -102,7 +102,7 @@ class BatteryTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(20 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
@@ -134,7 +134,7 @@ class BatteryTest {
             listOf(
                 createTestTask(
                     id = 0,
-                    fragments = listOf(fragment(30 * 60 * 1000, 1000.0)),
+                    fragments = arrayListOf(fragment(30 * 60 * 1000, 1000.0)),
                     submissionTime = "2022-01-01T00:00",
                 ),
             )
@@ -163,7 +163,7 @@ class BatteryTest {
             listOf(
                 createTestTask(
                     id = 0,
-                    fragments = listOf(fragment(30 * 60 * 1000, 1000.0)),
+                    fragments = arrayListOf(fragment(30 * 60 * 1000, 1000.0)),
                     submissionTime = "2022-01-01T00:00",
                 ),
             )
@@ -202,7 +202,7 @@ class BatteryTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(fragment(10 * 60 * 1000, 1000.0)),
+                        arrayListOf(fragment(10 * 60 * 1000, 1000.0)),
                     submissionTime = "2022-01-01T00:00",
                 )
             }
@@ -229,7 +229,7 @@ class BatteryTest {
             listOf(
                 createTestTask(
                     id = 0,
-                    fragments = listOf(fragment(10 * 60 * 1000, 1000.0)),
+                    fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)),
                     submissionTime = "2022-01-01T00:00",
                 ),
             )
@@ -264,7 +264,7 @@ class BatteryTest {
             listOf(
                 createTestTask(
                     id = 0,
-                    fragments = listOf(fragment(10 * 60 * 1000, 1000.0)),
+                    fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)),
                     submissionTime = "2022-01-01T00:00",
                 ),
             )
@@ -282,7 +282,7 @@ class BatteryTest {
                 workload,
                 failureModel = failureModel,
                 checkpointModel =
-                    CheckpointSpec(
+                    CheckpointModelSpec(
                         interval = TimeDelta.ofMillis(60 * 1000L),
                         duration = TimeDelta.ofMillis(1000L),
                     ),

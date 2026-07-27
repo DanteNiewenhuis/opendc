@@ -38,12 +38,13 @@ import org.opendc.sdk.model.export.ExportSpec
 import org.opendc.sdk.model.export.OutputFileSpec
 import org.opendc.sdk.model.topology.PowerModelType
 import org.opendc.sdk.model.workload.InlineWorkloadSpec
-import org.opendc.sdk.model.workload.TaskFragmentSpec
 import org.opendc.sdk.model.workload.TaskSpec
+import org.opendc.sdk.model.workload.toTaskWorkload
 import org.opendc.sdk.runner.OpenDC
 import org.opendc.sdk.runner.provision.FileSystemResourceProvisioner
 import org.opendc.sdk.runner.sink.CallbackSink
 import org.opendc.sdk.runner.sink.InMemorySink
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.nio.file.Files
 
 /**
@@ -67,6 +68,10 @@ class OutputSinkTest {
                     }
                 }
             }
+        val taskFragments = ArrayList<TaskFragment>()
+        taskFragments += TaskFragment(10 * 60 * 1000L, 1000.0, 0.0, 0)
+
+
         val task =
             TaskSpec(
                 id = 0,
@@ -75,8 +80,9 @@ class OutputSinkTest {
                 duration = (10 * 60 * 1000).ms,
                 cpuCoreCount = 1,
                 cpuCapacity = 1000.mhz,
+                totalLoad = taskFragments.sumOf { it.cpuUsage() * (it.duration() / 3_600_000.0) },
                 memory = 0.mib,
-                fragments = listOf(TaskFragmentSpec(duration = (10 * 60 * 1000).ms, cpuUsage = 1000.mhz)),
+                workload = taskFragments.toTaskWorkload(taskId = 0),
             )
         val design =
             experiment {

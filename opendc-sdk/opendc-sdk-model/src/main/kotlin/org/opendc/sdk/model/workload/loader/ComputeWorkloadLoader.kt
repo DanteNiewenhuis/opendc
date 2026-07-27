@@ -20,11 +20,13 @@
  * SOFTWARE.
  */
 
-package org.opendc.compute.workload
+package org.opendc.sdk.model.workload.loader
 
 import mu.KotlinLogging
-import org.opendc.compute.api.SimpleTaskDescription
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.common.units.DataSize
+import org.opendc.common.units.Frequency
+import org.opendc.common.units.TimeDelta
+import org.opendc.sdk.model.workload.TaskSpec
 import org.opendc.simulator.compute.workload.trace.TaskWorkload
 import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import org.opendc.simulator.compute.workload.trace.scaling.ScalingPolicy
@@ -51,15 +53,11 @@ import java.io.File
 import java.lang.ref.SoftReference
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.math.roundToLong
-
-
 
 /**
  * A helper class for loading compute workload traces into memory.
  *
  */
-@Deprecated("Replaced by the ComputeWorkloadLoader in opendc-sdk-model")
 public class ComputeWorkloadLoader(
     private val pathToFile: File,
     private val subMissionTime: String? = null,
@@ -77,7 +75,7 @@ public class ComputeWorkloadLoader(
     /**
      * The cache of workloads.
      */
-    private val cache = ConcurrentHashMap<File, SoftReference<List<ServiceTask>>>()
+    private val cache = ConcurrentHashMap<File, SoftReference<List<TaskSpec>>>()
 
     /**
      * Read the fragments into memory.
@@ -127,7 +125,7 @@ public class ComputeWorkloadLoader(
     private fun parseTasks(
         trace: Trace,
         fragments: Map<Int, Builder>,
-    ): List<ServiceTask> {
+    ): List<TaskSpec> {
         val reader = checkNotNull(trace.getTable(TABLE_TASKS)).newReader()
 
         val idCol = reader.resolve(TASK_ID)
@@ -144,7 +142,7 @@ public class ComputeWorkloadLoader(
         val deferrableCol = reader.resolve(TASK_DEFERRABLE)
         val deadlineCol = reader.resolve(TASK_DEADLINE)
 
-        val entries = mutableListOf<ServiceTask>()
+        val entries = mutableListOf<TaskSpec>()
 
         return try {
             while (reader.nextRow()) {
@@ -175,12 +173,12 @@ public class ComputeWorkloadLoader(
                 var parents = reader.getSet(parentsCol, Int::class.java) // No dependencies in the trace
                 var children = reader.getSet(childrenCol, Int::class.java) // No dependencies in the trace
 
-                var parentsOutput: ArrayList<Int>? = null
+                var parentsOutput: Set<Int>? = null
 
                 if (parents?.isEmpty() == true) {
                     parentsOutput = null
                 } else {
-                    parentsOutput = ArrayList(parents!!)
+                    parentsOutput = parents!!
                 }
 
                 if (children?.isEmpty() == true) {
@@ -198,31 +196,29 @@ public class ComputeWorkloadLoader(
                 val totalLoad = builder.totalLoad
 
                 entries.add(
-                    ServiceTask(
-                        SimpleTaskDescription(
-                            id = id,
-                            name = name,
-                            submissionTimeMs = submissionTime,
-                            durationMs = duration,
-                            cpuCoreCount = cpuCoreCount,
-                            cpuCapacityMHz = cpuCapacity,
-                            memoryMiB = memUsage.roundToLong(),
-                            gpuCoreCount = gpuCoreCount,
-                            gpuCapacityMHz = gpuCapacity,
-                            gpuMemoryMiB = gpuMemory,
-                            deferrable = deferrable,
-                            deadlineMs = deadline,
-                            childrenIds = children ?: emptySet(),
-                        ),
-                        builder.build(),
-                        parentsOutput,
-                        totalLoad,
+                    TaskSpec(
+                        id = id,
+                        name = name,
+                        submissionTime = TimeDelta.ofMillis(submissionTime),
+                        duration = TimeDelta.ofMillis(duration),
+                        cpuCoreCount = cpuCoreCount,
+                        cpuCapacity = Frequency.ofMHz(cpuCapacity),
+                        totalLoad = totalLoad,
+                        memory = DataSize.ofMiB(memUsage),
+                        gpuCoreCount = gpuCoreCount,
+                        gpuCapacity = Frequency.ofMHz(gpuCapacity),
+                        gpuMemory = DataSize.ofBytes(gpuMemory),
+                        workload = builder.build(),
+                        deferrable = deferrable,
+                        deadline = if (deadline == -1L) null else TimeDelta.ofMillis(deadline),
+                        parents = parentsOutput,
+                        children = children,
                     ),
                 )
             }
 
             // Make sure the virtual machines are ordered by start time
-            entries.sortBy { it.submittedAt }
+            entries.sortBy { it.submissionTime.toMsLong() }
 
             entries
         } catch (e: Exception) {
@@ -236,7 +232,7 @@ public class ComputeWorkloadLoader(
     /**
      * Load the trace at the specified [pathToFile].
      */
-    override fun load(): List<ServiceTask> {
+    override fun load(): List<TaskSpec> {
         val trace = Trace.open(pathToFile, "workload")
         val fragments = parseFragments(trace)
         val vms = parseTasks(trace, fragments)

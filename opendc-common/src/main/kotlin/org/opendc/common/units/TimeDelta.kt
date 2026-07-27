@@ -79,6 +79,8 @@ public value class TimeDelta private constructor(
 
     public override operator fun minus(other: TimeDelta): TimeDelta = TimeDelta(value - other.value)
 
+    public operator fun minus(other: Long): TimeDelta = TimeDelta(value - other)
+
     public override operator fun div(scalar: Number): TimeDelta = TimeDelta(value / scalar.toDouble())
 
     public override operator fun div(other: TimeDelta): Percentage = Percentage.ofRatio(value / other.value)

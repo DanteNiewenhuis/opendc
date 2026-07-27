@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
+import org.opendc.compute.api.TaskDescription;
 import org.opendc.compute.api.TaskState;
 import org.opendc.compute.simulator.TaskWatcher;
 import org.opendc.compute.simulator.host.SimHost;
@@ -42,29 +43,37 @@ public class ServiceTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTask.class);
 
     private ComputeService service;
-    private final int id;
+
+    /**
+     * The task's identity and resource requirements, as described by the workload model. Backs
+     * most of this class's read-only getters instead of each one holding its own duplicate copy.
+     */
+    private final TaskDescription task;
+
     private final ArrayList<Integer> parents;
-    private final Set<Integer> children;
 
-    private final String name;
-    private final boolean deferrable;
-
-    private final long duration;
-    private long deadline;
     public Workload workload;
 
-    private final int cpuCoreCount;
-    private final double cpuCapacity;
+    // Not backed by `task`: `TaskDescription.totalLoad` (as computed by the model that builds a
+    // TaskSpec) and this value (as computed when a TaskSpec is materialized into a ServiceTask)
+    // currently use different formulas - see the constructor. Kept as this task's own field,
+    // computed the same way as before, until that discrepancy is deliberately resolved.
     private final double totalCPULoad;
-    private final long memorySize;
 
-    private final int gpuCoreCount;
-    private final double gpuCapacity;
+    // Not backed by `task`: mutated at runtime (by the replayer adjusting for simulation offset),
+    // so it needs to be this task's own copy rather than a shared, delegated value.
+    private long deadline;
+
+    // Not backed by `task`: `submittedAt` predates this class holding a `task` reference and has
+    // its own setter; kept as an independent field to preserve that mutability.
+    private long submittedAt;
+
+    // Not backed by `task`: `copy()` deliberately resets this to 0, which isn't possible if it
+    // were delegated to the (shared, immutable) `task`.
     private final long gpuMemorySize;
 
     private final List<TaskWatcher> watchers = new ArrayList<>(1);
     private int stateOrdinal = TaskState.CREATED.ordinal();
-    private long submittedAt;
     private long scheduledAt;
     private long finishedAt;
     private SimHost host = null;
@@ -90,7 +99,7 @@ public class ServiceTask {
     }
 
     public int getId() {
-        return id;
+        return task.getId();
     }
 
     public ArrayList<Integer> getParents() {
@@ -98,19 +107,19 @@ public class ServiceTask {
     }
 
     public Set<Integer> getChildren() {
-        return children;
+        return task.getChildrenIds();
     }
 
     public String getName() {
-        return name;
+        return task.getName();
     }
 
     public boolean getDeferrable() {
-        return deferrable;
+        return task.getDeferrable();
     }
 
     public long getDuration() {
-        return duration;
+        return task.getDurationMs();
     }
 
     public long getDeadline() {
@@ -130,11 +139,11 @@ public class ServiceTask {
     }
 
     public int getCpuCoreCount() {
-        return cpuCoreCount;
+        return task.getCpuCoreCount();
     }
 
     public double getCpuCapacity() {
-        return cpuCapacity;
+        return task.getCpuCapacityMHz();
     }
 
     public double getTotalCPULoad() {
@@ -142,15 +151,15 @@ public class ServiceTask {
     }
 
     public long getMemorySize() {
-        return memorySize;
+        return task.getMemoryMiB();
     }
 
     public int getGpuCoreCount() {
-        return gpuCoreCount;
+        return task.getGpuCoreCount();
     }
 
     public double getGpuCapacity() {
-        return gpuCapacity;
+        return task.getGpuCapacityMHz();
     }
 
     public long getGpuMemorySize() {
@@ -266,63 +275,32 @@ public class ServiceTask {
     /// Constructor and Public Methods
     /// //////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public ServiceTask(
-            int id,
-            String name,
-            long submissionTime,
-            long duration,
-            int cpuCoreCount,
-            double cpuCapacity,
-            double totalCPULoad,
-            long memorySize,
-            int gpuCoreCount,
-            double gpuCapacity,
-            long gpuMemorySize,
+    public ServiceTask(TaskDescription task, Workload workload, ArrayList<Integer> parents, double totalCPULoad) {
+        this(task, workload, parents, totalCPULoad, task.getGpuMemoryMiB());
+    }
+
+    private ServiceTask(
+            TaskDescription task,
             Workload workload,
-            boolean deferrable,
-            long deadline,
             ArrayList<Integer> parents,
-            Set<Integer> children) {
-        this.id = id;
-        this.name = name;
-        this.submittedAt = submissionTime;
-        this.duration = duration;
+            double totalCPULoad,
+            long gpuMemorySize) {
+        this.task = task;
         this.workload = workload;
-
-        this.cpuCoreCount = cpuCoreCount;
-        this.cpuCapacity = cpuCapacity;
+        this.submittedAt = task.getSubmissionTimeMs();
+        this.deadline = task.getDeadlineMs();
         this.totalCPULoad = totalCPULoad;
-        this.memorySize = memorySize;
-
-        this.gpuCoreCount = gpuCoreCount;
-        this.gpuCapacity = gpuCapacity;
         this.gpuMemorySize = gpuMemorySize;
-
-        this.deferrable = deferrable;
-        this.deadline = deadline;
-
         this.parents = parents;
-        this.children = children;
     }
 
     public ServiceTask copy() {
         return new ServiceTask(
-                this.id,
-                this.name,
-                this.submittedAt,
-                this.duration,
-                this.cpuCoreCount,
-                this.cpuCapacity,
-                this.totalCPULoad,
-                this.memorySize,
-                this.gpuCoreCount,
-                this.gpuCapacity,
-                0,
+                this.task,
                 this.workload,
-                this.deferrable,
-                this.deadline,
                 this.parents == null ? null : new ArrayList<>(this.parents),
-                this.children == null ? null : Set.copyOf(this.children));
+                this.totalCPULoad,
+                0);
     }
 
     public void start() {
@@ -337,18 +315,18 @@ public class ServiceTask {
                 LOGGER.warn("User tried to start deleted task");
                 throw new IllegalStateException("Task is deleted");
             case CREATED:
-                LOGGER.info("User requested to start task {}", id);
+                LOGGER.info("User requested to start task {}", getId());
                 setState(TaskState.PROVISIONING);
                 assert request == null : "Scheduling request already active";
                 request = service.schedule(this);
                 break;
             case PAUSED:
-                LOGGER.info("User requested to start task after pause {}", id);
+                LOGGER.info("User requested to start task after pause {}", getId());
                 setState(TaskState.PROVISIONING);
                 request = service.schedule(this, false);
                 break;
             case FAILED:
-                LOGGER.info("User requested to start task after failure {}", id);
+                LOGGER.info("User requested to start task after failure {}", getId());
                 setState(TaskState.PROVISIONING);
                 request = service.schedule(this, false);
                 break;
@@ -379,16 +357,16 @@ public class ServiceTask {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ServiceTask task = (ServiceTask) o;
-        return service.equals(task.service) && id == task.id;
+        ServiceTask other = (ServiceTask) o;
+        return service.equals(other.service) && getId() == other.getId();
     }
 
     public int hashCode() {
-        return Objects.hash(service, id);
+        return Objects.hash(service, getId());
     }
 
     public String toString() {
-        return "Task[uid=" + this.id + ",name=" + this.name + ",state=" + this.getState() + "]";
+        return "Task[uid=" + this.getId() + ",name=" + this.getName() + ",state=" + this.getState() + "]";
     }
 
     /**
@@ -407,8 +385,8 @@ public class ServiceTask {
             return;
         }
 
-        for (int task : completedTasks) {
-            this.removeFromParents(task);
+        for (int completedTask : completedTasks) {
+            this.removeFromParents(completedTask);
         }
     }
 
@@ -421,11 +399,7 @@ public class ServiceTask {
     }
 
     public boolean hasChildren() {
-        if (children == null) {
-            return false;
-        }
-
-        return !children.isEmpty();
+        return !task.getChildrenIds().isEmpty();
     }
 
     public boolean hasParents() {

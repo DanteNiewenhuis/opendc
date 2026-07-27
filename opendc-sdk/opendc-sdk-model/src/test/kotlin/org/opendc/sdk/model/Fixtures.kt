@@ -22,7 +22,10 @@
 
 package org.opendc.sdk.model
 
-import org.opendc.sdk.model.checkpoint.CheckpointSpec
+import org.opendc.common.units.DataSize
+import org.opendc.common.units.Frequency
+import org.opendc.common.units.TimeDelta
+import org.opendc.sdk.model.checkpoint.CheckpointModelSpec
 import org.opendc.sdk.model.dsl.ghz
 import org.opendc.sdk.model.dsl.gib
 import org.opendc.sdk.model.dsl.kwatts
@@ -49,14 +52,26 @@ import org.opendc.sdk.model.topology.PowerSpec
 import org.opendc.sdk.model.topology.TopologySpec
 import org.opendc.sdk.model.workload.InlineWorkloadSpec
 import org.opendc.sdk.model.workload.ScalingPolicySpec
-import org.opendc.sdk.model.workload.TaskFragmentSpec
 import org.opendc.sdk.model.workload.TaskSpec
+import org.opendc.sdk.model.workload.toTaskWorkload
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 
 /**
  * Shared, constructor-built test data. This is the single source of truth for the SDK-model test suite;
  * the `valid*` fixtures are minimal well-formed models and the `sample*` fixtures exercise many fields.
  * All fixtures are built with whole-unit magnitudes so they survive a JSON round-trip unchanged.
  */
+
+/** Builds a [TaskFragment] with durations/usages given as typed units. */
+private fun taskFragment(
+    duration: TimeDelta,
+    cpuUsage: Frequency,
+    gpuUsage: Frequency = Frequency.ofMHz(0),
+    gpuMemory: DataSize = DataSize.ofBytes(0),
+): TaskFragment = TaskFragment(duration.toMsLong(), cpuUsage.toMHz(), gpuUsage.toMHz(), gpuMemory.toMiB().toInt())
+
+/** Computes the `totalLoad` a [TaskSpec] should report for the given fragments. */
+private fun totalLoad(fragments: List<TaskFragment>): Double = fragments.sumOf { it.cpuUsage() * (it.duration() / 3_600_000.0) }
 
 public val validMemory: MemorySpec = MemorySpec(size = 64.gib)
 
@@ -66,6 +81,8 @@ public val validHost: HostSpec = HostSpec(cpu = validCpu, memory = validMemory)
 
 public val validTopology: TopologySpec = TopologySpec(listOf(ClusterSpec(hosts = listOf(validHost))))
 
+private val validTaskFragments: ArrayList<TaskFragment> = arrayListOf(taskFragment(duration = 10.minutes, cpuUsage = 1.ghz))
+
 public val validTask: TaskSpec =
     TaskSpec(
         id = 0,
@@ -74,8 +91,9 @@ public val validTask: TaskSpec =
         duration = 10.minutes,
         cpuCoreCount = 1,
         cpuCapacity = 1.ghz,
+        totalLoad = totalLoad(validTaskFragments),
         memory = 1.gib,
-        fragments = listOf(TaskFragmentSpec(duration = 10.minutes, cpuUsage = 1.ghz)),
+        workload = validTaskFragments.toTaskWorkload(taskId = 0),
     )
 
 public val validWorkload: InlineWorkloadSpec = InlineWorkloadSpec(listOf(validTask))
@@ -113,6 +131,12 @@ public val sampleCluster: ClusterSpec =
 
 public val sampleTopology: TopologySpec = TopologySpec(listOf(sampleCluster))
 
+private val sampleRootTaskFragments: ArrayList<TaskFragment> =
+    arrayListOf(
+        taskFragment(duration = 5.minutes, cpuUsage = 2.ghz),
+        taskFragment(duration = 5.minutes, cpuUsage = 1.ghz, gpuUsage = 1.ghz, gpuMemory = 2.gib),
+    )
+
 public val sampleRootTask: TaskSpec =
     TaskSpec(
         id = 0,
@@ -121,13 +145,12 @@ public val sampleRootTask: TaskSpec =
         duration = 10.minutes,
         cpuCoreCount = 4,
         cpuCapacity = 2.ghz,
+        totalLoad = totalLoad(sampleRootTaskFragments),
         memory = 8.gib,
-        fragments =
-            listOf(
-                TaskFragmentSpec(duration = 5.minutes, cpuUsage = 2.ghz),
-                TaskFragmentSpec(duration = 5.minutes, cpuUsage = 1.ghz, gpuUsage = 1.ghz, gpuMemory = 2.gib),
-            ),
+        workload = sampleRootTaskFragments.toTaskWorkload(taskId = 0),
     )
+
+private val sampleLeafTaskFragments: ArrayList<TaskFragment> = arrayListOf(taskFragment(duration = 20.minutes, cpuUsage = 3.ghz))
 
 public val sampleLeafTask: TaskSpec =
     TaskSpec(
@@ -137,8 +160,9 @@ public val sampleLeafTask: TaskSpec =
         duration = 20.minutes,
         cpuCoreCount = 8,
         cpuCapacity = 3.ghz,
+        totalLoad = totalLoad(sampleLeafTaskFragments),
         memory = 16.gib,
-        fragments = listOf(TaskFragmentSpec(duration = 20.minutes, cpuUsage = 3.ghz)),
+        workload = sampleLeafTaskFragments.toTaskWorkload(taskId = 1),
         deferrable = true,
         deadline = 60.minutes,
         parents = setOf(0),
@@ -153,7 +177,7 @@ public val sampleScenario: ScenarioSpec =
         allocationPolicy = PrefabAllocationPolicySpec(SchedulerNameSpec.CoreMem),
         exportModel = ExportSpec(exportInterval = 10.minutes),
         failureModel = NoFailureSpec,
-        checkpointModel = CheckpointSpec(),
+        checkpointModel = CheckpointModelSpec(),
         maxNumFailures = 5,
         runs = 3,
         initialSeed = 42,

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.experiments.base.experiment.specs.TraceBasedFailureModelSpec
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 /**
@@ -53,7 +53,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -94,7 +94,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -138,7 +138,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -184,7 +184,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -244,7 +244,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     checkpointInterval = 60 * 1000L,
@@ -298,8 +298,8 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0),
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     checkpointInterval = 60 * 1000L,
@@ -352,8 +352,8 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     checkpointInterval = 60 * 1000L,
@@ -402,7 +402,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     checkpointInterval = 60 * 1000L,
@@ -445,7 +445,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     checkpointInterval = 60 * 1000L,
@@ -488,7 +488,7 @@ class FailuresAndCheckpointingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     checkpointInterval = 60 * 1000L,

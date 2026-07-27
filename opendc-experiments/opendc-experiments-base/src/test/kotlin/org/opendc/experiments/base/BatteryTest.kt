@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
 import org.opendc.experiments.base.experiment.specs.TraceBasedFailureModelSpec
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 /**
@@ -45,7 +45,7 @@ class BatteryTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -71,7 +71,7 @@ class BatteryTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -98,7 +98,7 @@ class BatteryTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(20 * 60 * 1000, 1000.0),
+                            TaskFragment(20 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -126,7 +126,7 @@ class BatteryTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(30 * 60 * 1000, 1000.0),
+                            TaskFragment(30 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -153,7 +153,7 @@ class BatteryTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(30 * 60 * 1000, 1000.0),
+                            TaskFragment(30 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -195,7 +195,7 @@ class BatteryTest {
                         createTestTask(
                             id = 0,
                             fragments =
-                                arrayListOf(TraceFragment(10 * 60 * 1000, 1000.0)),
+                                arrayListOf(TaskFragment(10 * 60 * 1000, 1000.0)),
                             submissionTime = "2022-01-01T00:00",
                         ),
                     )
@@ -221,7 +221,7 @@ class BatteryTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -254,7 +254,7 @@ class BatteryTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     checkpointInterval = 60 * 1000L,
                     checkpointDuration = 1000L,

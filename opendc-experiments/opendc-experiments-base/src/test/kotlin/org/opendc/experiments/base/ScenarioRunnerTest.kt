@@ -30,7 +30,7 @@ import org.opendc.compute.simulator.scheduler.filters.ComputeFilter
 import org.opendc.compute.simulator.scheduler.filters.RamFilter
 import org.opendc.compute.simulator.scheduler.filters.VCpuFilter
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 /**
@@ -55,7 +55,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -92,7 +92,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -100,7 +100,7 @@ class ScenarioRunnerTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(5 * 60 * 1000, 2000.0),
+                            TaskFragment(5 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -145,7 +145,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -153,7 +153,7 @@ class ScenarioRunnerTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -190,7 +190,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -198,7 +198,7 @@ class ScenarioRunnerTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(5 * 60 * 1000, 2000.0),
+                            TaskFragment(5 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     submissionTime = "1970-01-01T00:20",
@@ -236,7 +236,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,
@@ -284,7 +284,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -331,7 +331,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -377,7 +377,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -422,7 +422,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -431,7 +431,7 @@ class ScenarioRunnerTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -477,7 +477,7 @@ class ScenarioRunnerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 0.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 0.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 0,
@@ -486,7 +486,7 @@ class ScenarioRunnerTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,

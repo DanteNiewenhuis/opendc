@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import org.opendc.simulator.compute.workload.trace.scaling.NoDelayScaling
 import org.opendc.simulator.compute.workload.trace.scaling.PerfectScaling
 import java.util.ArrayList
@@ -48,8 +48,8 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0),
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = NoDelayScaling(),
@@ -62,8 +62,8 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0),
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = PerfectScaling(),
@@ -104,7 +104,7 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = NoDelayScaling(),
@@ -117,7 +117,7 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = PerfectScaling(),
@@ -155,9 +155,9 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 4000.0),
-                            TraceFragment(10 * 60 * 1000, 1500.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 1500.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = NoDelayScaling(),
@@ -170,9 +170,9 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 4000.0),
-                            TraceFragment(10 * 60 * 1000, 1500.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 1500.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = PerfectScaling(),
@@ -217,7 +217,7 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = NoDelayScaling(),
@@ -226,7 +226,7 @@ class FragmentScalingTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = NoDelayScaling(),
@@ -239,7 +239,7 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = PerfectScaling(),
@@ -248,7 +248,7 @@ class FragmentScalingTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = PerfectScaling(),
@@ -291,7 +291,7 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = NoDelayScaling(),
@@ -300,7 +300,7 @@ class FragmentScalingTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = NoDelayScaling(),
@@ -313,7 +313,7 @@ class FragmentScalingTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = PerfectScaling(),
@@ -322,7 +322,7 @@ class FragmentScalingTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
                     scalingPolicy = PerfectScaling(),

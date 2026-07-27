@@ -41,10 +41,10 @@ import org.slf4j.LoggerFactory;
 
 public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimTraceWorkload.class);
-    private LinkedList<TraceFragment> remainingFragments;
+    private LinkedList<TaskFragment> remainingFragments;
     private int fragmentIndex;
 
-    private TraceFragment currentFragment;
+    private TaskFragment currentFragment;
     private long startOfFragment;
 
     // The resources used by this workload and the edges to the components
@@ -71,7 +71,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     private double totalRemainingWork = 0.0;
 
     private final long checkpointDuration;
-    private final TraceWorkload snapshot;
+    private final TaskWorkload snapshot;
 
     private final ScalingPolicy scalingPolicy;
     private final int taskId;
@@ -84,7 +84,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         return now - this.startOfFragment;
     }
 
-    public TraceWorkload getSnapshot() {
+    public TaskWorkload getSnapshot() {
         return snapshot;
     }
 
@@ -115,7 +115,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     // Constructors
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public SimTraceWorkload(FlowSupplier supplier, TraceWorkload workload) {
+    public SimTraceWorkload(FlowSupplier supplier, TaskWorkload workload) {
         super(((FlowNode) supplier).getEngine());
 
         this.snapshot = workload;
@@ -135,7 +135,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
     }
 
     // Needed if workload not started by VM
-    public SimTraceWorkload(List<FlowSupplier> resourceSuppliers, TraceWorkload workload) {
+    public SimTraceWorkload(List<FlowSupplier> resourceSuppliers, TaskWorkload workload) {
         // same engine for all suppliers
         super(((FlowNode) resourceSuppliers.getFirst()).getEngine());
 
@@ -277,7 +277,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
      *
      * @return The next TraceFragment or null if there are no more fragments
      */
-    public TraceFragment getNextFragment() {
+    public TaskFragment getNextFragment() {
         if (this.remainingFragments.isEmpty()) {
             return null;
         }
@@ -293,7 +293,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
      * If no more fragments are left, stopWorkload is called.
      */
     private void startNextFragment() {
-        TraceFragment nextFragment = this.getNextFragment();
+        TaskFragment nextFragment = this.getNextFragment();
         if (nextFragment == null) {
             this.stopWorkload();
             return;
@@ -403,7 +403,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         // but with the remaining duration. Put the adjusted fragment at the front of the
         // remaining fragments and snapshot
         if (remainingDuration > 0) {
-            TraceFragment adjustedFragment = new TraceFragment(
+            TaskFragment adjustedFragment = new TaskFragment(
                     remainingDuration,
                     currentFragment.cpuUsage(),
                     currentFragment.gpuUsage(),
@@ -414,7 +414,7 @@ public class SimTraceWorkload extends SimWorkload implements FlowConsumer {
         }
 
         // Create a fragment for processing the snapshot process and add it to the front of the remaining fragments
-        TraceFragment snapshotFragment = new TraceFragment(
+        TaskFragment snapshotFragment = new TaskFragment(
                 this.checkpointDuration,
                 this.snapshot.getMaxCpuDemand(),
                 this.snapshot.getMaxGpuDemand(),

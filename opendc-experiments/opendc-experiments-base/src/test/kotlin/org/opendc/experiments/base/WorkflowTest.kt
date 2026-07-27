@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 /**
@@ -51,7 +51,7 @@ class WorkflowTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(),
@@ -61,7 +61,7 @@ class WorkflowTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -71,7 +71,7 @@ class WorkflowTest {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -81,7 +81,7 @@ class WorkflowTest {
                     id = 3,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(1, 2),
@@ -138,7 +138,7 @@ class WorkflowTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(),
@@ -148,7 +148,7 @@ class WorkflowTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -158,7 +158,7 @@ class WorkflowTest {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(5 * 60 * 1000, 1000.0),
+                            TaskFragment(5 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -168,7 +168,7 @@ class WorkflowTest {
                     id = 3,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(1, 2),
@@ -244,7 +244,7 @@ class WorkflowTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(),
@@ -254,7 +254,7 @@ class WorkflowTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -264,7 +264,7 @@ class WorkflowTest {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -274,7 +274,7 @@ class WorkflowTest {
                     id = 3,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(1, 2),
@@ -284,7 +284,7 @@ class WorkflowTest {
                     id = 5,
                     fragments =
                         arrayListOf(
-                            TraceFragment(40 * 60 * 1000, 1000.0),
+                            TaskFragment(40 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -359,7 +359,7 @@ class WorkflowTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(),
@@ -369,7 +369,7 @@ class WorkflowTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -379,7 +379,7 @@ class WorkflowTest {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -389,7 +389,7 @@ class WorkflowTest {
                     id = 3,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(1, 2),
@@ -399,7 +399,7 @@ class WorkflowTest {
                     id = 5,
                     fragments =
                         arrayListOf(
-                            TraceFragment(15 * 60 * 1000, 1000.0),
+                            TaskFragment(15 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -474,7 +474,7 @@ class WorkflowTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 10000.0),
+                            TaskFragment(10 * 60 * 1000, 10000.0),
                         ),
                     cpuCoreCount = 10,
                     parents = arrayListOf(),
@@ -484,7 +484,7 @@ class WorkflowTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -494,7 +494,7 @@ class WorkflowTest {
                     id = 2,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(0),
@@ -504,7 +504,7 @@ class WorkflowTest {
                     id = 3,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                     parents = arrayListOf(1, 2),
@@ -514,7 +514,7 @@ class WorkflowTest {
                     id = 5,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),

@@ -26,7 +26,7 @@ import org.opendc.common.units.DataSize
 import org.opendc.common.units.Frequency
 import org.opendc.common.units.TimeDelta
 import org.opendc.compute.topology.specs.ClusterSpec
-import org.opendc.sdk.model.checkpoint.CheckpointSpec
+import org.opendc.sdk.model.checkpoint.CheckpointModelSpec
 import org.opendc.sdk.model.experiment.ScenarioSpec
 import org.opendc.sdk.model.export.ExportSpec
 import org.opendc.sdk.model.failure.FailureModelSpec
@@ -41,12 +41,13 @@ import org.opendc.sdk.model.serialization.SdkJson
 import org.opendc.sdk.model.topology.TopologySpec
 import org.opendc.sdk.model.workload.InlineWorkloadSpec
 import org.opendc.sdk.model.workload.ScalingPolicySpec
-import org.opendc.sdk.model.workload.TaskFragmentSpec
 import org.opendc.sdk.model.workload.TaskSpec
+import org.opendc.sdk.model.workload.toTaskWorkload
 import org.opendc.sdk.runner.executor.runScenario
 import org.opendc.sdk.runner.factory.toClusterSpecs
 import org.opendc.sdk.runner.provision.FileSystemResourceProvisioner
-import org.opendc.sdk.runner.sink.MonitorSink
+import org.opendc.sdk.runner.sink.ParquetSink
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.nio.file.Path
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -72,12 +73,12 @@ internal fun createTopology(name: String): TopologySpec {
 /** Converts a [TopologySpec] to engine [ClusterSpec]s for topology-parsing assertions. */
 internal fun TopologySpec.toClusters(): List<ClusterSpec> = toClusterSpecs { provisioner.provision(it).path }
 
-/** Builds an SDK [TaskFragmentSpec] with durations in milliseconds and usages in MHz. */
+/** Builds an engine [TaskFragment] with durations in milliseconds and usages in MHz. */
 internal fun fragment(
     duration: Long,
     cpuUsage: Double,
     gpuUsage: Double = 0.0,
-): TaskFragmentSpec = TaskFragmentSpec(TimeDelta.ofMillis(duration), Frequency.ofMHz(cpuUsage), Frequency.ofMHz(gpuUsage))
+): TaskFragment = TaskFragment(duration, cpuUsage, gpuUsage, 0)
 
 /**
  * Builds an SDK [TaskSpec] reproducing the legacy `createTestTask`: per-core capacity is the peak
@@ -91,7 +92,7 @@ internal fun createTestTask(
     duration: Long = 0L,
     cpuCoreCount: Int = 1,
     gpuCoreCount: Int = 0,
-    fragments: List<TaskFragmentSpec>,
+    fragments: ArrayList<TaskFragment>,
     parents: Set<Int> = emptySet(),
     children: Set<Int> = emptySet(),
 ): TaskSpec {
@@ -102,11 +103,12 @@ internal fun createTestTask(
         submissionTime = TimeDelta.ofMillis(submitMs),
         duration = TimeDelta.ofMillis(duration),
         cpuCoreCount = cpuCoreCount,
-        cpuCapacity = Frequency.ofMHz(fragments.maxOf { it.cpuUsage.toMHz() }),
+        cpuCapacity = Frequency.ofMHz(fragments.maxOf { it.cpuUsage() }),
+        totalLoad = fragments.sumOf { it.cpuUsage() * (it.duration() / 3_600_000.0) },
         memory = DataSize.ofMiB(memCapacity),
-        fragments = fragments,
+        workload = fragments.toTaskWorkload(id),
         gpuCoreCount = gpuCoreCount,
-        gpuCapacity = Frequency.ofMHz(fragments.maxOfOrNull { it.gpuUsage.toMHz() } ?: 0.0),
+        gpuCapacity = Frequency.ofMHz(fragments.maxOfOrNull { it.gpuUsage() } ?: 0.0),
         gpuMemory = DataSize.ofBytes(0),
         deferrable = false,
         deadline = null,
@@ -125,19 +127,20 @@ internal fun runTest(
     workload: List<TaskSpec>,
     failureModel: FailureModelSpec = NoFailureSpec,
     allocationPolicy: AllocationPolicySpec = defaultPolicy,
-    checkpointModel: CheckpointSpec? = null,
+    checkpointModel: CheckpointModelSpec? = null,
     scalingPolicy: ScalingPolicySpec = ScalingPolicySpec.NoDelay,
 ): TestComputeMonitor {
-    val monitor = TestComputeMonitor()
+    val monitor = ParquetSink(Path.of("output"))
+//    val monitor = TestComputeMonitor()
     val scenario =
         ScenarioSpec(
             topology = topology,
             workload = InlineWorkloadSpec(workload, scalingPolicy),
             allocationPolicy = allocationPolicy,
-            exportModel = ExportSpec(exportInterval = TimeDelta.ofMin(1), printFrequency = null),
+            exportModel = ExportSpec(exportInterval = TimeDelta.ofHours(1), printFrequency = null),
             failureModel = failureModel,
             checkpointModel = checkpointModel,
         )
-    runScenario(scenario, "", 0, 0L, listOf(MonitorSink(monitor)), provisioner)
-    return monitor
+    runScenario(scenario, "", 0, 0L, listOf(monitor), provisioner)
+    return TestComputeMonitor()
 }

@@ -34,7 +34,7 @@ import org.opendc.compute.simulator.scheduler.filters.VGpuFilter
 import org.opendc.compute.simulator.scheduler.weights.VCpuWeigher
 import org.opendc.compute.simulator.scheduler.weights.VGpuWeigher
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 class SchedulerTest {
@@ -46,7 +46,7 @@ class SchedulerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -54,7 +54,7 @@ class SchedulerTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(5 * 60 * 1000, 2000.0),
+                            TaskFragment(5 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     submissionTime = "1970-01-01T00:20",
@@ -97,7 +97,7 @@ class SchedulerTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,
@@ -106,7 +106,7 @@ class SchedulerTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
                     gpuCoreCount = 1,

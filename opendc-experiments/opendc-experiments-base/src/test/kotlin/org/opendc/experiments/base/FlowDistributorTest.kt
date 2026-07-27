@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 /**
@@ -46,8 +46,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -82,8 +82,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 3000.0),
-                            TraceFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -118,8 +118,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -154,8 +154,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 4000.0),
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -190,8 +190,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 4000.0),
-                            TraceFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 4000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -226,8 +226,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -235,8 +235,8 @@ class FlowDistributorTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 3000.0),
-                            TraceFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 3000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -275,8 +275,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 6000.0),
-                            TraceFragment(10 * 60 * 1000, 5000.0),
+                            TaskFragment(10 * 60 * 1000, 6000.0),
+                            TaskFragment(10 * 60 * 1000, 5000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -284,8 +284,8 @@ class FlowDistributorTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 5000.0),
-                            TraceFragment(10 * 60 * 1000, 6000.0),
+                            TaskFragment(10 * 60 * 1000, 5000.0),
+                            TaskFragment(10 * 60 * 1000, 6000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -324,8 +324,8 @@ class FlowDistributorTest {
                     submissionTime = "2024-02-01T10:00",
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -334,7 +334,7 @@ class FlowDistributorTest {
                     submissionTime = "2024-02-01T10:05",
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -384,7 +384,7 @@ class FlowDistributorTest {
                     submissionTime = "2024-02-01T10:00",
                     fragments =
                         arrayListOf(
-                            TraceFragment(20 * 60 * 1000, 3000.0),
+                            TaskFragment(20 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -393,7 +393,7 @@ class FlowDistributorTest {
                     submissionTime = "2024-02-01T10:05",
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1500.0),
+                            TaskFragment(10 * 60 * 1000, 1500.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -439,10 +439,10 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(5 * 60 * 1000, 1000.0),
-                            TraceFragment(5 * 60 * 1000, 1500.0),
-                            TraceFragment(5 * 60 * 1000, 2500.0),
-                            TraceFragment(5 * 60 * 1000, 1000.0),
+                            TaskFragment(5 * 60 * 1000, 1000.0),
+                            TaskFragment(5 * 60 * 1000, 1500.0),
+                            TaskFragment(5 * 60 * 1000, 2500.0),
+                            TaskFragment(5 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -450,7 +450,7 @@ class FlowDistributorTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(20 * 60 * 1000, 3000.0),
+                            TaskFragment(20 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -501,8 +501,8 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        arrayListOf<TraceFragment>().apply {
-                            repeat(1) { this.add(TraceFragment(10 * 60 * 1000, 3000.0)) }
+                        arrayListOf<TaskFragment>().apply {
+                            repeat(1) { this.add(TaskFragment(10 * 60 * 1000, 3000.0)) }
                         },
                     cpuCoreCount = 1,
                 ),
@@ -530,8 +530,8 @@ class FlowDistributorTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        arrayListOf<TraceFragment>().apply {
-                            repeat(1000) { this.add(TraceFragment(10 * 60 * 1000, 2000.0)) }
+                        arrayListOf<TaskFragment>().apply {
+                            repeat(1000) { this.add(TaskFragment(10 * 60 * 1000, 2000.0)) }
                         },
                     cpuCoreCount = 1,
                 ),
@@ -563,7 +563,7 @@ class FlowDistributorTest {
                         createTestTask(
                             id = 0,
                             fragments =
-                                arrayListOf(TraceFragment(10 * 60 * 1000, 2000.0)),
+                                arrayListOf(TaskFragment(10 * 60 * 1000, 2000.0)),
                             cpuCoreCount = 1,
                         ),
                     )
@@ -591,8 +591,8 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
-                            TraceFragment(10 * 60 * 1000, 0.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -641,7 +641,7 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -690,7 +690,7 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 2000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 2000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -739,7 +739,7 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 2000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 2000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -788,7 +788,7 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -796,7 +796,7 @@ class FlowDistributorTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -857,7 +857,7 @@ class FlowDistributorTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 1000.0, 0.0),
+                            TaskFragment(10 * 60 * 1000, 1000.0, 0.0),
                         ),
                     cpuCoreCount = 1,
                 ),
@@ -865,7 +865,7 @@ class FlowDistributorTest {
                     id = 1,
                     fragments =
                         arrayListOf(
-                            TraceFragment(10 * 60 * 1000, 0.0, 1000.0),
+                            TaskFragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
                     gpuCoreCount = 1,

@@ -34,7 +34,7 @@ plugins {
 
 jmh {
     resultFormat.set("JSON")
-    val jmhIncludes = findProperty("jmhIncludes") as? String ?: ".*WorkloadNoExportBenchmark.*"
+    val jmhIncludes = findProperty("jmhIncludes") as? String ?: ".*CIBenchmark.*"
     includes.add(jmhIncludes)
 }
 

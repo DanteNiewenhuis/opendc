@@ -28,9 +28,10 @@ import org.opendc.common.units.TimeDelta
 import org.opendc.sdk.model.resource.ResourceReference
 import org.opendc.sdk.model.workload.InlineWorkloadSpec
 import org.opendc.sdk.model.workload.ScalingPolicySpec
-import org.opendc.sdk.model.workload.TaskFragmentSpec
 import org.opendc.sdk.model.workload.TaskSpec
 import org.opendc.sdk.model.workload.TraceWorkloadSpec
+import org.opendc.sdk.model.workload.toTaskWorkload
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 
 /**
  * Builds a [TraceWorkloadSpec] backed by an external trace resource.
@@ -73,15 +74,16 @@ public class InlineWorkloadBuilder {
         gpuMemory: DataSize = DataSize.ofBytes(0),
         deferrable: Boolean = false,
         deadline: TimeDelta? = null,
-        parents: Set<Int> = emptySet(),
-        children: Set<Int> = emptySet(),
+        parents: Set<Int>? = null,
+        children: Set<Int>? = null,
         block: TaskBuilder.() -> Unit,
     ) {
         val fragments = TaskBuilder().apply(block).build()
+        val totalLoad = fragments.sumOf { it.cpuUsage() * (it.duration() / 3_600_000.0) }
         tasks +=
             TaskSpec(
-                id, name, submissionTime, duration, cpuCoreCount, cpuCapacity, memory, fragments,
-                gpuCoreCount, gpuCapacity, gpuMemory, deferrable, deadline, parents, children,
+                id, name, submissionTime, duration, cpuCoreCount, cpuCapacity, totalLoad, memory, gpuCoreCount,
+                gpuCapacity, gpuMemory, fragments.toTaskWorkload(id), deferrable, deadline, parents, children,
             )
     }
 
@@ -91,7 +93,7 @@ public class InlineWorkloadBuilder {
 /** Collects the execution fragments of a [TaskSpec]. */
 @SdkDsl
 public class TaskBuilder {
-    private val fragments = mutableListOf<TaskFragmentSpec>()
+    private val fragments = ArrayList<TaskFragment>()
 
     public fun fragment(
         duration: TimeDelta,
@@ -99,8 +101,8 @@ public class TaskBuilder {
         gpuUsage: Frequency = Frequency.ofMHz(0),
         gpuMemory: DataSize = DataSize.ofBytes(0),
     ) {
-        fragments += TaskFragmentSpec(duration, cpuUsage, gpuUsage, gpuMemory)
+        fragments += TaskFragment(duration.toMsLong(), cpuUsage.toMHz(), gpuUsage.toMHz(), gpuMemory.toMiB().toInt())
     }
 
-    internal fun build(): List<TaskFragmentSpec> = fragments.toList()
+    internal fun build(): ArrayList<TaskFragment> = fragments
 }

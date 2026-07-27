@@ -25,6 +25,8 @@ package org.opendc.sdk.runner.base
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.opendc.sdk.model.generators.generateTopology
+import org.opendc.sdk.model.generators.generateWorkload
 import org.opendc.sdk.model.scheduler.PrefabAllocationPolicySpec
 import org.opendc.sdk.model.scheduler.SchedulerNameSpec
 import org.opendc.sdk.runner.base.harness.createTestTask
@@ -37,9 +39,20 @@ import org.opendc.sdk.runner.base.harness.runTest
  * driving the SDK runner and asserting the identical values.
  */
 class ScenarioRunnerTest {
+
+    @Test
+    fun newTest(){
+        val workload = generateWorkload(1_000_000)
+
+        val topology = generateTopology(100)
+        val monitor = runTest(topology, workload)
+
+        println(monitor)
+    }
+
     @Test
     fun testScenario1() {
-        val workload = listOf(createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1))
+        val workload = listOf(createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1))
         val topology = createTopology("single_1_2000.json")
 
         val monitor = runTest(topology, workload)
@@ -58,8 +71,8 @@ class ScenarioRunnerTest {
     fun testScenario2() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
-                createTestTask(id = 1, fragments = listOf(fragment(5 * 60 * 1000, 2000.0)), cpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
+                createTestTask(id = 1, fragments = arrayListOf(fragment(5 * 60 * 1000, 2000.0)), cpuCoreCount = 1),
             )
         val topology = createTopology("single_1_2000.json")
 
@@ -79,8 +92,8 @@ class ScenarioRunnerTest {
     fun testScenario3() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
-                createTestTask(id = 1, fragments = listOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
+                createTestTask(id = 1, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
             )
         val topology = createTopology("single_2_2000.json")
 
@@ -100,10 +113,10 @@ class ScenarioRunnerTest {
     fun testScenario4() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0)), cpuCoreCount = 1),
                 createTestTask(
                     id = 1,
-                    fragments = listOf(fragment(5 * 60 * 1000, 2000.0)),
+                    fragments = arrayListOf(fragment(5 * 60 * 1000, 2000.0)),
                     cpuCoreCount = 1,
                     submissionTime = "1970-01-01T00:20",
                 ),
@@ -130,7 +143,7 @@ class ScenarioRunnerTest {
     fun testScenario5() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 0.0, 1000.0)), cpuCoreCount = 0, gpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 0.0, 1000.0)), cpuCoreCount = 0, gpuCoreCount = 1),
             )
         val topology = createTopology("Gpus/single_gpu_no_vendor_no_memory.json")
 
@@ -162,7 +175,7 @@ class ScenarioRunnerTest {
     fun testScenario6() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
             )
         val topology = createTopology("Gpus/single_gpu_no_vendor_no_memory.json")
 
@@ -194,7 +207,7 @@ class ScenarioRunnerTest {
     fun testScenario7() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0, 2000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0, 2000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
             )
         val topology = createTopology("Gpus/single_gpu_no_vendor_no_memory.json")
 
@@ -226,7 +239,7 @@ class ScenarioRunnerTest {
     fun testScenario8() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 2000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 2000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
             )
         val topology = createTopology("Gpus/single_gpu_no_vendor_no_memory.json")
 
@@ -258,8 +271,8 @@ class ScenarioRunnerTest {
     fun testScenario9() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
-                createTestTask(id = 1, fragments = listOf(fragment(10 * 60 * 1000, 1000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
+                createTestTask(id = 1, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0, 1000.0)), cpuCoreCount = 1, gpuCoreCount = 1),
             )
         val topology = createTopology("Gpus/single_gpu_no_vendor_no_memory.json")
 
@@ -291,8 +304,8 @@ class ScenarioRunnerTest {
     fun testScenario10() {
         val workload =
             listOf(
-                createTestTask(id = 0, fragments = listOf(fragment(10 * 60 * 1000, 1000.0, 0.0)), cpuCoreCount = 1, gpuCoreCount = 0),
-                createTestTask(id = 1, fragments = listOf(fragment(10 * 60 * 1000, 0.0, 1000.0)), cpuCoreCount = 0, gpuCoreCount = 1),
+                createTestTask(id = 0, fragments = arrayListOf(fragment(10 * 60 * 1000, 1000.0, 0.0)), cpuCoreCount = 1, gpuCoreCount = 0),
+                createTestTask(id = 1, fragments = arrayListOf(fragment(10 * 60 * 1000, 0.0, 1000.0)), cpuCoreCount = 0, gpuCoreCount = 1),
             )
         val topology = createTopology("Gpus/single_gpu_no_vendor_no_memory.json")
 

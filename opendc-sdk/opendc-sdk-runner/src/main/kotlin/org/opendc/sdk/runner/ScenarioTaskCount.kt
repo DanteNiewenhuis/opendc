@@ -28,7 +28,7 @@ import org.opendc.sdk.model.experiment.expand
 import org.opendc.sdk.model.resource.ResourceProvisioner
 import org.opendc.sdk.model.workload.WorkloadSpec
 import org.opendc.sdk.runner.executor.ResourceScope
-import org.opendc.sdk.runner.factory.toServiceTasks
+import org.opendc.sdk.runner.factory.getTasks
 
 /**
  * How many tasks a single run of [scenario] will submit, resolved before any simulation runs.
@@ -66,7 +66,7 @@ public fun ExperimentSpec.planTaskCounts(resourceProvisioner: ResourceProvisione
 public fun ScenarioSpec.countTasks(resourceProvisioner: ResourceProvisioner): Int = ResourceScope(resourceProvisioner).use(::countTasks)
 
 internal fun ScenarioSpec.countTasks(resourceScope: ResourceScope): Int =
-    workload.toServiceTasks(
+    workload.getTasks(
         checkpointModel,
         resourceScope::resolve,
     ).size

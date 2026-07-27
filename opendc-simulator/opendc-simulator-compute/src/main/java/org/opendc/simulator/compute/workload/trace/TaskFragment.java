@@ -24,17 +24,17 @@ package org.opendc.simulator.compute.workload.trace;
 
 import org.opendc.common.ResourceType;
 
-public record TraceFragment(long duration, double cpuUsage, double gpuUsage, int gpuMemoryUsage) {
+public record TaskFragment(long duration, double cpuUsage, double gpuUsage, int gpuMemoryUsage) {
 
-    public TraceFragment(long start, long duration, double cpuUsage) {
+    public TaskFragment(long start, long duration, double cpuUsage) {
         this(duration, cpuUsage, 0.0, 0);
     }
 
-    public TraceFragment(long duration, double cpuUsage) {
+    public TaskFragment(long duration, double cpuUsage) {
         this(duration, cpuUsage, 0.0, 0);
     }
 
-    public TraceFragment(long duration, double cpuUsage, double gpuUsage) {
+    public TaskFragment(long duration, double cpuUsage, double gpuUsage) {
         this(duration, cpuUsage, gpuUsage, 0);
     }
 

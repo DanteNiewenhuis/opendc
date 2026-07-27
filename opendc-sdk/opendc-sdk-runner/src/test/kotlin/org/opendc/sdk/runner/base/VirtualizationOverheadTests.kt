@@ -120,7 +120,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -146,7 +146,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -174,7 +174,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -202,7 +202,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -215,7 +215,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
@@ -224,7 +224,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
@@ -237,7 +237,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
@@ -246,7 +246,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,
@@ -255,7 +255,7 @@ class VirtualizationOverheadTests {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 0.0, 1000.0),
                         ),
                     cpuCoreCount = 0,

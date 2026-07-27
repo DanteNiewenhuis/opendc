@@ -48,7 +48,7 @@ class CarbonTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(120 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
@@ -95,7 +95,7 @@ class CarbonTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(40 * 60 * 1000, 1000.0),
                             fragment(40 * 60 * 1000, 2000.0),
                             fragment(40 * 60 * 1000, 1000.0),
@@ -164,7 +164,7 @@ class CarbonTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(60 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",

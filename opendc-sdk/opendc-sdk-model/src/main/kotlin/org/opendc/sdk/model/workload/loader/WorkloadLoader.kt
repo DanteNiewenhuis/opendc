@@ -20,41 +20,47 @@
  * SOFTWARE.
  */
 
-package org.opendc.compute.workload
+package org.opendc.sdk.model.workload.loader
+
 import mu.KotlinLogging
-import org.opendc.compute.simulator.service.ServiceTask
+import org.opendc.common.units.TimeDelta
+import org.opendc.sdk.model.workload.TaskSpec
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
-@Deprecated("Replaced by the WorkloadLoader in opendc-sdk-model")
 public abstract class WorkloadLoader(private val submissionTime: String? = null) {
     private val logger = KotlinLogging.logger {}
 
-    public fun reScheduleTasks(workload: List<ServiceTask>) {
+    /**
+     * Shifts every task in [workload] so the earliest submission time becomes [submissionTime],
+     * preserving the relative offsets (including deadlines) between tasks. Returns [workload]
+     * unchanged when no [submissionTime] was configured.
+     */
+    public fun reScheduleTasks(workload: List<TaskSpec>): List<TaskSpec> {
         if (submissionTime == null) {
-            return
+            return workload
         }
 
-        val workloadSubmissionTime = workload.minOf({ it.submittedAt })
+        val workloadSubmissionTime = workload.minOf { it.submissionTime.toMsLong() }
         val submissionTimeLong = LocalDateTime.parse(submissionTime).toInstant(ZoneOffset.UTC).toEpochMilli()
 
         val timeShift = submissionTimeLong - workloadSubmissionTime
 
-        for (task in workload) {
-            task.submittedAt += timeShift
-            task.deadline = if (task.deadline == -1L) -1L else task.deadline + timeShift
+        return workload.map { task ->
+            task.copy(
+                submissionTime = TimeDelta.ofMillis(task.submissionTime.toMsLong() + timeShift),
+                deadline = task.deadline?.let { TimeDelta.ofMillis(it.toMsLong() + timeShift) },
+            )
         }
     }
 
-    public abstract fun load(): List<ServiceTask>
+    public abstract fun load(): List<TaskSpec>
 
     /**
      * Load the workload at sample tasks until a fraction of the workload is loaded
      */
-    public fun sampleByLoad(fraction: Double): List<ServiceTask> {
-        val workload = this.load()
-
-        reScheduleTasks(workload)
+    public fun sampleByLoad(fraction: Double): List<TaskSpec> {
+        val workload = reScheduleTasks(this.load())
 
         if (fraction >= 1.0) {
             return workload
@@ -64,9 +70,9 @@ public abstract class WorkloadLoader(private val submissionTime: String? = null)
             throw Error("The fraction of tasks to load cannot be 0.0 or lower")
         }
 
-        val res = mutableListOf<ServiceTask>()
+        val res = mutableListOf<TaskSpec>()
 
-        val totalLoad = workload.sumOf { it.totalCPULoad }
+        val totalLoad = workload.sumOf { it.totalLoad }
         val desiredLoad = totalLoad * fraction
         var currentLoad = 0.0
 
@@ -74,11 +80,11 @@ public abstract class WorkloadLoader(private val submissionTime: String? = null)
             val entry = workload.random()
             res += entry
 
-            currentLoad += entry.totalCPULoad
+            currentLoad += entry.totalLoad
         }
 
         logger.info { "Sampled ${workload.size} VMs (fraction $fraction) into subset of ${res.size} VMs" }
 
-        return res.sortedBy { it.submittedAt }
+        return res.sortedBy { it.submissionTime.toMsLong() }
     }
 }

@@ -42,7 +42,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 2000.0),
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
@@ -55,7 +55,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 2000.0),
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
@@ -88,7 +88,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
@@ -100,7 +100,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
@@ -128,7 +128,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                             fragment(10 * 60 * 1000, 4000.0),
                             fragment(10 * 60 * 1000, 1500.0),
@@ -142,7 +142,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                             fragment(10 * 60 * 1000, 4000.0),
                             fragment(10 * 60 * 1000, 1500.0),
@@ -182,7 +182,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -190,7 +190,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
@@ -202,7 +202,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -210,7 +210,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 3000.0),
                         ),
                     cpuCoreCount = 1,
@@ -242,7 +242,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
@@ -250,7 +250,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,
@@ -262,7 +262,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 2000.0),
                         ),
                     cpuCoreCount = 1,
@@ -270,7 +270,7 @@ class FragmentScalingTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 4000.0),
                         ),
                     cpuCoreCount = 1,

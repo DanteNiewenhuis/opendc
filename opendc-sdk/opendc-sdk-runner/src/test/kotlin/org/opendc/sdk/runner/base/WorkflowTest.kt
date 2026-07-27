@@ -41,7 +41,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -51,7 +51,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -61,7 +61,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -71,7 +71,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 3,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -118,7 +118,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -128,7 +128,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -138,7 +138,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(5 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -148,7 +148,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 3,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -215,7 +215,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -225,7 +225,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -235,7 +235,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -245,7 +245,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 3,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -255,7 +255,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 5,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(40 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -320,7 +320,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -330,7 +330,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -340,7 +340,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -350,7 +350,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 3,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -360,7 +360,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 5,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(15 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -425,7 +425,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 0,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 10000.0),
                         ),
                     cpuCoreCount = 10,
@@ -435,7 +435,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 1,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -445,7 +445,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 2,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -455,7 +455,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 3,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,
@@ -465,7 +465,7 @@ class WorkflowTest {
                 createTestTask(
                     id = 5,
                     fragments =
-                        listOf(
+                        arrayListOf(
                             fragment(10 * 60 * 1000, 1000.0),
                         ),
                     cpuCoreCount = 1,

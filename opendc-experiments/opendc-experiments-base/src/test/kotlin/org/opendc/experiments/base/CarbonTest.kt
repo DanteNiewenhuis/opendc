@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
 import org.opendc.compute.simulator.service.ServiceTask
-import org.opendc.simulator.compute.workload.trace.TraceFragment
+import org.opendc.simulator.compute.workload.trace.TaskFragment
 import java.util.ArrayList
 
 /**
@@ -49,7 +49,7 @@ class CarbonTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(120 * 60 * 1000, 1000.0),
+                            TaskFragment(120 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -96,14 +96,14 @@ class CarbonTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(40 * 60 * 1000, 1000.0),
-                            TraceFragment(40 * 60 * 1000, 2000.0),
-                            TraceFragment(40 * 60 * 1000, 1000.0),
-                            TraceFragment(40 * 60 * 1000, 2000.0),
-                            TraceFragment(40 * 60 * 1000, 1000.0),
-                            TraceFragment(40 * 60 * 1000, 2000.0),
-                            TraceFragment(40 * 60 * 1000, 1000.0),
-                            TraceFragment(40 * 60 * 1000, 2000.0),
+                            TaskFragment(40 * 60 * 1000, 1000.0),
+                            TaskFragment(40 * 60 * 1000, 2000.0),
+                            TaskFragment(40 * 60 * 1000, 1000.0),
+                            TaskFragment(40 * 60 * 1000, 2000.0),
+                            TaskFragment(40 * 60 * 1000, 1000.0),
+                            TaskFragment(40 * 60 * 1000, 2000.0),
+                            TaskFragment(40 * 60 * 1000, 1000.0),
+                            TaskFragment(40 * 60 * 1000, 2000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),
@@ -165,7 +165,7 @@ class CarbonTest {
                     id = 0,
                     fragments =
                         arrayListOf(
-                            TraceFragment(60 * 60 * 1000, 1000.0),
+                            TaskFragment(60 * 60 * 1000, 1000.0),
                         ),
                     submissionTime = "2022-01-01T00:00",
                 ),

@@ -29,6 +29,7 @@
                 "duration": "30 minutes",
                 "cpuCoreCount": 4,
                 "cpuCapacity": "2.4 GHz",
+                "totalLoad": 800.0,
                 "memory": "8 GiB",
                 "fragments": [
                     {
@@ -48,6 +49,7 @@
                 "duration": "15 minutes",
                 "cpuCoreCount": 8,
                 "cpuCapacity": "3.0 GHz",
+                "totalLoad": 750.0,
                 "memory": "16 GiB",
                 "deferrable": true,
                 "deadline": "2 hours",

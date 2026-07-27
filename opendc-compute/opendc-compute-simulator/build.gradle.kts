@@ -31,6 +31,7 @@ plugins {
 dependencies {
     api(projects.opendcSimulator.opendcSimulatorCompute)
     api(projects.opendcTrace.opendcTraceParquet)
+    api(projects.opendcCompute.opendcComputeApi)
     api(libs.commons.math3)
     implementation(projects.opendcCommon)
     implementation(libs.kotlin.logging)
