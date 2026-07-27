@@ -78,7 +78,7 @@ tasks.named("jmh") {
 }
 
 tasks.test {
-    maxHeapSize = "2g"
+    maxHeapSize = "10g"
     jvmArgs(
         "-Xlog:gc*:file=build/gc.log:time,uptime,level,tags:filecount=5,filesize=50m",
         // optional but useful alongside gc logging:

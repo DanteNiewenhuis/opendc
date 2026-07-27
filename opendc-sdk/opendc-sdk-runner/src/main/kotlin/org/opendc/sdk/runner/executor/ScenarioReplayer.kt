@@ -74,13 +74,7 @@ internal suspend fun ComputeService.replay(
             engineFailure?.start()
             var simulationOffset = Long.MIN_VALUE
 
-            var i = 0
             while (queue.isNotEmpty()) {
-                if (i == 999_999) {
-                    println("Tasks 999_999")
-                    Thread.sleep(10000)
-                }
-                i ++;
 
                 val task = queue.removeFirst()
 
@@ -101,6 +95,10 @@ internal suspend fun ComputeService.replay(
 //                    watcher.await()
 //                }
             }
+
+            println("Created ServiceTask")
+            Thread.sleep(10000)
+
         }
         yield()
     } finally {
