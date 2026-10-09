@@ -27,36 +27,180 @@ import org.apache.parquet.schema.MessageType
 import org.apache.parquet.schema.PrimitiveType
 import org.apache.parquet.schema.Types
 
-private val FRAGMENT_SCHEMA_v1: MessageType =
+private val FRAGMENT_SCHEMA_v1: MessageType = Types.buildMessage()
+    .addFields(
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.BINARY)
+            .`as`(LogicalTypeAnnotation.stringType())
+            .named("id"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
+            .named("time"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .named("duration"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT32)
+            .named("cores"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+            .named("cpuUsage"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+            .named("flops")
+    )
+    .named("resource_state")
+
+private val FRAGMENT_SCHEMA_v2: MessageType = Types.buildMessage()
+    .addFields(
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.BINARY)
+            .`as`(LogicalTypeAnnotation.stringType())
+            .named("id"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
+            .named("timestamp"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .named("duration"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT32)
+            .named("cpu_count"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+            .named("cpu_usage")
+    )
+    .named("resource_state")
+
+private val FRAGMENT_SCHEMA_v3: MessageType = Types.buildMessage()
+    .addFields(
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.BINARY)
+            .`as`(LogicalTypeAnnotation.stringType())
+            .named("id"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
+            .named("timestamp"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .named("duration"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT32)
+            .named("cpu_count"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+            .named("cpu_usage"),
+    )
+    .named("resource_state")
+
+private val FRAGMENT_SCHEMA_v4: MessageType = Types.buildMessage()
+    .addFields(
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.BINARY)
+            .`as`(LogicalTypeAnnotation.stringType())
+            .named("id"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
+            .named("timestamp"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .named("duration"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT32)
+            .named("cpu_count"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+            .named("cpu_usage"),
+    )
+    .named("resource_state")
+
+private val FRAGMENT_SCHEMA_v5: MessageType = Types.buildMessage()
+    .addFields(
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.BINARY)
+            .`as`(LogicalTypeAnnotation.stringType())
+            .named("id"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
+            .named("timestamp"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT64)
+            .named("duration"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.INT32)
+            .named("cpu_count"),
+        Types
+            .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+            .named("cpu_usage"),
+        Types
+            .optional(PrimitiveType.PrimitiveTypeName.INT32)
+            .named("gpu_count"),
+        Types
+            .optional(PrimitiveType.PrimitiveTypeName.DOUBLE)
+            .named("gpu_usage"),
+    )
+    .named("resource_state")
+
+private val FRAGMENT_SCHEMA_v5_1: MessageType =
     Types.buildMessage()
         .addFields(
             Types
-                .required(PrimitiveType.PrimitiveTypeName.BINARY)
-                .`as`(LogicalTypeAnnotation.stringType())
+                .required(PrimitiveType.PrimitiveTypeName.INT32)
                 .named("id"),
-            Types
-                .required(PrimitiveType.PrimitiveTypeName.INT64)
-                .`as`(LogicalTypeAnnotation.timestampType(true, LogicalTypeAnnotation.TimeUnit.MILLIS))
-                .named("timestamp"),
             Types
                 .required(PrimitiveType.PrimitiveTypeName.INT64)
                 .named("duration"),
             Types
-                .required(PrimitiveType.PrimitiveTypeName.INT32)
-                .named("cpu_count"),
-            Types
                 .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
                 .named("cpu_usage"),
-            Types
-                .optional(PrimitiveType.PrimitiveTypeName.INT32)
-                .named("gpu_count"),
             Types
                 .optional(PrimitiveType.PrimitiveTypeName.DOUBLE)
                 .named("gpu_usage"),
         )
         .named("resource_state")
 
-private val FRAGMENT_SCHEMA_v2: MessageType =
+private val FRAGMENT_SCHEMA_v6: MessageType =
+    Types.buildMessage()
+        .addFields(
+            Types
+                .required(PrimitiveType.PrimitiveTypeName.INT32)
+                .named("id"),
+            Types
+                .required(PrimitiveType.PrimitiveTypeName.INT64)
+                .named("duration"),
+            Types
+                .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+                .named("cpu_usage"),
+            Types
+                .optional(PrimitiveType.PrimitiveTypeName.DOUBLE)
+                .named("gpu_usage"),
+        )
+        .named("resource_state")
+
+private val FRAGMENT_SCHEMA_v6_1: MessageType =
+    Types.buildMessage()
+        .addFields(
+            Types
+                .required(PrimitiveType.PrimitiveTypeName.INT32)
+                .named("id"),
+            Types
+                .required(PrimitiveType.PrimitiveTypeName.INT64)
+                .named("duration"),
+            Types
+                .required(PrimitiveType.PrimitiveTypeName.DOUBLE)
+                .named("cpu_usage"),
+            Types
+                .optional(PrimitiveType.PrimitiveTypeName.DOUBLE)
+                .named("gpu_usage"),
+        )
+        .named("resource_state")
+
+private val FRAGMENT_SCHEMA_v6_2: MessageType =
     Types.buildMessage()
         .addFields(
             Types
@@ -77,4 +221,4 @@ private val FRAGMENT_SCHEMA_v2: MessageType =
 /**
  * Parquet read schema for the "resource states" table in the trace.
  */
-public val FRAGMENT_SCHEMA: MessageType = FRAGMENT_SCHEMA_v2
+public val FRAGMENT_SCHEMA: MessageType = FRAGMENT_SCHEMA_v6_2
